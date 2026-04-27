@@ -1,4 +1,3 @@
-import { Button } from "./Button";
 import styles from "./Pagination.module.css";
 
 type PaginationProps = {
@@ -8,17 +7,43 @@ type PaginationProps = {
 };
 
 export function Pagination({ page, totalPages, onChange }: PaginationProps) {
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+
   return (
-    <div className={styles.pagination} aria-label="페이지네이션">
-      <Button disabled={page === 1} onClick={() => onChange(page - 1)}>
-        이전
-      </Button>
-      <span>
-        {page} / {totalPages}
-      </span>
-      <Button disabled={page === totalPages} onClick={() => onChange(page + 1)}>
-        다음
-      </Button>
-    </div>
+    <nav className={styles.pagination} aria-label="페이지네이션">
+      <button
+        aria-label="이전 페이지"
+        className={styles.pageButton}
+        disabled={page === 1}
+        type="button"
+        onClick={() => onChange(page - 1)}
+      >
+        ‹
+      </button>
+      {pages.map((pageNumber) => (
+        <button
+          aria-current={pageNumber === page ? "page" : undefined}
+          className={
+            pageNumber === page
+              ? `${styles.pageButton} ${styles.active}`
+              : styles.pageButton
+          }
+          key={pageNumber}
+          type="button"
+          onClick={() => onChange(pageNumber)}
+        >
+          {pageNumber}
+        </button>
+      ))}
+      <button
+        aria-label="다음 페이지"
+        className={styles.pageButton}
+        disabled={page === totalPages}
+        type="button"
+        onClick={() => onChange(page + 1)}
+      >
+        ›
+      </button>
+    </nav>
   );
 }

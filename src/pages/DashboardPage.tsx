@@ -30,7 +30,8 @@ import type {
   SelectableFilter,
   ServiceName,
 } from "../types/issue";
-import { formatPercent } from "../utils/formatters";
+import { usePagination } from "../hooks/usePagination";
+import { createJiraUrl, formatDate, formatPercent } from "../utils/formatters";
 import {
   DEFAULT_FILTERS,
   filterIssues,
@@ -43,9 +44,10 @@ import {
   getServiceStatus,
 } from "../utils/issueMetrics";
 import { KpiCard } from "../components/dashboard/KpiCard";
-import { IssueTable } from "../components/tables/IssueTable";
 import { Button } from "../components/ui/Button";
+import { Pagination } from "../components/ui/Pagination";
 import { SectionCard } from "../components/ui/SectionCard";
+import { StatusBadge } from "../components/ui/StatusBadge";
 import styles from "./DashboardPage.module.css";
 
 const reasonColors = ["#1f6feb", "#12b76a", "#f79009", "#f04438", "#667085"];
@@ -83,6 +85,7 @@ export function DashboardPage() {
     () => getNotIssueReasonStatus(filteredIssues),
     [filteredIssues],
   );
+  const detailPagination = usePagination(filteredIssues, 5);
 
   const periodSummary = `${selectedPeriod.start.replaceAll("-", ".")} - ${selectedPeriod.end.replaceAll("-", ".")}`;
   const currentSummary = `현재 조회: 전체 기간 · ${filters.serviceName} 서비스 · ${filters.platform} 플랫폼`;
@@ -365,9 +368,73 @@ export function DashboardPage() {
         </SectionCard>
       </div>
 
-      <SectionCard title="상세 데이터">
-        <IssueTable items={filteredIssues} />
-      </SectionCard>
+      <section className={styles.detailPanel}>
+        <div className={styles.detailHeader}>
+          <h2>상세 데이터</h2>
+          <span>
+            총 <strong>{filteredIssues.length}</strong>건
+          </span>
+        </div>
+        <div className={styles.detailTableWrap}>
+          <table className={styles.detailTable}>
+            <thead>
+              <tr>
+                <th>등록일</th>
+                <th>작성자</th>
+                <th>서비스</th>
+                <th>플랫폼</th>
+                <th>실행 경로</th>
+                <th>이슈 여부</th>
+                <th>수정 여부</th>
+                <th>지라 번호</th>
+              </tr>
+            </thead>
+            <tbody>
+              {detailPagination.paginatedItems.length > 0 ? (
+                detailPagination.paginatedItems.map((issue) => (
+                  <tr key={issue.id}>
+                    <td>{formatDate(issue.registeredAt)}</td>
+                    <td>{issue.authorName}</td>
+                    <td>{issue.serviceName}</td>
+                    <td>{issue.platform}</td>
+                    <td>{issue.path}</td>
+                    <td>
+                      <StatusBadge value={issue.issueStatus} />
+                    </td>
+                    <td>
+                      <StatusBadge value={issue.fixStatus} />
+                    </td>
+                    <td>
+                      {issue.jiraKey ? (
+                        <a
+                          href={createJiraUrl(issue.jiraKey)}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          {issue.jiraKey}
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className={styles.empty} colSpan={8}>
+                    표시할 데이터가 없습니다.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <Pagination
+          page={detailPagination.page}
+          totalPages={detailPagination.totalPages}
+          onChange={detailPagination.goToPage}
+        />
+      </section>
     </>
   );
 }
