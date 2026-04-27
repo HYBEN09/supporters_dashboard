@@ -49,7 +49,7 @@ export const ISSUE_FORM_PLATFORM_OPTIONS = [
   "Mac",
 ] as const;
 
-export const ISSUE_STATUS_OPTIONS = ["이슈", "이슈 아님"] as const;
+export const ISSUE_STATUS_OPTIONS = ["이슈", "이슈 아님", "보류"] as const;
 
 export const FIX_STATUS_OPTIONS = ["수정 필요", "수정 완료"] as const;
 

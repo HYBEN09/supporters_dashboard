@@ -17,7 +17,7 @@ export type ServiceName =
 
 export type Platform = "Web" | "iOS" | "Android" | IssueFormPlatform;
 
-export type IssueStatus = "이슈" | "이슈 아님";
+export type IssueStatus = "이슈" | "이슈 아님" | "보류";
 
 export type FixStatus = "수정 필요" | "수정 완료";
 
@@ -57,7 +57,6 @@ export type IssueFormValues = {
   authorName: string;
   serviceName: ServiceName | "";
   platform: Platform;
-  path: string;
   issueStatus: IssueStatus | "";
   fixStatus: FixStatus;
   notIssueReason: NotIssueReason | "";

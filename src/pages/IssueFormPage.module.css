@@ -31,6 +31,12 @@
   padding: 0 11px;
 }
 
+.field select:disabled {
+  background: #f3f6fb;
+  color: #98a2b3;
+  cursor: not-allowed;
+}
+
 .field em {
   color: #b42318;
   font-size: 12px;

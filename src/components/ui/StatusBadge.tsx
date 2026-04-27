@@ -11,9 +11,11 @@ export function StatusBadge({ value }: StatusBadgeProps) {
       ? "danger"
       : value === "이슈 아님"
         ? "neutral"
-        : value === "수정 완료"
-          ? "success"
-          : "warning";
+        : value === "보류"
+          ? "pending"
+          : value === "수정 완료"
+            ? "success"
+            : "warning";
 
   return <span className={`${styles.badge} ${styles[tone]}`}>{value}</span>;
 }

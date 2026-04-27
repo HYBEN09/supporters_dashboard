@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
   FIX_STATUS_OPTIONS,
-  ISSUE_STATUS_OPTIONS,
   ISSUE_FORM_PLATFORM_OPTIONS,
   ISSUE_FORM_SERVICE_OPTIONS,
+  ISSUE_STATUS_OPTIONS,
   NOT_ISSUE_REASON_OPTIONS,
 } from "../data/filterOptions";
 import { useIssues } from "../features/issues/useIssues";
@@ -19,7 +19,6 @@ const defaultValues: IssueFormValues = {
   authorName: "",
   serviceName: "",
   platform: "선택 안 함",
-  path: "",
   issueStatus: "",
   fixStatus: "수정 필요",
   notIssueReason: "",
@@ -38,6 +37,7 @@ export function IssueFormPage() {
     reset,
   } = useForm<IssueFormValues>({ defaultValues });
   const issueStatus = useWatch({ control, name: "issueStatus" });
+  const isNotIssue = issueStatus === "이슈 아님";
 
   function toIssueItem(values: IssueFormValues): Omit<IssueItem, "id"> {
     return {
@@ -45,7 +45,7 @@ export function IssueFormPage() {
       authorName: values.authorName.trim(),
       serviceName: values.serviceName || "카카오톡",
       platform: values.platform,
-      path: values.path.trim() || "-",
+      path: "-",
       issueStatus: values.issueStatus || "이슈",
       fixStatus: values.fixStatus,
       notIssueReason:
@@ -139,11 +139,6 @@ export function IssueFormPage() {
               {errors.platform ? <em>{errors.platform.message}</em> : null}
             </label>
 
-            <label className={`${styles.field} ${styles.wide}`}>
-              <span>실행 경로</span>
-              <input placeholder="예: /payment/coupon" {...register("path")} />
-            </label>
-
             <label className={styles.field}>
               <span>이슈 여부</span>
               <select
@@ -172,19 +167,17 @@ export function IssueFormPage() {
               </select>
             </label>
 
-            {issueStatus === "이슈 아님" ? (
-              <label className={styles.field}>
-                <span>이슈 아님 사유</span>
-                <select {...register("notIssueReason")}>
-                  <option value="">선택</option>
-                  {NOT_ISSUE_REASON_OPTIONS.map((reason) => (
-                    <option key={reason} value={reason}>
-                      {reason}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
+            <label className={styles.field}>
+              <span>이슈 아님 사유</span>
+              <select disabled={!isNotIssue} {...register("notIssueReason")}>
+                <option value="">선택</option>
+                {NOT_ISSUE_REASON_OPTIONS.map((reason) => (
+                  <option key={reason} value={reason}>
+                    {reason}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <label className={styles.field}>
               <span>지라 카드 번호</span>
