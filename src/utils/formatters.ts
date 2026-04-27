@@ -18,6 +18,16 @@ export function createJiraUrl(jiraKey?: string) {
     : `https://jira.example.com/browse/${jiraKey}`;
 }
 
+export function createServiceJiraUrl(jiraKey?: string) {
+  if (!jiraKey) {
+    return "";
+  }
+
+  return jiraKey.startsWith("http")
+    ? jiraKey
+    : `https://jira.daumkakao.com/browse/${jiraKey}`;
+}
+
 export function getIssueJiraLinks(issue: IssueItem) {
   const links = [];
 
@@ -29,11 +39,11 @@ export function getIssueJiraLinks(issue: IssueItem) {
     });
   }
 
-  if (issue.serviceJiraUrl) {
+  if (issue.serviceJiraUrl || issue.jiraKey) {
     links.push({
       label: "서비스 전달",
-      url: createJiraUrl(issue.serviceJiraUrl),
-      text: issue.serviceJiraUrl,
+      url: createServiceJiraUrl(issue.serviceJiraUrl ?? issue.jiraKey),
+      text: issue.serviceJiraUrl ?? issue.jiraKey ?? "",
     });
   }
 

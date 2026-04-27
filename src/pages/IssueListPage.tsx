@@ -103,7 +103,7 @@ export function IssueListPage() {
           <label className={styles.filterField}>
             <span>검색어</span>
             <input
-              placeholder="작성자, 경로, 지라 번호"
+              placeholder="작성자, Jira 링크"
               value={draftFilters.keyword}
               onChange={(event) => updateDraft("keyword", event.target.value)}
             />
@@ -250,9 +250,9 @@ export function IssueListPage() {
                 <th>작성자</th>
                 <th>서비스</th>
                 <th>플랫폼</th>
-                <th>실행 경로</th>
                 <th>이슈 여부</th>
                 <th>수정 여부</th>
+                <th>이슈 아님 사유</th>
                 <th>Jira 링크</th>
                 <th>상세</th>
               </tr>
@@ -265,13 +265,13 @@ export function IssueListPage() {
                     <td>{issue.authorName}</td>
                     <td>{issue.serviceName}</td>
                     <td>{issue.platform}</td>
-                    <td>{issue.path}</td>
                     <td>
                       <StatusBadge value={issue.issueStatus} />
                     </td>
                     <td>
                       <StatusBadge value={issue.fixStatus} />
                     </td>
+                    <td>{issue.notIssueReason ?? "-"}</td>
                     <td>
                       {getIssueJiraLinks(issue).length > 0 ? (
                         <div className={styles.jiraLinks}>

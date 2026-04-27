@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { mockIssues } from "../../data/mockIssues";
 import type { IssueItem } from "../../types/issue";
 import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
@@ -11,9 +11,39 @@ function createIssueId(sequence: number) {
   return `ISS-${String(sequence).padStart(3, "0")}`;
 }
 
+const STORAGE_KEY = "supporters-issues";
+
+function getInitialIssues() {
+  try {
+    const savedIssues = localStorage.getItem(STORAGE_KEY);
+
+    if (!savedIssues) {
+      return mockIssues;
+    }
+
+    const parsedIssues = JSON.parse(savedIssues) as IssueItem[];
+    return Array.isArray(parsedIssues) ? parsedIssues : mockIssues;
+  } catch {
+    return mockIssues;
+  }
+}
+
+function getNextSequence(issues: IssueItem[]) {
+  const maxSequence = issues.reduce((max, issue) => {
+    const sequence = Number(issue.id.replace("ISS-", ""));
+    return Number.isFinite(sequence) ? Math.max(max, sequence) : max;
+  }, 0);
+
+  return maxSequence + 1;
+}
+
 export function IssueProvider({ children }: IssueProviderProps) {
-  const [issues, setIssues] = useState<IssueItem[]>(mockIssues);
-  const nextSequence = useRef(mockIssues.length + 1);
+  const [issues, setIssues] = useState<IssueItem[]>(getInitialIssues);
+  const nextSequence = useRef(getNextSequence(issues));
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
+  }, [issues]);
 
   const addIssue = useCallback((issue: NewIssueItem) => {
     const newIssue = {

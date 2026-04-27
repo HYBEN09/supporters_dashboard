@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   FIX_STATUS_OPTIONS,
   ISSUE_FORM_PLATFORM_OPTIONS,
   ISSUE_FORM_SERVICE_OPTIONS,
   ISSUE_STATUS_OPTIONS,
   NOT_ISSUE_REASON_OPTIONS,
+  PERIOD_OPTIONS,
 } from "../data/filterOptions";
 import { useIssues } from "../features/issues/useIssues";
+import { usePeriod } from "../features/period/usePeriod";
 import type { IssueFormValues, IssueItem } from "../types/issue";
 import { Button } from "../components/ui/Button";
 import styles from "./IssueFormPage.module.css";
@@ -26,6 +29,8 @@ const defaultValues: IssueFormValues = {
 
 export function IssueFormPage() {
   const { addIssue } = useIssues();
+  const { setSelectedPeriodId } = usePeriod();
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const {
     formState: { errors },
@@ -58,8 +63,19 @@ export function IssueFormPage() {
 
   function onSubmit(values: IssueFormValues) {
     const createdIssue = addIssue(toIssueItem(values));
+    const period = PERIOD_OPTIONS.find(
+      (option) =>
+        createdIssue.registeredAt >= option.start &&
+        createdIssue.registeredAt <= option.end,
+    );
+
+    if (period) {
+      setSelectedPeriodId(period.id);
+    }
+
     setMessage(`${createdIssue.id} 제보가 등록되었습니다.`);
     reset(defaultValues);
+    navigate("/issues");
   }
 
   function saveDraft() {
