@@ -2,7 +2,6 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  border-top: 4px solid #0f6b78;
   border-bottom: 1px solid #dfe5ef;
   background: #ffffff;
 }
@@ -11,15 +10,30 @@
   display: grid;
   grid-template-columns: 220px 1fr auto;
   align-items: center;
-  width: min(1440px, calc(100% - 48px));
-  min-height: 68px;
+  width: min(1040px, calc(100% - 48px));
+  min-height: 52px;
   margin: 0 auto;
-  gap: 28px;
+  gap: 24px;
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: #081a33;
-  font-size: 20px;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.brandIcon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 7px;
+  background: #4f6bed;
+  color: #ffffff;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -31,9 +45,10 @@
 .navLink {
   display: inline-flex;
   align-items: center;
-  height: 38px;
+  height: 52px;
   padding: 0 16px;
-  border-radius: 6px;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
   color: #344054;
   font-size: 14px;
   font-weight: 800;
@@ -41,12 +56,13 @@
 }
 
 .navLink:hover {
-  background: #f0f4fa;
+  background: transparent;
   color: #1d2939;
 }
 
 .active {
-  background: #e8f1ff;
+  border-bottom-color: #1f6feb;
+  background: transparent;
   color: #1459b8;
 }
 
@@ -63,8 +79,8 @@
 }
 
 .periodSelect {
-  width: 208px;
-  height: 38px;
+  width: 206px;
+  height: 32px;
   border: 1px solid #cfd8e6;
   border-radius: 6px;
   background: #ffffff;
@@ -100,8 +116,8 @@
 
 .avatar {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   place-items: center;
   border-radius: 50%;
   background: #1f6feb;

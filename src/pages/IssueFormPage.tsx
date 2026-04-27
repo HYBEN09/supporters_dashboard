@@ -10,8 +10,6 @@ import {
 import { useIssues } from "../features/issues/useIssues";
 import type { IssueFormValues, IssueItem } from "../types/issue";
 import { Button } from "../components/ui/Button";
-import { PageHeader } from "../components/ui/PageHeader";
-import { SectionCard } from "../components/ui/SectionCard";
 import styles from "./IssueFormPage.module.css";
 
 const defaultValues: IssueFormValues = {
@@ -75,131 +73,195 @@ export function IssueFormPage() {
   }
 
   return (
-    <>
-      <PageHeader
-        title="이슈 입력 뷰"
-        description="서포터즈 제보 내용을 운영 데이터로 등록합니다."
-      />
+    <div className={styles.page}>
+      <header className={styles.pageHeader}>
+        <div>
+          <h1>이슈 입력 뷰</h1>
+          <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
+        </div>
+      </header>
 
-      <SectionCard title="제보 등록">
+      <section className={styles.panel}>
+        <div className={styles.panelHeader}>
+          <h2>제보 등록</h2>
+          <span className={styles.requiredGuide}>* 표시는 필수입니다</span>
+        </div>
+
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-          <div className={styles.grid}>
-            <label className={styles.field}>
-              <span>등록일</span>
-              <input
-                type="date"
-                {...register("registeredAt", { required: "등록일은 필수입니다." })}
-              />
-              {errors.registeredAt ? (
-                <em>{errors.registeredAt.message}</em>
-              ) : null}
-            </label>
+          <fieldset className={styles.section}>
+            <legend>
+              <span>1</span>
+              기본 정보
+            </legend>
+            <div className={styles.grid}>
+              <label className={styles.field}>
+                <span>
+                  등록일 <b>*</b>
+                </span>
+                <input
+                  type="date"
+                  {...register("registeredAt", {
+                    required: "등록일은 필수입니다.",
+                  })}
+                />
+                {errors.registeredAt ? (
+                  <em>{errors.registeredAt.message}</em>
+                ) : null}
+              </label>
 
-            <label className={styles.field}>
-              <span>작성자 이름</span>
-              <input
-                placeholder="예: 김민준"
-                {...register("authorName", {
-                  required: "작성자 이름은 필수입니다.",
-                })}
-              />
-              {errors.authorName ? <em>{errors.authorName.message}</em> : null}
-            </label>
+              <label className={styles.field}>
+                <span>
+                  작성자 이름 <small>선택</small>
+                </span>
+                <input
+                  placeholder="예: 김민준"
+                  {...register("authorName", {
+                    required: "작성자 이름은 필수입니다.",
+                  })}
+                />
+                {errors.authorName ? (
+                  <em>{errors.authorName.message}</em>
+                ) : null}
+              </label>
 
-            <label className={styles.field}>
-              <span>서비스명</span>
-              <select
-                {...register("serviceName", {
-                  required: "서비스명은 필수입니다.",
-                })}
-              >
-                <option value="">선택</option>
-                {ISSUE_FORM_SERVICE_OPTIONS.map((service) => (
-                  <option key={service} value={service}>
-                    {service}
-                  </option>
-                ))}
-              </select>
-              {errors.serviceName ? <em>{errors.serviceName.message}</em> : null}
-            </label>
+              <label className={styles.field}>
+                <span>
+                  서비스명 <b>*</b>
+                </span>
+                <select
+                  {...register("serviceName", {
+                    required: "서비스명은 필수입니다.",
+                  })}
+                >
+                  <option value="">선택</option>
+                  {ISSUE_FORM_SERVICE_OPTIONS.map((service) => (
+                    <option key={service} value={service}>
+                      {service}
+                    </option>
+                  ))}
+                </select>
+                {errors.serviceName ? (
+                  <em>{errors.serviceName.message}</em>
+                ) : null}
+              </label>
+            </div>
+          </fieldset>
 
-            <label className={styles.field}>
-              <span>플랫폼</span>
-              <select
-                {...register("platform", {
-                  required: "플랫폼은 필수입니다.",
-                })}
-              >
-                {ISSUE_FORM_PLATFORM_OPTIONS.map((platform) => (
-                  <option key={platform} value={platform}>
-                    {platform}
-                  </option>
-                ))}
-              </select>
-              {errors.platform ? <em>{errors.platform.message}</em> : null}
-            </label>
+          <fieldset className={styles.section}>
+            <legend>
+              <span>2</span>
+              상태 분류
+            </legend>
+            <div className={styles.grid}>
+              <label className={styles.field}>
+                <span>플랫폼</span>
+                <select
+                  {...register("platform", {
+                    required: "플랫폼은 필수입니다.",
+                  })}
+                >
+                  {ISSUE_FORM_PLATFORM_OPTIONS.map((platform) => (
+                    <option key={platform} value={platform}>
+                      {platform}
+                    </option>
+                  ))}
+                </select>
+                {errors.platform ? <em>{errors.platform.message}</em> : null}
+              </label>
 
-            <label className={styles.field}>
-              <span>이슈 여부</span>
-              <select
-                {...register("issueStatus", {
-                  required: "이슈 여부는 필수입니다.",
-                })}
-              >
-                <option value="">선택</option>
-                {ISSUE_STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-              {errors.issueStatus ? <em>{errors.issueStatus.message}</em> : null}
-            </label>
+              <label className={styles.field}>
+                <span>
+                  이슈 여부 <b>*</b>
+                </span>
+                <select
+                  {...register("issueStatus", {
+                    required: "이슈 여부는 필수입니다.",
+                  })}
+                >
+                  <option value="">선택</option>
+                  {ISSUE_STATUS_OPTIONS.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
 
-            <label className={styles.field}>
-              <span>수정 여부</span>
-              <select {...register("fixStatus")}>
-                {FIX_STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </label>
+                {errors.issueStatus ? (
+                  <em>{errors.issueStatus.message}</em>
+                ) : null}
+              </label>
 
-            <label className={styles.field}>
-              <span>이슈 아님 사유</span>
-              <select disabled={!isNotIssue} {...register("notIssueReason")}>
-                <option value="">선택</option>
-                {NOT_ISSUE_REASON_OPTIONS.map((reason) => (
-                  <option key={reason} value={reason}>
-                    {reason}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <label className={styles.field}>
+                <span>수정 여부</span>
+                <select {...register("fixStatus")}>
+                  {FIX_STATUS_OPTIONS.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </fieldset>
 
-            <label className={styles.field}>
-              <span>지라 카드 번호</span>
-              <input placeholder="예: SPT-201" {...register("jiraKey")} />
-            </label>
-          </div>
+          <fieldset className={styles.section}>
+            <legend>
+              <span>3</span>
+              추가 정보
+            </legend>
+            <div className={styles.grid}>
+              <label className={styles.field}>
+                <span>
+                  이슈 아님 사유
+                  {!isNotIssue ? (
+                    <small className={styles.locked}>
+                      이슈 아님 선택 시 활성
+                    </small>
+                  ) : null}
+                </span>
+                <select disabled={!isNotIssue} {...register("notIssueReason")}>
+                  <option value="">선택</option>
+                  {NOT_ISSUE_REASON_OPTIONS.map((reason) => (
+                    <option key={reason} value={reason}>
+                      {reason}
+                    </option>
+                  ))}
+                </select>
+                <small className={styles.help}>
+                  이슈 여부를 이슈 아님으로 선택해야만 활성화됩니다.
+                </small>
+              </label>
+
+              <label className={`${styles.field} ${styles.wide}`}>
+                <span>
+                  지라 카드 번호 <small>선택</small>
+                </span>
+                <input placeholder="예: SPT-201" {...register("jiraKey")} />
+                <small className={styles.help}>
+                  형식: 프로젝트코드-번호 (예: SPT-201, KKT-045)
+                </small>
+              </label>
+            </div>
+          </fieldset>
 
           {message ? <p className={styles.message}>{message}</p> : null}
 
-          <div className={styles.actions}>
-            <Button variant="secondary" onClick={saveDraft}>
-              임시 저장
-            </Button>
-            <Button type="submit" variant="primary">
-              등록
-            </Button>
-            <Button variant="ghost" onClick={resetForm}>
-              초기화
-            </Button>
+          <div className={styles.footer}>
+            <span className={styles.autoSave}>자동 저장 대기 중</span>
+            <div className={styles.actions}>
+              <Button variant="ghost" onClick={resetForm}>
+                초기화
+              </Button>
+              <Button variant="secondary" onClick={saveDraft}>
+                ▣ 임시 저장
+              </Button>
+              <Button type="submit" variant="primary">
+                ✓ 등록
+              </Button>
+            </div>
           </div>
         </form>
-      </SectionCard>
-    </>
+      </section>
+    </div>
   );
 }

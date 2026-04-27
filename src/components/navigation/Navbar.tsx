@@ -15,7 +15,10 @@ export function Navbar() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <div className={styles.brand}>서포터즈 제보 관리</div>
+        <div className={styles.brand}>
+          <span className={styles.brandIcon}>✓</span>
+          서포터즈 제보 관리
+        </div>
         <nav className={styles.nav} aria-label="주요 메뉴">
           {navItems.map((item) => (
             <NavLink
