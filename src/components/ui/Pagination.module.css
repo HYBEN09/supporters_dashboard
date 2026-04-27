@@ -1,0 +1,15 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pagination span {
+  min-width: 68px;
+  color: #536174;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}

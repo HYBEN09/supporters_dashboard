@@ -9,16 +9,26 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
+    /* CommonJS/ESM 패키지를 번들러 환경에서 더 자연스럽게 가져옵니다. */
+    "esModuleInterop": true,
     "allowImportingTsExtensions": true,
+    /* CSS, SVG 같은 번들러 처리 파일 import를 허용합니다. */
+    "allowArbitraryExtensions": true,
+    /* Vite의 파일별 변환 방식에서 안전하지 않은 TS 문법을 미리 잡습니다. */
+    "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
 
     /* Linting */
+    /* 공식 권장 기본값으로 엄격한 타입 검사를 켭니다. */
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    /* 타입이 없는 부작용-only import가 숨어 들어오는 것을 방지합니다. */
+    "noUncheckedSideEffectImports": true
   },
   "include": ["vite.config.ts"]
 }

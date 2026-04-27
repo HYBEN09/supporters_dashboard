@@ -1,0 +1,27 @@
+.card {
+  border: 1px solid #dfe5ef;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.card span {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.card strong {
+  display: block;
+  margin-top: 10px;
+  color: #101828;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.card p {
+  margin: 8px 0 0;
+  color: #7a8799;
+  font-size: 12px;
+}

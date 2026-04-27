@@ -1,0 +1,109 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #dfe5ef;
+  background: #ffffff;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 220px 1fr auto;
+  align-items: center;
+  width: min(1440px, calc(100% - 48px));
+  min-height: 68px;
+  margin: 0 auto;
+  gap: 28px;
+}
+
+.brand {
+  font-size: 19px;
+  font-weight: 800;
+  color: #101828;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 6px;
+  color: #536174;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navLink:hover {
+  background: #f0f4fa;
+  color: #182033;
+}
+
+.active {
+  background: #e8f1ff;
+  color: #1459b8;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.periodLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: #596579;
+}
+
+.periodSelect {
+  height: 38px;
+  min-width: 210px;
+  border: 1px solid #cfd8e6;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #172033;
+  font-size: 14px;
+  padding: 0 10px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 10px;
+  border-left: 1px solid #e2e8f0;
+}
+
+.profile strong,
+.profile span {
+  display: block;
+}
+
+.profile strong {
+  font-size: 13px;
+  color: #172033;
+}
+
+.profile span {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #6b7688;
+}
+
+.avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: #1f6feb;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+}

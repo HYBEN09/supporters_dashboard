@@ -1,0 +1,45 @@
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.chartGrid > section:first-child {
+  grid-column: 1 / -1;
+}
+
+.chartBox {
+  min-height: 300px;
+}
+
+.reasonGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.summaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.summaryTable th,
+.summaryTable td {
+  border-bottom: 1px solid #edf1f6;
+  padding: 10px;
+  text-align: left;
+}
+
+.summaryTable th {
+  color: #526174;
+  font-weight: 900;
+}

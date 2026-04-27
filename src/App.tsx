@@ -1,10 +1,17 @@
-import "./App.css";
+import { BrowserRouter } from "react-router-dom";
+import { IssueProvider } from "./features/issues/IssueProvider";
+import { PeriodProvider } from "./features/period/PeriodProvider";
+import { AppRoutes } from "./routes/AppRoutes";
 
 function App() {
   return (
-    <>
-      <h1>시작</h1>
-    </>
+    <BrowserRouter>
+      <PeriodProvider>
+        <IssueProvider>
+          <AppRoutes />
+        </IssueProvider>
+      </PeriodProvider>
+    </BrowserRouter>
   );
 }
 
