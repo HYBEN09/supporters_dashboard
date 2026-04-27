@@ -1,5 +1,5 @@
 import type { IssueItem } from "../../types/issue";
-import { createJiraUrl, formatDate } from "../../utils/formatters";
+import { formatDate, getIssueJiraLinks } from "../../utils/formatters";
 import { Button } from "../ui/Button";
 import { StatusBadge } from "../ui/StatusBadge";
 import styles from "./IssueTable.module.css";
@@ -49,15 +49,20 @@ export function IssueTable({
                 </td>
                 <td>{item.notIssueReason ?? "-"}</td>
                 <td>
-                  {item.jiraKey ? (
-                    <a
-                      className={styles.link}
-                      href={createJiraUrl(item.jiraKey)}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      {item.jiraKey}
-                    </a>
+                  {getIssueJiraLinks(item).length > 0 ? (
+                    <div className={styles.links}>
+                      {getIssueJiraLinks(item).map((link) => (
+                        <a
+                          className={styles.link}
+                          href={link.url}
+                          key={link.label}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          {link.label}
+                        </a>
+                      ))}
+                    </div>
                   ) : (
                     "-"
                   )}

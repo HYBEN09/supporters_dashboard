@@ -39,6 +39,8 @@ export type IssueItem = {
   fixStatus: FixStatus;
   notIssueReason?: NotIssueReason;
   jiraKey?: string;
+  supporterJiraUrl?: string;
+  serviceJiraUrl?: string;
 };
 
 export type SelectableFilter<T extends string> = "전체" | T;
@@ -60,5 +62,6 @@ export type IssueFormValues = {
   issueStatus: IssueStatus | "";
   fixStatus: FixStatus;
   notIssueReason: NotIssueReason | "";
-  jiraKey: string;
+  supporterJiraUrl: string;
+  serviceJiraUrl: string;
 };

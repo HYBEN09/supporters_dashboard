@@ -17,7 +17,7 @@ import type {
   SelectableFilter,
   ServiceName,
 } from "../types/issue";
-import { createJiraUrl, formatDate } from "../utils/formatters";
+import { formatDate, getIssueJiraLinks } from "../utils/formatters";
 import {
   DEFAULT_FILTERS,
   filterIssues,
@@ -33,7 +33,7 @@ import styles from "./IssueListPage.module.css";
 
 export function IssueListPage() {
   const { selectedPeriodId } = usePeriod();
-  const { issues } = useIssues();
+  const { issues, updateIssue } = useIssues();
   const [draftFilters, setDraftFilters] = useState<Omit<IssueFilters, "periodId">>({
     keyword: "",
     serviceName: DEFAULT_FILTERS.serviceName,
@@ -253,7 +253,7 @@ export function IssueListPage() {
                 <th>실행 경로</th>
                 <th>이슈 여부</th>
                 <th>수정 여부</th>
-                <th>지라 번호</th>
+                <th>Jira 링크</th>
                 <th>상세</th>
               </tr>
             </thead>
@@ -273,14 +273,19 @@ export function IssueListPage() {
                       <StatusBadge value={issue.fixStatus} />
                     </td>
                     <td>
-                      {issue.jiraKey ? (
-                        <a
-                          href={createJiraUrl(issue.jiraKey)}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          {issue.jiraKey}
-                        </a>
+                      {getIssueJiraLinks(issue).length > 0 ? (
+                        <div className={styles.jiraLinks}>
+                          {getIssueJiraLinks(issue).map((link) => (
+                            <a
+                              href={link.url}
+                              key={link.label}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              {link.label}
+                            </a>
+                          ))}
+                        </div>
                       ) : (
                         "-"
                       )}
@@ -313,7 +318,16 @@ export function IssueListPage() {
         />
       </section>
 
-      <DetailModal issue={selectedIssue} onClose={() => setSelectedIssue(null)} />
+      <DetailModal
+        issue={selectedIssue}
+        onClose={() => setSelectedIssue(null)}
+        onSave={(id, updates) => {
+          updateIssue(id, updates);
+          setSelectedIssue((current) =>
+            current?.id === id ? { ...current, ...updates } : current,
+          );
+        }}
+      />
     </>
   );
 }

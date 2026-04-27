@@ -20,7 +20,8 @@ const defaultValues: IssueFormValues = {
   issueStatus: "",
   fixStatus: "수정 필요",
   notIssueReason: "",
-  jiraKey: "",
+  supporterJiraUrl: "",
+  serviceJiraUrl: "",
 };
 
 export function IssueFormPage() {
@@ -50,7 +51,8 @@ export function IssueFormPage() {
         values.issueStatus === "이슈 아님" && values.notIssueReason
           ? values.notIssueReason
           : undefined,
-      jiraKey: values.jiraKey.trim() || undefined,
+      supporterJiraUrl: values.supporterJiraUrl.trim() || undefined,
+      serviceJiraUrl: values.serviceJiraUrl.trim() || undefined,
     };
   }
 
@@ -232,15 +234,25 @@ export function IssueFormPage() {
                 </small>
               </label>
 
-              <label className={`${styles.field} ${styles.wide}`}>
-                <span>
-                  지라 카드 번호 <small>선택</small>
-                </span>
-                <input placeholder="예: SPT-201" {...register("jiraKey")} />
-                <small className={styles.help}>
-                  형식: 프로젝트코드-번호 (예: SPT-201, KKT-045)
-                </small>
-              </label>
+              <div className={`${styles.field} ${styles.wide}`}>
+                <span>Jira 링크</span>
+                <div className={styles.jiraLinks}>
+                  <label>
+                    <strong>서포터즈</strong>
+                    <input
+                      placeholder="https://jira.example.com/browse/SUP-..."
+                      {...register("supporterJiraUrl")}
+                    />
+                  </label>
+                  <label>
+                    <strong>서비스 전달</strong>
+                    <input
+                      placeholder="https://jira.daumkakao.com/browse/..."
+                      {...register("serviceJiraUrl")}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
           </fieldset>
 

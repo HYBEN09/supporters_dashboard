@@ -31,7 +31,7 @@ import type {
   ServiceName,
 } from "../types/issue";
 import { usePagination } from "../hooks/usePagination";
-import { createJiraUrl, formatDate, formatPercent } from "../utils/formatters";
+import { formatDate, formatPercent, getIssueJiraLinks } from "../utils/formatters";
 import {
   DEFAULT_FILTERS,
   filterIssues,
@@ -386,7 +386,7 @@ export function DashboardPage() {
                 <th>실행 경로</th>
                 <th>이슈 여부</th>
                 <th>수정 여부</th>
-                <th>지라 번호</th>
+                <th>Jira 링크</th>
               </tr>
             </thead>
             <tbody>
@@ -405,14 +405,19 @@ export function DashboardPage() {
                       <StatusBadge value={issue.fixStatus} />
                     </td>
                     <td>
-                      {issue.jiraKey ? (
-                        <a
-                          href={createJiraUrl(issue.jiraKey)}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          {issue.jiraKey}
-                        </a>
+                      {getIssueJiraLinks(issue).length > 0 ? (
+                        <div className={styles.jiraLinks}>
+                          {getIssueJiraLinks(issue).map((link) => (
+                            <a
+                              href={link.url}
+                              key={link.label}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              {link.label}
+                            </a>
+                          ))}
+                        </div>
                       ) : (
                         "-"
                       )}

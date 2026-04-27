@@ -31,13 +31,26 @@
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  background: #eef4ff;
   color: #1f6feb;
+  font-size: 12px;
   font-weight: 800;
   text-decoration: none;
+  padding: 0 9px;
 }
 
 .link:hover {
   text-decoration: underline;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .empty {

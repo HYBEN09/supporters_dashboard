@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { mockIssues } from "../../data/mockIssues";
 import type { IssueItem } from "../../types/issue";
-import { IssueContext, type NewIssueItem } from "./issueContext";
+import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
 
 type IssueProviderProps = {
   children: React.ReactNode;
@@ -26,7 +26,18 @@ export function IssueProvider({ children }: IssueProviderProps) {
     return newIssue;
   }, []);
 
-  const value = useMemo(() => ({ issues, addIssue }), [addIssue, issues]);
+  const updateIssue = useCallback((id: string, updates: IssueUpdate) => {
+    setIssues((current) =>
+      current.map((issue) =>
+        issue.id === id ? { ...issue, ...updates } : issue,
+      ),
+    );
+  }, []);
+
+  const value = useMemo(
+    () => ({ issues, addIssue, updateIssue }),
+    [addIssue, issues, updateIssue],
+  );
 
   return (
     <IssueContext.Provider value={value}>{children}</IssueContext.Provider>

@@ -1,3 +1,5 @@
+import type { IssueItem } from "../types/issue";
+
 export function formatPercent(value: number) {
   return `${value.toFixed(1)}%`;
 }
@@ -7,5 +9,33 @@ export function formatDate(value: string) {
 }
 
 export function createJiraUrl(jiraKey?: string) {
-  return jiraKey ? `https://jira.example.com/browse/${jiraKey}` : "";
+  if (!jiraKey) {
+    return "";
+  }
+
+  return jiraKey.startsWith("http")
+    ? jiraKey
+    : `https://jira.example.com/browse/${jiraKey}`;
+}
+
+export function getIssueJiraLinks(issue: IssueItem) {
+  const links = [];
+
+  if (issue.supporterJiraUrl || issue.jiraKey) {
+    links.push({
+      label: "서포터즈",
+      url: createJiraUrl(issue.supporterJiraUrl ?? issue.jiraKey),
+      text: issue.supporterJiraUrl ?? issue.jiraKey ?? "",
+    });
+  }
+
+  if (issue.serviceJiraUrl) {
+    links.push({
+      label: "서비스 전달",
+      url: createJiraUrl(issue.serviceJiraUrl),
+      text: issue.serviceJiraUrl,
+    });
+  }
+
+  return links;
 }

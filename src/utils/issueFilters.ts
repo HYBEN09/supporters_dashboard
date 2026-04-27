@@ -36,6 +36,8 @@ export function filterIssues(items: IssueItem[], filters: IssueFilters) {
         item.fixStatus,
         item.notIssueReason ?? "",
         item.jiraKey ?? "",
+        item.supporterJiraUrl ?? "",
+        item.serviceJiraUrl ?? "",
       ]
         .join(" ")
         .toLowerCase()
