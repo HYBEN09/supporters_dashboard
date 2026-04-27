@@ -3,9 +3,9 @@ import { useForm, useWatch } from "react-hook-form";
 import {
   FIX_STATUS_OPTIONS,
   ISSUE_STATUS_OPTIONS,
+  ISSUE_FORM_PLATFORM_OPTIONS,
+  ISSUE_FORM_SERVICE_OPTIONS,
   NOT_ISSUE_REASON_OPTIONS,
-  PLATFORM_OPTIONS,
-  SERVICE_OPTIONS,
 } from "../data/filterOptions";
 import { useIssues } from "../features/issues/useIssues";
 import type { IssueFormValues, IssueItem } from "../types/issue";
@@ -18,7 +18,7 @@ const defaultValues: IssueFormValues = {
   registeredAt: new Date().toISOString().slice(0, 10),
   authorName: "",
   serviceName: "",
-  platform: "",
+  platform: "선택 안 함",
   path: "",
   issueStatus: "",
   fixStatus: "수정 필요",
@@ -43,8 +43,8 @@ export function IssueFormPage() {
     return {
       registeredAt: values.registeredAt,
       authorName: values.authorName.trim(),
-      serviceName: values.serviceName || "서비스 A",
-      platform: values.platform || "Web",
+      serviceName: values.serviceName || "카카오톡",
+      platform: values.platform,
       path: values.path.trim() || "-",
       issueStatus: values.issueStatus || "이슈",
       fixStatus: values.fixStatus,
@@ -114,7 +114,7 @@ export function IssueFormPage() {
                 })}
               >
                 <option value="">선택</option>
-                {SERVICE_OPTIONS.map((service) => (
+                {ISSUE_FORM_SERVICE_OPTIONS.map((service) => (
                   <option key={service} value={service}>
                     {service}
                   </option>
@@ -130,8 +130,7 @@ export function IssueFormPage() {
                   required: "플랫폼은 필수입니다.",
                 })}
               >
-                <option value="">선택</option>
-                {PLATFORM_OPTIONS.map((platform) => (
+                {ISSUE_FORM_PLATFORM_OPTIONS.map((platform) => (
                   <option key={platform} value={platform}>
                     {platform}
                   </option>

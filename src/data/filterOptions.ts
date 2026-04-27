@@ -23,6 +23,32 @@ export const SERVICE_OPTIONS = [
 
 export const PLATFORM_OPTIONS = ["Web", "iOS", "Android"] as const;
 
+export const ISSUE_FORM_SERVICE_OPTIONS = [
+  "카카오톡",
+  "멜론",
+  "카카오페이",
+  "카카오페이지",
+  "카카오맵",
+  "카카오T",
+  "카카오메이커스",
+  "카카오지하철",
+  "카카오뱅크",
+  "카카오버스",
+  "선물하기",
+  "카카오내비",
+  "카카오택시",
+  "톡딜",
+] as const;
+
+export const ISSUE_FORM_PLATFORM_OPTIONS = [
+  "선택 안 함",
+  "Android",
+  "iOS",
+  "WIN",
+  "Watch",
+  "Mac",
+] as const;
+
 export const ISSUE_STATUS_OPTIONS = ["이슈", "이슈 아님"] as const;
 
 export const FIX_STATUS_OPTIONS = ["수정 필요", "수정 완료"] as const;

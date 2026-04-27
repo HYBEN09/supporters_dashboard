@@ -1,11 +1,21 @@
+import type {
+  ISSUE_FORM_PLATFORM_OPTIONS,
+  ISSUE_FORM_SERVICE_OPTIONS,
+} from "../data/filterOptions";
+
+type IssueFormServiceName = (typeof ISSUE_FORM_SERVICE_OPTIONS)[number];
+
+type IssueFormPlatform = (typeof ISSUE_FORM_PLATFORM_OPTIONS)[number];
+
 export type ServiceName =
   | "서비스 A"
   | "서비스 B"
   | "서비스 C"
   | "서비스 D"
-  | "서비스 E";
+  | "서비스 E"
+  | IssueFormServiceName;
 
-export type Platform = "Web" | "iOS" | "Android";
+export type Platform = "Web" | "iOS" | "Android" | IssueFormPlatform;
 
 export type IssueStatus = "이슈" | "이슈 아님";
 
@@ -46,7 +56,7 @@ export type IssueFormValues = {
   registeredAt: string;
   authorName: string;
   serviceName: ServiceName | "";
-  platform: Platform | "";
+  platform: Platform;
   path: string;
   issueStatus: IssueStatus | "";
   fixStatus: FixStatus;
