@@ -4,9 +4,9 @@ import { usePeriod } from "../../features/period/usePeriod";
 import styles from "./Navbar.module.css";
 
 const navItems = [
-  { label: "대시보드", to: "/dashboard" },
-  { label: "이슈 입력", to: "/issues/new" },
-  { label: "이슈 리스트", to: "/issues" },
+  { end: true, label: "대시보드", to: "/dashboard" },
+  { end: true, label: "이슈 입력", to: "/issues/new" },
+  { end: true, label: "이슈 리스트", to: "/issues" },
 ];
 
 export function Navbar() {
@@ -25,6 +25,7 @@ export function Navbar() {
               className={({ isActive }) =>
                 isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
               }
+              end={item.end}
               key={item.to}
               to={item.to}
             >
