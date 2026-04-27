@@ -1,27 +1,110 @@
 .card {
+  min-height: 178px;
   border: 1px solid #dfe5ef;
+  border-top: 2px solid #1f6feb;
   border-radius: 8px;
   background: #ffffff;
-  padding: 18px;
+  padding: 17px 18px 18px;
 }
 
-.card span {
+.icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 8px;
+  background: #e8f1ff;
+  color: #1f6feb;
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.label {
   display: block;
-  color: #667085;
-  font-size: 13px;
-  font-weight: 800;
+  color: #172033;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .card strong {
   display: block;
-  margin-top: 10px;
-  color: #101828;
+  margin-top: 8px;
+  color: currentColor;
   font-size: 30px;
   font-weight: 900;
+  line-height: 1.1;
 }
 
 .card p {
   margin: 8px 0 0;
   color: #7a8799;
   font-size: 12px;
+  line-height: 1.45;
+}
+
+.progress {
+  width: 100%;
+  height: 6px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eceff5;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+}
+
+.blue {
+  border-top-color: #1f6feb;
+  color: #0f172a;
+}
+
+.blue .icon {
+  background: #e8f1ff;
+  color: #1f6feb;
+}
+
+.orange {
+  border-top-color: #f97316;
+  color: #0f172a;
+}
+
+.orange .icon {
+  background: #fff0e6;
+  color: #f97316;
+}
+
+.green {
+  border-top-color: #16875a;
+  color: #0f172a;
+}
+
+.green .icon {
+  background: #dcfae6;
+  color: #16875a;
+}
+
+.purple {
+  border-top-color: #7b3fd6;
+  color: #7b3fd6;
+}
+
+.purple .icon {
+  background: #efe7ff;
+  color: #7b3fd6;
+}
+
+.gray {
+  border-top-color: #586174;
+  color: #0f172a;
+}
+
+.gray .icon {
+  background: #eef2f6;
+  color: #586174;
 }

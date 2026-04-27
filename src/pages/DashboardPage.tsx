@@ -17,7 +17,6 @@ import {
 import {
   FIX_STATUS_OPTIONS,
   ISSUE_STATUS_OPTIONS,
-  PERIOD_OPTIONS,
   PLATFORM_OPTIONS,
   SERVICE_OPTIONS,
 } from "../data/filterOptions";
@@ -32,7 +31,11 @@ import type {
   ServiceName,
 } from "../types/issue";
 import { formatPercent } from "../utils/formatters";
-import { DEFAULT_FILTERS, filterIssues } from "../utils/issueFilters";
+import {
+  DEFAULT_FILTERS,
+  filterIssues,
+  getPeriodById,
+} from "../utils/issueFilters";
 import {
   getKpis,
   getMonthlyStatus,
@@ -40,17 +43,15 @@ import {
   getServiceStatus,
 } from "../utils/issueMetrics";
 import { KpiCard } from "../components/dashboard/KpiCard";
-import { FilterBar, FilterField } from "../components/filters/FilterBar";
 import { IssueTable } from "../components/tables/IssueTable";
 import { Button } from "../components/ui/Button";
-import { PageHeader } from "../components/ui/PageHeader";
 import { SectionCard } from "../components/ui/SectionCard";
 import styles from "./DashboardPage.module.css";
 
 const reasonColors = ["#1f6feb", "#12b76a", "#f79009", "#f04438", "#667085"];
 
 export function DashboardPage() {
-  const { selectedPeriodId, setSelectedPeriodId } = usePeriod();
+  const { selectedPeriodId } = usePeriod();
   const { issues } = useIssues();
   const [filters, setFilters] = useState<Omit<IssueFilters, "periodId">>({
     keyword: "",
@@ -59,6 +60,7 @@ export function DashboardPage() {
     issueStatus: DEFAULT_FILTERS.issueStatus,
     fixStatus: DEFAULT_FILTERS.fixStatus,
   });
+  const selectedPeriod = getPeriodById(selectedPeriodId);
   const effectiveFilters = useMemo(
     () => ({ ...filters, periodId: selectedPeriodId }),
     [filters, selectedPeriodId],
@@ -82,6 +84,9 @@ export function DashboardPage() {
     [filteredIssues],
   );
 
+  const periodSummary = `${selectedPeriod.start.replaceAll("-", ".")} - ${selectedPeriod.end.replaceAll("-", ".")}`;
+  const currentSummary = `현재 조회: 전체 기간 · ${filters.serviceName} 서비스 · ${filters.platform} 플랫폼`;
+
   function updateFilter<Key extends keyof Omit<IssueFilters, "periodId">>(
     key: Key,
     value: Omit<IssueFilters, "periodId">[Key],
@@ -101,102 +106,139 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHeader
-        title="전체 대시보드 뷰"
-        description="기간, 서비스, 플랫폼 기준으로 제보와 개선 현황을 확인합니다."
-      />
+      <section className={styles.filterPanel} aria-label="대시보드 필터">
+        <div className={styles.filterGrid}>
+          <label className={styles.dateField}>
+            <span>기간</span>
+            <div className={styles.dateRange}>
+              <input readOnly type="date" value={selectedPeriod.start} />
+              <span aria-hidden="true">~</span>
+              <input readOnly type="date" value={selectedPeriod.end} />
+            </div>
+          </label>
 
-      <FilterBar
-        actions={
-          <Button variant="secondary" onClick={resetFilters}>
-            초기화
+          <label className={styles.filterField}>
+            <span>서비스</span>
+            <select
+              value={filters.serviceName}
+              onChange={(event) =>
+                updateFilter(
+                  "serviceName",
+                  event.target.value as SelectableFilter<ServiceName>,
+                )
+              }
+            >
+              <option>전체</option>
+              {SERVICE_OPTIONS.map((service) => (
+                <option key={service}>{service}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className={styles.filterField}>
+            <span>플랫폼</span>
+            <select
+              value={filters.platform}
+              onChange={(event) =>
+                updateFilter(
+                  "platform",
+                  event.target.value as SelectableFilter<Platform>,
+                )
+              }
+            >
+              <option>전체</option>
+              {PLATFORM_OPTIONS.map((platform) => (
+                <option key={platform}>{platform}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className={styles.filterField}>
+            <span>이슈 여부</span>
+            <select
+              value={filters.issueStatus}
+              onChange={(event) =>
+                updateFilter(
+                  "issueStatus",
+                  event.target.value as SelectableFilter<IssueStatus>,
+                )
+              }
+            >
+              <option>전체</option>
+              {ISSUE_STATUS_OPTIONS.map((status) => (
+                <option key={status}>{status}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className={styles.filterField}>
+            <span>수정 여부</span>
+            <select
+              value={filters.fixStatus}
+              onChange={(event) =>
+                updateFilter(
+                  "fixStatus",
+                  event.target.value as SelectableFilter<FixStatus>,
+                )
+              }
+            >
+              <option>전체</option>
+              {FIX_STATUS_OPTIONS.map((status) => (
+                <option key={status}>{status}</option>
+              ))}
+            </select>
+          </label>
+
+          <Button
+            className={styles.resetButton}
+            variant="secondary"
+            onClick={resetFilters}
+          >
+            ↻ 초기화
           </Button>
-        }
-      >
-        <FilterField label="기간">
-          <select
-            value={selectedPeriodId}
-            onChange={(event) => setSelectedPeriodId(event.target.value)}
-          >
-            {PERIOD_OPTIONS.map((period) => (
-              <option key={period.id} value={period.id}>
-                {period.label}
-              </option>
-            ))}
-          </select>
-        </FilterField>
-        <FilterField label="서비스">
-          <select
-            value={filters.serviceName}
-            onChange={(event) =>
-              updateFilter(
-                "serviceName",
-                event.target.value as SelectableFilter<ServiceName>,
-              )
-            }
-          >
-            <option>전체</option>
-            {SERVICE_OPTIONS.map((service) => (
-              <option key={service}>{service}</option>
-            ))}
-          </select>
-        </FilterField>
-        <FilterField label="플랫폼">
-          <select
-            value={filters.platform}
-            onChange={(event) =>
-              updateFilter(
-                "platform",
-                event.target.value as SelectableFilter<Platform>,
-              )
-            }
-          >
-            <option>전체</option>
-            {PLATFORM_OPTIONS.map((platform) => (
-              <option key={platform}>{platform}</option>
-            ))}
-          </select>
-        </FilterField>
-        <FilterField label="이슈 여부">
-          <select
-            value={filters.issueStatus}
-            onChange={(event) =>
-              updateFilter(
-                "issueStatus",
-                event.target.value as SelectableFilter<IssueStatus>,
-              )
-            }
-          >
-            <option>전체</option>
-            {ISSUE_STATUS_OPTIONS.map((status) => (
-              <option key={status}>{status}</option>
-            ))}
-          </select>
-        </FilterField>
-        <FilterField label="수정 여부">
-          <select
-            value={filters.fixStatus}
-            onChange={(event) =>
-              updateFilter(
-                "fixStatus",
-                event.target.value as SelectableFilter<FixStatus>,
-              )
-            }
-          >
-            <option>전체</option>
-            {FIX_STATUS_OPTIONS.map((status) => (
-              <option key={status}>{status}</option>
-            ))}
-          </select>
-        </FilterField>
-      </FilterBar>
+        </div>
+        <p className={styles.currentSummary}>
+          {currentSummary} · 기준 기간 {periodSummary}
+        </p>
+      </section>
 
       <div className={styles.kpiGrid}>
-        <KpiCard label="전체 제보 수" value={kpis.totalReports} />
-        <KpiCard label="전체 이슈 수" value={kpis.totalIssues} />
-        <KpiCard label="수정 완료 수" value={kpis.fixedIssues} />
-        <KpiCard label="개선율" value={formatPercent(kpis.improvementRate)} />
-        <KpiCard label="이슈 아님 수" value={kpis.notIssues} />
+        <KpiCard
+          helper="조회 기간 내 등록된 총 제보"
+          icon="▣"
+          label="전체 제보 수"
+          tone="blue"
+          value={kpis.totalReports}
+        />
+        <KpiCard
+          helper="접근성 또는 사용성 이슈로 판정된 제보"
+          icon="!"
+          label="전체 이슈 수"
+          tone="orange"
+          value={kpis.totalIssues}
+        />
+        <KpiCard
+          helper="이슈 중 수정이 완료된 건수"
+          icon="✓"
+          label="수정 완료 수"
+          tone="green"
+          value={kpis.fixedIssues}
+        />
+        <KpiCard
+          helper={`전체 이슈 중 수정 완료 비율 (${kpis.fixedIssues} / ${kpis.totalIssues})`}
+          icon="↗"
+          label="개선율"
+          progressValue={kpis.improvementRate}
+          tone="purple"
+          value={formatPercent(kpis.improvementRate)}
+        />
+        <KpiCard
+          helper="검토 후 이슈 아님으로 판정된 건수"
+          icon="⊘"
+          label="이슈 아님 수"
+          tone="gray"
+          value={kpis.notIssues}
+        />
       </div>
 
       <div className={styles.chartGrid}>
