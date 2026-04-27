@@ -25,6 +25,7 @@ const defaultValues: IssueFormValues = {
   notIssueReason: "",
   supporterJiraUrl: "",
   serviceJiraUrl: "",
+  memo: "",
 };
 
 export function IssueFormPage() {
@@ -58,6 +59,7 @@ export function IssueFormPage() {
           : undefined,
       supporterJiraUrl: values.supporterJiraUrl.trim() || undefined,
       serviceJiraUrl: values.serviceJiraUrl.trim() || undefined,
+      memo: values.memo.trim() || undefined,
     };
   }
 
@@ -270,6 +272,23 @@ export function IssueFormPage() {
                 </div>
               </div>
             </div>
+          </fieldset>
+
+          <fieldset className={styles.section}>
+            <legend>
+              <span>4</span>
+              비고 / 전달 메모
+            </legend>
+            <label className={`${styles.field} ${styles.full}`}>
+              <textarea
+                placeholder="추가 메모나 전달 사항을 입력하세요"
+                rows={5}
+                {...register("memo")}
+              />
+              <small className={styles.localHint}>
+                브라우저 로컬 저장소에 자동 저장됩니다
+              </small>
+            </label>
           </fieldset>
 
           {message ? <p className={styles.message}>{message}</p> : null}

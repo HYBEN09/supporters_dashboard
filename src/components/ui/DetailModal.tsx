@@ -46,6 +46,7 @@ function getDefaultValues(issue: IssueItem): IssueFormValues {
     notIssueReason: issue.notIssueReason ?? "",
     supporterJiraUrl: issue.supporterJiraUrl ?? issue.jiraKey ?? "",
     serviceJiraUrl: issue.serviceJiraUrl ?? "",
+    memo: issue.memo ?? "",
   };
 }
 
@@ -99,6 +100,7 @@ function DetailModalContent({ issue, onClose, onSave }: DetailModalContentProps)
       jiraKey: undefined,
       supporterJiraUrl: values.supporterJiraUrl.trim() || undefined,
       serviceJiraUrl: values.serviceJiraUrl.trim() || undefined,
+      memo: values.memo.trim() || undefined,
     });
     setIsEditing(false);
   }
@@ -180,6 +182,10 @@ function DetailModalContent({ issue, onClose, onSave }: DetailModalContentProps)
                   "-"
                 )}
               </dd>
+            </div>
+            <div>
+              <dt>비고 / 전달 메모</dt>
+              <dd>{issue.memo ?? "-"}</dd>
             </div>
           </dl>
         ) : (
@@ -281,6 +287,14 @@ function DetailModalContent({ issue, onClose, onSave }: DetailModalContentProps)
                 />
               </label>
             </div>
+            <label className={styles.memoEditor}>
+              <span>비고 / 전달 메모</span>
+              <textarea
+                placeholder="추가 메모나 전달 사항을 입력하세요"
+                rows={4}
+                {...register("memo")}
+              />
+            </label>
             <div className={styles.formActions}>
               <Button variant="ghost" onClick={cancelEditing}>
                 취소

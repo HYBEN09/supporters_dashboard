@@ -41,6 +41,7 @@ export type IssueItem = {
   jiraKey?: string;
   supporterJiraUrl?: string;
   serviceJiraUrl?: string;
+  memo?: string;
 };
 
 export type SelectableFilter<T extends string> = "전체" | T;
@@ -64,4 +65,5 @@ export type IssueFormValues = {
   notIssueReason: NotIssueReason | "";
   supporterJiraUrl: string;
   serviceJiraUrl: string;
+  memo: string;
 };

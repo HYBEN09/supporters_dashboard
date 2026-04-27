@@ -38,6 +38,7 @@ export function filterIssues(items: IssueItem[], filters: IssueFilters) {
         item.jiraKey ?? "",
         item.supporterJiraUrl ?? "",
         item.serviceJiraUrl ?? "",
+        item.memo ?? "",
       ]
         .join(" ")
         .toLowerCase()
