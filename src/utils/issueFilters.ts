@@ -1,9 +1,12 @@
 import { PERIOD_OPTIONS } from "../data/filterOptions";
 import type { IssueFilters, IssueItem } from "../types/issue";
 
+const DEFAULT_PERIOD = PERIOD_OPTIONS[1];
+
 export const DEFAULT_FILTERS: IssueFilters = {
   keyword: "",
-  periodId: PERIOD_OPTIONS[1].id,
+  periodStart: DEFAULT_PERIOD.start,
+  periodEnd: DEFAULT_PERIOD.end,
   serviceName: "전체",
   platform: "전체",
   issueStatus: "전체",
@@ -12,13 +15,19 @@ export const DEFAULT_FILTERS: IssueFilters = {
 
 export function getPeriodById(periodId: string) {
   return (
-    PERIOD_OPTIONS.find((period) => period.id === periodId) ?? PERIOD_OPTIONS[1]
+    PERIOD_OPTIONS.find((period) => period.id === periodId) ?? DEFAULT_PERIOD
   );
 }
 
-export function isWithinPeriod(registeredAt: string, periodId: string) {
-  const period = getPeriodById(periodId);
-  return registeredAt >= period.start && registeredAt <= period.end;
+export function isWithinPeriod(
+  registeredAt: string,
+  periodStart: string,
+  periodEnd: string,
+) {
+  const startsAfter = periodStart.length === 0 || registeredAt >= periodStart;
+  const endsBefore = periodEnd.length === 0 || registeredAt <= periodEnd;
+
+  return startsAfter && endsBefore;
 }
 
 export function filterIssues(items: IssueItem[], filters: IssueFilters) {
@@ -44,7 +53,11 @@ export function filterIssues(items: IssueItem[], filters: IssueFilters) {
         .toLowerCase()
         .includes(keyword);
 
-    const matchesPeriod = isWithinPeriod(item.registeredAt, filters.periodId);
+    const matchesPeriod = isWithinPeriod(
+      item.registeredAt,
+      filters.periodStart,
+      filters.periodEnd,
+    );
     const matchesService =
       filters.serviceName === "전체" || item.serviceName === filters.serviceName;
     const matchesPlatform =

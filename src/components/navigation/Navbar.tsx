@@ -1,6 +1,4 @@
 import { NavLink } from "react-router-dom";
-import { PERIOD_OPTIONS } from "../../data/filterOptions";
-import { usePeriod } from "../../features/period/usePeriod";
 import styles from "./Navbar.module.css";
 
 const navItems = [
@@ -10,8 +8,6 @@ const navItems = [
 ];
 
 export function Navbar() {
-  const { selectedPeriodId, setSelectedPeriodId } = usePeriod();
-
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -34,21 +30,6 @@ export function Navbar() {
           ))}
         </nav>
         <div className={styles.actions}>
-          <label className={styles.periodLabel} htmlFor="global-period">
-            기간
-          </label>
-          <select
-            className={styles.periodSelect}
-            id="global-period"
-            value={selectedPeriodId}
-            onChange={(event) => setSelectedPeriodId(event.target.value)}
-          >
-            {PERIOD_OPTIONS.map((period) => (
-              <option key={period.id} value={period.id}>
-                {period.label}
-              </option>
-            ))}
-          </select>
           <div className={styles.profile} aria-label="관리자 프로필">
             <span className={styles.avatar}>관</span>
             <div>

@@ -48,7 +48,8 @@ export type SelectableFilter<T extends string> = "전체" | T;
 
 export type IssueFilters = {
   keyword: string;
-  periodId: string;
+  periodStart: string;
+  periodEnd: string;
   serviceName: SelectableFilter<ServiceName>;
   platform: SelectableFilter<Platform>;
   issueStatus: SelectableFilter<IssueStatus>;

@@ -55,22 +55,16 @@ const reasonColors = ["#1f6feb", "#12b76a", "#f79009", "#f04438", "#667085"];
 export function DashboardPage() {
   const { selectedPeriodId } = usePeriod();
   const { issues } = useIssues();
-  const [filters, setFilters] = useState<Omit<IssueFilters, "periodId">>({
-    keyword: "",
-    serviceName: DEFAULT_FILTERS.serviceName,
-    platform: DEFAULT_FILTERS.platform,
-    issueStatus: DEFAULT_FILTERS.issueStatus,
-    fixStatus: DEFAULT_FILTERS.fixStatus,
-  });
   const selectedPeriod = getPeriodById(selectedPeriodId);
-  const effectiveFilters = useMemo(
-    () => ({ ...filters, periodId: selectedPeriodId }),
-    [filters, selectedPeriodId],
-  );
+  const [filters, setFilters] = useState<IssueFilters>({
+    ...DEFAULT_FILTERS,
+    periodStart: selectedPeriod.start,
+    periodEnd: selectedPeriod.end,
+  });
 
   const filteredIssues = useMemo(
-    () => filterIssues(issues, effectiveFilters),
-    [effectiveFilters, issues],
+    () => filterIssues(issues, filters),
+    [filters, issues],
   );
   const kpis = useMemo(() => getKpis(filteredIssues), [filteredIssues]);
   const monthlyStatus = useMemo(
@@ -87,19 +81,21 @@ export function DashboardPage() {
   );
   const detailPagination = usePagination(filteredIssues, 5);
 
-  const periodSummary = `${selectedPeriod.start.replaceAll("-", ".")} - ${selectedPeriod.end.replaceAll("-", ".")}`;
+  const periodSummary = `${filters.periodStart.replaceAll("-", ".")} - ${filters.periodEnd.replaceAll("-", ".")}`;
   const currentSummary = `현재 조회: 전체 기간 · ${filters.serviceName} 서비스 · ${filters.platform} 플랫폼`;
 
-  function updateFilter<Key extends keyof Omit<IssueFilters, "periodId">>(
+  function updateFilter<Key extends keyof IssueFilters>(
     key: Key,
-    value: Omit<IssueFilters, "periodId">[Key],
+    value: IssueFilters[Key],
   ) {
     setFilters((current) => ({ ...current, [key]: value }));
   }
 
   function resetFilters() {
     setFilters({
-      keyword: "",
+      ...DEFAULT_FILTERS,
+      periodStart: selectedPeriod.start,
+      periodEnd: selectedPeriod.end,
       serviceName: DEFAULT_FILTERS.serviceName,
       platform: DEFAULT_FILTERS.platform,
       issueStatus: DEFAULT_FILTERS.issueStatus,
@@ -114,9 +110,25 @@ export function DashboardPage() {
           <label className={styles.dateField}>
             <span>기간</span>
             <div className={styles.dateRange}>
-              <input readOnly type="date" value={selectedPeriod.start} />
+              <input
+                aria-label="조회 시작일"
+                max={filters.periodEnd || undefined}
+                type="date"
+                value={filters.periodStart}
+                onChange={(event) =>
+                  updateFilter("periodStart", event.target.value)
+                }
+              />
               <span aria-hidden="true">~</span>
-              <input readOnly type="date" value={selectedPeriod.end} />
+              <input
+                aria-label="조회 종료일"
+                min={filters.periodStart || undefined}
+                type="date"
+                value={filters.periodEnd}
+                onChange={(event) =>
+                  updateFilter("periodEnd", event.target.value)
+                }
+              />
             </div>
           </label>
 

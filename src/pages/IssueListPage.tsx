@@ -34,41 +34,30 @@ import styles from "./IssueListPage.module.css";
 export function IssueListPage() {
   const { selectedPeriodId } = usePeriod();
   const { issues, updateIssue } = useIssues();
-  const [draftFilters, setDraftFilters] = useState<Omit<IssueFilters, "periodId">>({
-    keyword: "",
-    serviceName: DEFAULT_FILTERS.serviceName,
-    platform: DEFAULT_FILTERS.platform,
-    issueStatus: DEFAULT_FILTERS.issueStatus,
-    fixStatus: DEFAULT_FILTERS.fixStatus,
-  });
-  const [appliedFilters, setAppliedFilters] = useState<
-    Omit<IssueFilters, "periodId">
-  >({
-    keyword: "",
-    serviceName: DEFAULT_FILTERS.serviceName,
-    platform: DEFAULT_FILTERS.platform,
-    issueStatus: DEFAULT_FILTERS.issueStatus,
-    fixStatus: DEFAULT_FILTERS.fixStatus,
-  });
-  const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
   const selectedPeriod = getPeriodById(selectedPeriodId);
-  const effectiveAppliedFilters = useMemo(
-    () => ({ ...appliedFilters, periodId: selectedPeriodId }),
-    [appliedFilters, selectedPeriodId],
-  );
+  const defaultFilters: IssueFilters = {
+    ...DEFAULT_FILTERS,
+    periodStart: selectedPeriod.start,
+    periodEnd: selectedPeriod.end,
+  };
+  const [draftFilters, setDraftFilters] =
+    useState<IssueFilters>(defaultFilters);
+  const [appliedFilters, setAppliedFilters] =
+    useState<IssueFilters>(defaultFilters);
+  const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
 
   const filteredIssues = useMemo(
-    () => filterIssues(issues, effectiveAppliedFilters),
-    [effectiveAppliedFilters, issues],
+    () => filterIssues(issues, appliedFilters),
+    [appliedFilters, issues],
   );
   const kpis = useMemo(() => getKpis(filteredIssues), [filteredIssues]);
   const pagination = usePagination(filteredIssues, 5);
-  const periodSummary = `${selectedPeriod.start.replaceAll("-", ".")} - ${selectedPeriod.end.replaceAll("-", ".")}`;
+  const periodSummary = `${appliedFilters.periodStart.replaceAll("-", ".")} - ${appliedFilters.periodEnd.replaceAll("-", ".")}`;
   const currentSummary = `현재 조회: 전체 기간 · ${appliedFilters.serviceName} 서비스 · ${appliedFilters.platform} 플랫폼`;
 
-  function updateDraft<Key extends keyof Omit<IssueFilters, "periodId">>(
+  function updateDraft<Key extends keyof IssueFilters>(
     key: Key,
-    value: Omit<IssueFilters, "periodId">[Key],
+    value: IssueFilters[Key],
   ) {
     setDraftFilters((current) => ({ ...current, [key]: value }));
   }
@@ -80,7 +69,9 @@ export function IssueListPage() {
 
   function resetFilters() {
     const nextFilters = {
-      keyword: "",
+      ...DEFAULT_FILTERS,
+      periodStart: selectedPeriod.start,
+      periodEnd: selectedPeriod.end,
       serviceName: DEFAULT_FILTERS.serviceName,
       platform: DEFAULT_FILTERS.platform,
       issueStatus: DEFAULT_FILTERS.issueStatus,
@@ -112,9 +103,25 @@ export function IssueListPage() {
           <label className={styles.dateField}>
             <span>기간</span>
             <div className={styles.dateRange}>
-              <input readOnly type="date" value={selectedPeriod.start} />
+              <input
+                aria-label="조회 시작일"
+                max={draftFilters.periodEnd || undefined}
+                type="date"
+                value={draftFilters.periodStart}
+                onChange={(event) =>
+                  updateDraft("periodStart", event.target.value)
+                }
+              />
               <span aria-hidden="true">~</span>
-              <input readOnly type="date" value={selectedPeriod.end} />
+              <input
+                aria-label="조회 종료일"
+                min={draftFilters.periodStart || undefined}
+                type="date"
+                value={draftFilters.periodEnd}
+                onChange={(event) =>
+                  updateDraft("periodEnd", event.target.value)
+                }
+              />
             </div>
           </label>
 
