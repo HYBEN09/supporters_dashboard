@@ -325,15 +325,23 @@ export function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {serviceStatus.map((service) => (
-                <tr key={service.serviceName}>
-                  <td>{service.serviceName}</td>
-                  <td>{service.totalReports}</td>
-                  <td>{service.issueCount}</td>
-                  <td>{service.fixedCount}</td>
-                  <td>{formatPercent(service.improvementRate)}</td>
+              {serviceStatus.length > 0 ? (
+                serviceStatus.map((service) => (
+                  <tr key={service.serviceName}>
+                    <td>{service.serviceName}</td>
+                    <td>{service.totalReports}</td>
+                    <td>{service.issueCount}</td>
+                    <td>{service.fixedCount}</td>
+                    <td>{formatPercent(service.improvementRate)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className={styles.empty} colSpan={5}>
+                    생성된 이슈가 없습니다.
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </SectionCard>

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { mockIssues } from "../../data/mockIssues";
-import type { IssueItem, ServiceName } from "../../types/issue";
+import type { IssueItem, Platform, ServiceName } from "../../types/issue";
 import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
 
 type IssueProviderProps = {
@@ -12,6 +11,15 @@ function createIssueId(sequence: number) {
 }
 
 const STORAGE_KEY = "supporters-issues";
+const MOCK_REMOVAL_KEY = "supporters-issues-mock-data-removed";
+const MOCK_REMOVAL_V2_KEY = "supporters-issues-mock-data-removed-v2";
+
+const LEGACY_MOCK_ISSUE_IDS = new Set(
+  Array.from(
+    { length: 36 },
+    (_, index) => `ISS-${String(index + 1).padStart(3, "0")}`,
+  ),
+);
 
 const LEGACY_SERVICE_NAME_MAP: Record<string, ServiceName> = {
   "서비스 A": "카카오톡",
@@ -21,12 +29,26 @@ const LEGACY_SERVICE_NAME_MAP: Record<string, ServiceName> = {
   "서비스 E": "카카오맵",
 };
 
-function migrateLegacyServiceNames(issues: IssueItem[]) {
+const LEGACY_PLATFORM_MAP: Record<string, Platform> = {
+  Web: "WIN",
+};
+
+function migrateLegacyValues(issues: IssueItem[]) {
   return issues.map((issue) => ({
     ...issue,
     serviceName: LEGACY_SERVICE_NAME_MAP[issue.serviceName] ?? issue.serviceName,
-    platform: String(issue.platform) === "Web" ? "WIN" : issue.platform,
+    platform: LEGACY_PLATFORM_MAP[issue.platform] ?? issue.platform,
   }));
+}
+
+function removeSeedMockIssues(issues: IssueItem[]) {
+  if (localStorage.getItem(MOCK_REMOVAL_V2_KEY) === "true") {
+    return issues;
+  }
+
+  localStorage.setItem(MOCK_REMOVAL_KEY, "true");
+  localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
+  return issues.filter((issue) => !LEGACY_MOCK_ISSUE_IDS.has(issue.id));
 }
 
 function getInitialIssues() {
@@ -34,15 +56,24 @@ function getInitialIssues() {
     const savedIssues = localStorage.getItem(STORAGE_KEY);
 
     if (!savedIssues) {
-      return migrateLegacyServiceNames(mockIssues);
+      localStorage.setItem(MOCK_REMOVAL_KEY, "true");
+      localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
+      return [];
     }
 
     const parsedIssues = JSON.parse(savedIssues) as IssueItem[];
-    return Array.isArray(parsedIssues)
-      ? migrateLegacyServiceNames(parsedIssues)
-      : migrateLegacyServiceNames(mockIssues);
+
+    if (!Array.isArray(parsedIssues)) {
+      localStorage.setItem(MOCK_REMOVAL_KEY, "true");
+      localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
+      return [];
+    }
+
+    return migrateLegacyValues(removeSeedMockIssues(parsedIssues));
   } catch {
-    return migrateLegacyServiceNames(mockIssues);
+    localStorage.setItem(MOCK_REMOVAL_KEY, "true");
+    localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
+    return [];
   }
 }
 

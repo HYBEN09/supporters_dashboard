@@ -65,22 +65,29 @@ export function getMonthlyStatus(items: IssueItem[]) {
 }
 
 export function getServiceStatus(items: IssueItem[]) {
-  return SERVICE_OPTIONS.map((serviceName) => {
+  return SERVICE_OPTIONS.flatMap((serviceName) => {
     const serviceItems = items.filter((item) => item.serviceName === serviceName);
     const issueCount = serviceItems.filter(
       (item) => item.issueStatus === "이슈",
     ).length;
+
+    if (issueCount === 0) {
+      return [];
+    }
+
     const fixedCount = serviceItems.filter(
       (item) => item.issueStatus === "이슈" && item.fixStatus === "수정 완료",
     ).length;
 
-    return {
-      serviceName: serviceName as ServiceName,
-      totalReports: serviceItems.length,
-      issueCount,
-      fixedCount,
-      improvementRate: calculateImprovementRate(fixedCount, issueCount),
-    };
+    return [
+      {
+        serviceName: serviceName as ServiceName,
+        totalReports: serviceItems.length,
+        issueCount,
+        fixedCount,
+        improvementRate: calculateImprovementRate(fixedCount, issueCount),
+      },
+    ];
   });
 }
 
