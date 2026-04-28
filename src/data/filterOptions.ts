@@ -48,9 +48,8 @@ export const ISSUE_STATUS_OPTIONS = ["이슈", "이슈 아님", "보류"] as con
 export const FIX_STATUS_OPTIONS = ["수정 필요", "수정 완료"] as const;
 
 export const NOT_ISSUE_REASON_OPTIONS = [
-  "기획 의도에 부합",
-  "중복 제보",
-  "사용자 오인",
-  "개선 불가",
+  "정상 작동(이슈 재현 안됨)",
+  "실행 경로 불명확",
+  "사용성 이슈",
   "기타",
 ] as const;

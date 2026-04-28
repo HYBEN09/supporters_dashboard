@@ -215,7 +215,8 @@ function DetailModalContent({
       serviceName: values.serviceName || issue.serviceName,
       platform: values.platform,
       issueStatus: values.issueStatus || issue.issueStatus,
-      fixStatus: values.fixStatus,
+      fixStatus:
+        values.issueStatus === "이슈 아님" ? "수정 필요" : values.fixStatus,
       notIssueReason:
         values.issueStatus === "이슈 아님" && values.notIssueReason
           ? values.notIssueReason
@@ -469,7 +470,7 @@ function DetailModalContent({
             </label>
             <label>
               <span>수정 여부</span>
-              <select {...register("fixStatus")}>
+              <select disabled={isNotIssue} {...register("fixStatus")}>
                 {FIX_STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
                     {status}

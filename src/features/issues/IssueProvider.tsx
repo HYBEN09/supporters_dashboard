@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { IssueItem, Platform, ServiceName } from "../../types/issue";
+import type {
+  IssueItem,
+  NotIssueReason,
+  Platform,
+  ServiceName,
+} from "../../types/issue";
 import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
 
 type IssueProviderProps = {
@@ -33,11 +38,21 @@ const LEGACY_PLATFORM_MAP: Record<string, Platform> = {
   Web: "WIN",
 };
 
+const LEGACY_NOT_ISSUE_REASON_MAP: Record<string, NotIssueReason> = {
+  "기획 의도에 부합": "정상 작동(이슈 재현 안됨)",
+  "중복 제보": "기타",
+  "사용자 오인": "사용성 이슈",
+  "개선 불가": "기타",
+};
+
 function migrateLegacyValues(issues: IssueItem[]) {
   return issues.map((issue) => ({
     ...issue,
     serviceName: LEGACY_SERVICE_NAME_MAP[issue.serviceName] ?? issue.serviceName,
     platform: LEGACY_PLATFORM_MAP[issue.platform] ?? issue.platform,
+    notIssueReason: issue.notIssueReason
+      ? LEGACY_NOT_ISSUE_REASON_MAP[issue.notIssueReason] ?? issue.notIssueReason
+      : undefined,
   }));
 }
 

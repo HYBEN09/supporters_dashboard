@@ -16,10 +16,9 @@ export type IssueStatus = "이슈" | "이슈 아님" | "보류";
 export type FixStatus = "수정 필요" | "수정 완료";
 
 export type NotIssueReason =
-  | "기획 의도에 부합"
-  | "중복 제보"
-  | "사용자 오인"
-  | "개선 불가"
+  | "정상 작동(이슈 재현 안됨)"
+  | "실행 경로 불명확"
+  | "사용성 이슈"
   | "기타";
 
 export type IssueItem = {

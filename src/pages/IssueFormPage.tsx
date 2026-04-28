@@ -52,7 +52,8 @@ export function IssueFormPage() {
       platform: values.platform,
       path: "-",
       issueStatus: values.issueStatus || "이슈",
-      fixStatus: values.fixStatus,
+      fixStatus:
+        values.issueStatus === "이슈 아님" ? "수정 필요" : values.fixStatus,
       notIssueReason:
         values.issueStatus === "이슈 아님" && values.notIssueReason
           ? values.notIssueReason
@@ -212,8 +213,15 @@ export function IssueFormPage() {
               </label>
 
               <label className={styles.field}>
-                <span>수정 여부</span>
-                <select {...register("fixStatus")}>
+                <span>
+                  수정 여부
+                  {isNotIssue ? (
+                    <small className={styles.locked}>
+                      이슈 아님 선택 시 비활성
+                    </small>
+                  ) : null}
+                </span>
+                <select disabled={isNotIssue} {...register("fixStatus")}>
                   {FIX_STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status}>
                       {status}
