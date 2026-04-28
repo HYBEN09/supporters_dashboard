@@ -106,3 +106,47 @@
   font-size: 13px;
   font-weight: 900;
 }
+
+@media (max-width: 900px) {
+  .inner {
+    grid-template-columns: 1fr auto;
+    width: min(100% - 32px, 1440px);
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .nav {
+    grid-column: 1 / -1;
+    order: 3;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navLink {
+    height: 40px;
+    flex: 0 0 auto;
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .inner {
+    width: min(100% - 24px, 1440px);
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  .profile div {
+    display: none;
+  }
+}

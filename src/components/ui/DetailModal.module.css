@@ -377,3 +377,80 @@
   padding-top: 16px;
   margin-top: 4px;
 }
+
+@media (max-width: 640px) {
+  .backdrop {
+    align-items: stretch;
+    padding: 12px;
+  }
+
+  .modal {
+    width: 100%;
+    height: auto;
+    max-height: calc(100vh - 24px);
+    border-radius: 14px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 16px 14px;
+  }
+
+  .headerActions {
+    width: 100%;
+  }
+
+  .editButton,
+  .closeButton {
+    flex: 1;
+  }
+
+  .details div {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 12px 16px;
+  }
+
+  .details dt {
+    height: auto;
+    border-right: 0;
+    padding-right: 0;
+  }
+
+  .footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px 16px;
+  }
+
+  .footerActions {
+    width: 100%;
+  }
+
+  .utilityButton {
+    flex: 1;
+  }
+
+  .editForm {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .jiraEditor {
+    grid-column: auto;
+  }
+
+  .jiraEditor label {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    grid-column: auto;
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+}

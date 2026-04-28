@@ -204,3 +204,71 @@
   color: #667085;
   text-align: center;
 }
+
+@media (max-width: 1180px) {
+  .filterGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .actions {
+    grid-column: span 3;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .filterGrid,
+  .dateRange,
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    grid-column: auto;
+  }
+
+  .dateRange span {
+    display: none;
+  }
+
+  .filterPanel {
+    padding: 14px;
+  }
+
+  .listHeader {
+    padding: 0 14px;
+  }
+
+  .table {
+    min-width: 780px;
+  }
+}
+
+@media (max-width: 520px) {
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
