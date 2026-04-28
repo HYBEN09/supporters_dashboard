@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
@@ -40,9 +40,21 @@ export function IssueFormPage() {
     handleSubmit,
     register,
     reset,
+    setValue,
   } = useForm<IssueFormValues>({ defaultValues });
   const issueStatus = useWatch({ control, name: "issueStatus" });
   const isNotIssue = issueStatus === "이슈 아님";
+
+  useEffect(() => {
+    if (isNotIssue) {
+      setValue("fixStatus", "-");
+      return;
+    }
+
+    if (getValues("fixStatus") === "-") {
+      setValue("fixStatus", "수정 필요");
+    }
+  }, [getValues, isNotIssue, setValue]);
 
   function toIssueItem(values: IssueFormValues): Omit<IssueItem, "id"> {
     return {
@@ -52,8 +64,7 @@ export function IssueFormPage() {
       platform: values.platform,
       path: "-",
       issueStatus: values.issueStatus || "이슈",
-      fixStatus:
-        values.issueStatus === "이슈 아님" ? "수정 필요" : values.fixStatus,
+      fixStatus: values.issueStatus === "이슈 아님" ? "-" : values.fixStatus,
       notIssueReason:
         values.issueStatus === "이슈 아님" && values.notIssueReason
           ? values.notIssueReason
@@ -222,6 +233,7 @@ export function IssueFormPage() {
                   ) : null}
                 </span>
                 <select disabled={isNotIssue} {...register("fixStatus")}>
+                  {isNotIssue ? <option value="-">-</option> : null}
                   {FIX_STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status}>
                       {status}

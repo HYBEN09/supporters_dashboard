@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
+  FixStatus,
   IssueItem,
   NotIssueReason,
   Platform,
@@ -50,10 +51,19 @@ function migrateLegacyValues(issues: IssueItem[]) {
     ...issue,
     serviceName: LEGACY_SERVICE_NAME_MAP[issue.serviceName] ?? issue.serviceName,
     platform: LEGACY_PLATFORM_MAP[issue.platform] ?? issue.platform,
+    fixStatus: getMigratedFixStatus(issue),
     notIssueReason: issue.notIssueReason
       ? LEGACY_NOT_ISSUE_REASON_MAP[issue.notIssueReason] ?? issue.notIssueReason
       : undefined,
   }));
+}
+
+function getMigratedFixStatus(issue: IssueItem): FixStatus {
+  if (issue.issueStatus === "이슈 아님") {
+    return "-";
+  }
+
+  return issue.fixStatus === "-" ? "수정 필요" : issue.fixStatus;
 }
 
 function removeSeedMockIssues(issues: IssueItem[]) {

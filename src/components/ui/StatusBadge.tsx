@@ -7,7 +7,9 @@ type StatusBadgeProps = {
 
 export function StatusBadge({ value }: StatusBadgeProps) {
   const tone =
-    value === "이슈"
+    value === "-"
+      ? "neutral"
+      : value === "이슈"
       ? "danger"
       : value === "이슈 아님"
         ? "neutral"
