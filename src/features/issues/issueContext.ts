@@ -9,6 +9,7 @@ export type IssueContextValue = {
   issues: IssueItem[];
   addIssue: (issue: NewIssueItem) => IssueItem;
   updateIssue: (id: string, updates: IssueUpdate) => void;
+  deleteIssue: (id: string) => void;
 };
 
 export const IssueContext = createContext<IssueContextValue | null>(null);

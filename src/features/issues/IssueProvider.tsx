@@ -64,9 +64,13 @@ export function IssueProvider({ children }: IssueProviderProps) {
     );
   }, []);
 
+  const deleteIssue = useCallback((id: string) => {
+    setIssues((current) => current.filter((issue) => issue.id !== id));
+  }, []);
+
   const value = useMemo(
-    () => ({ issues, addIssue, updateIssue }),
-    [addIssue, issues, updateIssue],
+    () => ({ issues, addIssue, updateIssue, deleteIssue }),
+    [addIssue, deleteIssue, issues, updateIssue],
   );
 
   return (

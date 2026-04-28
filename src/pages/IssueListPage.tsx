@@ -33,7 +33,7 @@ import styles from "./IssueListPage.module.css";
 
 export function IssueListPage() {
   const { selectedPeriodId } = usePeriod();
-  const { issues, updateIssue } = useIssues();
+  const { deleteIssue, issues, updateIssue } = useIssues();
   const selectedPeriod = getPeriodById(selectedPeriodId);
   const defaultFilters: IssueFilters = {
     ...DEFAULT_FILTERS,
@@ -328,6 +328,10 @@ export function IssueListPage() {
       <DetailModal
         issue={selectedIssue}
         onClose={() => setSelectedIssue(null)}
+        onDelete={(id) => {
+          deleteIssue(id);
+          setSelectedIssue(null);
+        }}
         onSave={(id, updates) => {
           updateIssue(id, updates);
           setSelectedIssue((current) =>

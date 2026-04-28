@@ -29,9 +29,122 @@ const editablePlatformOptions = [
 const uniqueServiceOptions = Array.from(new Set(editableServiceOptions));
 const uniquePlatformOptions = Array.from(new Set(editablePlatformOptions));
 
+type DetailIconName =
+  | "ban"
+  | "calendar"
+  | "check"
+  | "circle"
+  | "clock"
+  | "copy"
+  | "edit"
+  | "external"
+  | "file"
+  | "globe"
+  | "link"
+  | "monitor"
+  | "trash"
+  | "user"
+  | "x";
+
+function DetailIcon({ name }: { name: DetailIconName }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={styles.icon}
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      {name === "calendar" ? (
+        <>
+          <path d="M8 3v4M16 3v4M4 9h16" />
+          <rect height="16" rx="2" width="16" x="4" y="5" />
+        </>
+      ) : null}
+      {name === "user" ? (
+        <>
+          <path d="M20 21a8 8 0 0 0-16 0" />
+          <circle cx="12" cy="7" r="4" />
+        </>
+      ) : null}
+      {name === "monitor" ? (
+        <>
+          <rect height="12" rx="2" width="18" x="3" y="4" />
+          <path d="M8 20h8M12 16v4" />
+        </>
+      ) : null}
+      {name === "globe" ? (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+        </>
+      ) : null}
+      {name === "circle" ? (
+        <circle cx="12" cy="12" r="8" />
+      ) : null}
+      {name === "check" ? (
+        <path d="m5 12 4 4L19 6" />
+      ) : null}
+      {name === "ban" ? (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="m5 5 14 14" />
+        </>
+      ) : null}
+      {name === "link" ? (
+        <>
+          <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
+          <path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1" />
+        </>
+      ) : null}
+      {name === "file" ? (
+        <>
+          <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z" />
+          <path d="M14 3v6h6" />
+        </>
+      ) : null}
+      {name === "clock" ? (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </>
+      ) : null}
+      {name === "edit" ? (
+        <>
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+        </>
+      ) : null}
+      {name === "x" ? (
+        <path d="M18 6 6 18M6 6l12 12" />
+      ) : null}
+      {name === "external" ? (
+        <>
+          <path d="M15 3h6v6" />
+          <path d="M10 14 21 3" />
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+        </>
+      ) : null}
+      {name === "copy" ? (
+        <>
+          <rect height="13" rx="2" width="13" x="8" y="8" />
+          <path d="M4 16c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h9c1.1 0 2 .9 2 2" />
+        </>
+      ) : null}
+      {name === "trash" ? (
+        <>
+          <path d="M3 6h18" />
+          <path d="M8 6V4h8v2M19 6l-1 14H6L5 6" />
+          <path d="M10 11v5M14 11v5" />
+        </>
+      ) : null}
+    </svg>
+  );
+}
+
 type DetailModalProps = {
   issue: IssueItem | null;
   onClose: () => void;
+  onDelete?: (id: string) => void;
   onSave?: (id: string, updates: IssueUpdate) => void;
 };
 
@@ -50,24 +163,36 @@ function getDefaultValues(issue: IssueItem): IssueFormValues {
   };
 }
 
-export function DetailModal({ issue, onClose, onSave }: DetailModalProps) {
+export function DetailModal({ issue, onClose, onDelete, onSave }: DetailModalProps) {
   if (!issue) {
     return null;
   }
 
   return (
-    <DetailModalContent issue={issue} onClose={onClose} onSave={onSave} />
+    <DetailModalContent
+      issue={issue}
+      onClose={onClose}
+      onDelete={onDelete}
+      onSave={onSave}
+    />
   );
 }
 
 type DetailModalContentProps = {
   issue: IssueItem;
   onClose: () => void;
+  onDelete?: (id: string) => void;
   onSave?: (id: string, updates: IssueUpdate) => void;
 };
 
-function DetailModalContent({ issue, onClose, onSave }: DetailModalContentProps) {
+function DetailModalContent({
+  issue,
+  onClose,
+  onDelete,
+  onSave,
+}: DetailModalContentProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [copyMessage, setCopyMessage] = useState("");
   const {
     formState: { errors },
     control,
@@ -105,6 +230,39 @@ function DetailModalContent({ issue, onClose, onSave }: DetailModalContentProps)
     setIsEditing(false);
   }
 
+  async function copyIssue() {
+    const jiraLinks = getIssueJiraLinks(issue)
+      .map((link) => `${link.label}: ${link.url}`)
+      .join("\n");
+    const text = [
+      `제보 번호: ${issue.id}`,
+      `등록일: ${formatDate(issue.registeredAt)}`,
+      `작성자: ${issue.authorName}`,
+      `서비스명: ${issue.serviceName}`,
+      `플랫폼: ${issue.platform}`,
+      `이슈 여부: ${issue.issueStatus}`,
+      `수정 여부: ${issue.fixStatus}`,
+      `이슈 아님 사유: ${issue.notIssueReason ?? "-"}`,
+      `Jira 링크: ${jiraLinks || "-"}`,
+      `비고 / 전달 메모: ${issue.memo ?? "-"}`,
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyMessage("복사 완료");
+    } catch {
+      setCopyMessage("복사 실패");
+    }
+  }
+
+  function deleteCurrentIssue() {
+    if (!window.confirm(`${issue.id} 제보를 삭제할까요?`)) {
+      return;
+    }
+
+    onDelete?.(issue.id);
+  }
+
   return (
     <div className={styles.backdrop} role="presentation" onMouseDown={onClose}>
       <section
@@ -114,80 +272,142 @@ function DetailModalContent({ issue, onClose, onSave }: DetailModalContentProps)
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className={styles.header}>
-          <div>
+          <div className={styles.titleBlock}>
+            <span className={styles.idBadge}>{issue.id}</span>
             <h2>제보 상세</h2>
-            <p>{issue.id}</p>
+            <div className={styles.headerBadges}>
+              <StatusBadge value={issue.issueStatus} />
+              <StatusBadge value={issue.fixStatus} />
+            </div>
           </div>
           <div className={styles.headerActions}>
             {!isEditing ? (
-              <Button variant="secondary" onClick={() => setIsEditing(true)}>
+              <Button
+                className={styles.editButton}
+                variant="secondary"
+                onClick={() => setIsEditing(true)}
+              >
+                <DetailIcon name="edit" />
                 수정
               </Button>
             ) : null}
-            <Button variant="ghost" onClick={onClose}>
+            <Button className={styles.closeButton} variant="ghost" onClick={onClose}>
+              <DetailIcon name="x" />
               닫기
             </Button>
           </div>
         </div>
         {!isEditing ? (
-          <dl className={styles.details}>
-            <div>
-              <dt>등록일</dt>
-              <dd>{formatDate(issue.registeredAt)}</dd>
-            </div>
-            <div>
-              <dt>작성자</dt>
-              <dd>{issue.authorName}</dd>
-            </div>
-            <div>
-              <dt>서비스명</dt>
-              <dd>{issue.serviceName}</dd>
-            </div>
-            <div>
-              <dt>플랫폼</dt>
-              <dd>{issue.platform}</dd>
-            </div>
-            <div>
-              <dt>실행 경로</dt>
-              <dd>{issue.path}</dd>
-            </div>
-            <div>
-              <dt>이슈 여부</dt>
-              <dd>
-                <StatusBadge value={issue.issueStatus} />
-              </dd>
-            </div>
-            <div>
-              <dt>수정 여부</dt>
-              <dd>
-                <StatusBadge value={issue.fixStatus} />
-              </dd>
-            </div>
-            <div>
-              <dt>이슈 아님 사유</dt>
-              <dd>{issue.notIssueReason ?? "-"}</dd>
-            </div>
-            <div>
-              <dt>Jira 링크</dt>
-              <dd>
-                {getIssueJiraLinks(issue).length > 0 ? (
-                  <div className={styles.jiraLinkList}>
-                    {getIssueJiraLinks(issue).map((link) => (
-                      <a href={link.url} key={link.label} rel="noreferrer" target="_blank">
-                        {link.label}
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  "-"
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>비고 / 전달 메모</dt>
-              <dd>{issue.memo ?? "-"}</dd>
-            </div>
-          </dl>
+          <>
+            <dl className={styles.details}>
+              <div>
+                <dt>
+                  <DetailIcon name="calendar" />
+                  등록일
+                </dt>
+                <dd>{formatDate(issue.registeredAt)}</dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="user" />
+                  작성자
+                </dt>
+                <dd>{issue.authorName}</dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="monitor" />
+                  서비스명
+                </dt>
+                <dd>{issue.serviceName}</dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="globe" />
+                  플랫폼
+                </dt>
+                <dd>{issue.platform}</dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="circle" />
+                  이슈 여부
+                </dt>
+                <dd>
+                  <StatusBadge value={issue.issueStatus} />
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="check" />
+                  수정 여부
+                </dt>
+                <dd>
+                  <StatusBadge value={issue.fixStatus} />
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="ban" />
+                  이슈 아님 사유
+                </dt>
+                <dd>{issue.notIssueReason ?? "-"}</dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="link" />
+                  Jira 링크
+                </dt>
+                <dd>
+                  {getIssueJiraLinks(issue).length > 0 ? (
+                    <div className={styles.jiraLinkList}>
+                      {getIssueJiraLinks(issue).map((link) => (
+                        <a
+                          href={link.url}
+                          key={link.label}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          <DetailIcon name="external" />
+                          {link.label}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    "-"
+                  )}
+                </dd>
+              </div>
+              <div className={styles.memoDetailRow}>
+                <dt>
+                  <DetailIcon name="file" />
+                  비고 / 전달 메모
+                </dt>
+                <dd>{issue.memo ?? "-"}</dd>
+              </div>
+            </dl>
+            <footer className={styles.footer}>
+              <span>
+                <DetailIcon name="clock" />
+                최종 수정 {formatDate(issue.registeredAt)}
+                {copyMessage ? ` · ${copyMessage}` : ""}
+              </span>
+              <div className={styles.footerActions}>
+                <button className={styles.utilityButton} type="button" onClick={copyIssue}>
+                  <DetailIcon name="copy" />
+                  복사
+                </button>
+                <button
+                  className={styles.utilityButton}
+                  type="button"
+                  onClick={deleteCurrentIssue}
+                >
+                  <DetailIcon name="trash" />
+                  삭제
+                </button>
+              </div>
+            </footer>
+          </>
         ) : (
           <form className={styles.editForm} onSubmit={handleSubmit(saveIssue)}>
             <label>
