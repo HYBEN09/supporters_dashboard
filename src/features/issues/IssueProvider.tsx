@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { mockIssues } from "../../data/mockIssues";
-import type { IssueItem } from "../../types/issue";
+import type { IssueItem, ServiceName } from "../../types/issue";
 import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
 
 type IssueProviderProps = {
@@ -13,18 +13,36 @@ function createIssueId(sequence: number) {
 
 const STORAGE_KEY = "supporters-issues";
 
+const LEGACY_SERVICE_NAME_MAP: Record<string, ServiceName> = {
+  "서비스 A": "카카오톡",
+  "서비스 B": "멜론",
+  "서비스 C": "카카오페이",
+  "서비스 D": "카카오페이지",
+  "서비스 E": "카카오맵",
+};
+
+function migrateLegacyServiceNames(issues: IssueItem[]) {
+  return issues.map((issue) => ({
+    ...issue,
+    serviceName: LEGACY_SERVICE_NAME_MAP[issue.serviceName] ?? issue.serviceName,
+    platform: String(issue.platform) === "Web" ? "WIN" : issue.platform,
+  }));
+}
+
 function getInitialIssues() {
   try {
     const savedIssues = localStorage.getItem(STORAGE_KEY);
 
     if (!savedIssues) {
-      return mockIssues;
+      return migrateLegacyServiceNames(mockIssues);
     }
 
     const parsedIssues = JSON.parse(savedIssues) as IssueItem[];
-    return Array.isArray(parsedIssues) ? parsedIssues : mockIssues;
+    return Array.isArray(parsedIssues)
+      ? migrateLegacyServiceNames(parsedIssues)
+      : migrateLegacyServiceNames(mockIssues);
   } catch {
-    return mockIssues;
+    return migrateLegacyServiceNames(mockIssues);
   }
 }
 

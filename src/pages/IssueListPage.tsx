@@ -84,11 +84,6 @@ export function IssueListPage() {
 
   return (
     <>
-      <header className={styles.header}>
-        <h1>이슈 리스트 뷰</h1>
-        <p>등록된 제보를 검색하고 상세 정보를 확인합니다.</p>
-      </header>
-
       <section className={styles.filterPanel} aria-label="이슈 목록 필터">
         <div className={styles.filterGrid}>
           <label className={styles.filterField}>

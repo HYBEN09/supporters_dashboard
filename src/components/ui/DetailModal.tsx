@@ -6,7 +6,6 @@ import {
   ISSUE_FORM_SERVICE_OPTIONS,
   ISSUE_STATUS_OPTIONS,
   NOT_ISSUE_REASON_OPTIONS,
-  PLATFORM_OPTIONS,
   SERVICE_OPTIONS,
 } from "../../data/filterOptions";
 import type { IssueUpdate } from "../../features/issues/issueContext";
@@ -22,7 +21,6 @@ const editableServiceOptions = [
 ] as const;
 
 const editablePlatformOptions = [
-  ...PLATFORM_OPTIONS,
   ...ISSUE_FORM_PLATFORM_OPTIONS,
 ] as const;
 

@@ -13,16 +13,6 @@ export const PERIOD_OPTIONS = [
   },
 ] as const;
 
-export const SERVICE_OPTIONS = [
-  "서비스 A",
-  "서비스 B",
-  "서비스 C",
-  "서비스 D",
-  "서비스 E",
-] as const;
-
-export const PLATFORM_OPTIONS = ["Web", "iOS", "Android"] as const;
-
 export const ISSUE_FORM_SERVICE_OPTIONS = [
   "카카오톡",
   "멜론",
@@ -40,6 +30,8 @@ export const ISSUE_FORM_SERVICE_OPTIONS = [
   "톡딜",
 ] as const;
 
+export const SERVICE_OPTIONS = ISSUE_FORM_SERVICE_OPTIONS;
+
 export const ISSUE_FORM_PLATFORM_OPTIONS = [
   "선택 안 함",
   "Android",
@@ -48,6 +40,8 @@ export const ISSUE_FORM_PLATFORM_OPTIONS = [
   "Watch",
   "Mac",
 ] as const;
+
+export const PLATFORM_OPTIONS = ISSUE_FORM_PLATFORM_OPTIONS;
 
 export const ISSUE_STATUS_OPTIONS = ["이슈", "이슈 아님", "보류"] as const;
 

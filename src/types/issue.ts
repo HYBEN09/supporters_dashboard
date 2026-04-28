@@ -7,15 +7,9 @@ type IssueFormServiceName = (typeof ISSUE_FORM_SERVICE_OPTIONS)[number];
 
 type IssueFormPlatform = (typeof ISSUE_FORM_PLATFORM_OPTIONS)[number];
 
-export type ServiceName =
-  | "서비스 A"
-  | "서비스 B"
-  | "서비스 C"
-  | "서비스 D"
-  | "서비스 E"
-  | IssueFormServiceName;
+export type ServiceName = IssueFormServiceName;
 
-export type Platform = "Web" | "iOS" | "Android" | IssueFormPlatform;
+export type Platform = IssueFormPlatform;
 
 export type IssueStatus = "이슈" | "이슈 아님" | "보류";
 
