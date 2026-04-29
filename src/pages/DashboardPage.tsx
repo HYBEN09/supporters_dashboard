@@ -298,27 +298,14 @@ export function DashboardPage() {
         </SectionCard>
 
         <SectionCard title="서비스별 현황">
-          <div className={styles.chartBox}>
-            <ResponsiveContainer height={300} width="100%">
-              <BarChart data={serviceStatus}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="serviceName" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="issueCount" fill="#1f6feb" name="이슈 수" />
-                <Bar dataKey="fixedCount" fill="#12b76a" name="수정 완료 수" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
           <table className={styles.summaryTable}>
             <thead>
               <tr>
                 <th>서비스</th>
-                <th>전체</th>
-                <th>이슈</th>
-                <th>수정 완료</th>
-                <th>개선율</th>
+                <th>서포터즈 제보 이슈 수</th>
+                <th>접근성 이슈 수</th>
+                <th>수정된 이슈 수</th>
+                <th>이슈 아님 수</th>
               </tr>
             </thead>
             <tbody>
@@ -326,10 +313,10 @@ export function DashboardPage() {
                 serviceStatus.map((service) => (
                   <tr key={service.serviceName}>
                     <td>{service.serviceName}</td>
-                    <td>{service.totalReports}</td>
-                    <td>{service.issueCount}</td>
-                    <td>{service.fixedCount}</td>
-                    <td>{formatPercent(service.improvementRate)}</td>
+                    <td>{service.supporterIssueCount}</td>
+                    <td>{service.accessibilityIssueCount}</td>
+                    <td>{service.fixedIssueCount}</td>
+                    <td>{service.notIssueCount}</td>
                   </tr>
                 ))
               ) : (

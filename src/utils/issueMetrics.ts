@@ -203,25 +203,36 @@ export function getAuthorReportStatus(items: IssueItem[]) {
 export function getServiceStatus(items: IssueItem[]) {
   return SERVICE_OPTIONS.flatMap((serviceName) => {
     const serviceItems = items.filter((item) => item.serviceName === serviceName);
-    const issueCount = serviceItems.filter(
-      (item) => item.issueStatus === "이슈",
+    const supporterIssueCount = serviceItems.filter(
+      (item) => item.supporterJiraUrl || item.jiraKey,
+    ).length;
+    const notIssueCount = serviceItems.filter(
+      (item) => item.issueStatus === "이슈 아님",
+    ).length;
+    const accessibilityIssueCount = Math.max(
+      0,
+      supporterIssueCount - notIssueCount,
+    );
+    const fixedIssueCount = serviceItems.filter(
+      (item) => item.serviceJiraUrl && item.fixStatus === "수정 완료",
     ).length;
 
-    if (issueCount === 0) {
+    if (
+      supporterIssueCount === 0 &&
+      accessibilityIssueCount === 0 &&
+      fixedIssueCount === 0 &&
+      notIssueCount === 0
+    ) {
       return [];
     }
-
-    const fixedCount = serviceItems.filter(
-      (item) => item.issueStatus === "이슈" && item.fixStatus === "수정 완료",
-    ).length;
 
     return [
       {
         serviceName: serviceName as ServiceName,
-        totalReports: serviceItems.length,
-        issueCount,
-        fixedCount,
-        improvementRate: calculateImprovementRate(fixedCount, issueCount),
+        supporterIssueCount,
+        accessibilityIssueCount,
+        fixedIssueCount,
+        notIssueCount,
       },
     ];
   });
