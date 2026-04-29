@@ -1,6 +1,6 @@
 # Supabase shared issue storage
 
-이 프로젝트는 기본적으로 브라우저 `localStorage`를 사용합니다. 아래 환경변수를 설정하면 Supabase REST API를 사용해 여러 컴퓨터에서 같은 제보 데이터를 공유합니다.
+이 프로젝트는 Supabase REST API를 사용해 여러 컴퓨터에서 같은 제보 데이터를 공유합니다. 브라우저 `localStorage`에는 이슈 데이터를 따로 저장하지 않습니다.
 
 ## 1. Table
 

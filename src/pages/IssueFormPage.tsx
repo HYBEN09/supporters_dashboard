@@ -94,9 +94,8 @@ export function IssueFormPage() {
 
   function saveDraft() {
     const values = getValues();
-    localStorage.setItem("supporters-issue-draft", JSON.stringify(values));
     console.info("임시 저장", values);
-    setMessage("입력 중인 내용이 임시 저장되었습니다.");
+    setMessage("임시 저장은 브라우저에 저장하지 않고 콘솔 로그로만 기록됩니다.");
   }
 
   function resetForm() {

@@ -30,9 +30,6 @@ function createIssueId() {
   return `ISS-${datePart}-${randomPart}`;
 }
 
-const MOCK_REMOVAL_KEY = "supporters-issues-mock-data-removed";
-const MOCK_REMOVAL_V2_KEY = "supporters-issues-mock-data-removed-v2";
-
 const LEGACY_MOCK_ISSUE_IDS = new Set(
   Array.from(
     { length: 36 },
@@ -80,12 +77,6 @@ function getMigratedFixStatus(issue: IssueItem): FixStatus {
 }
 
 function removeSeedMockIssues(issues: IssueItem[]) {
-  if (localStorage.getItem(MOCK_REMOVAL_V2_KEY) === "true") {
-    return issues;
-  }
-
-  localStorage.setItem(MOCK_REMOVAL_KEY, "true");
-  localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
   return issues.filter((issue) => !LEGACY_MOCK_ISSUE_IDS.has(issue.id));
 }
 
@@ -94,15 +85,11 @@ async function getInitialIssues() {
     const savedIssues = await loadIssuesFromStorage();
 
     if (savedIssues.length === 0) {
-      localStorage.setItem(MOCK_REMOVAL_KEY, "true");
-      localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
       return [];
     }
 
     return migrateLegacyValues(removeSeedMockIssues(savedIssues));
   } catch {
-    localStorage.setItem(MOCK_REMOVAL_KEY, "true");
-    localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
     return [];
   }
 }
@@ -136,7 +123,7 @@ export function IssueProvider({ children }: IssueProviderProps) {
 
     setIssues((current) => {
       const nextIssues = [newIssue, ...current];
-      void saveIssueToStorage(newIssue, nextIssues).catch(reportStorageError);
+      void saveIssueToStorage(newIssue).catch(reportStorageError);
 
       return nextIssues;
     });
@@ -158,7 +145,7 @@ export function IssueProvider({ children }: IssueProviderProps) {
   const deleteIssue = useCallback((id: string) => {
     setIssues((current) => {
       const nextIssues = current.filter((issue) => issue.id !== id);
-      void deleteIssueFromStorage(id, nextIssues).catch(reportStorageError);
+      void deleteIssueFromStorage(id).catch(reportStorageError);
 
       return nextIssues;
     });

@@ -1,6 +1,5 @@
 import type { IssueItem } from "../types/issue";
 
-const LOCAL_STORAGE_KEY = "supporters-issues";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as
   | string
@@ -130,54 +129,21 @@ async function requestSupabase<T>(
   return JSON.parse(responseText) as T;
 }
 
-function loadLocalIssues() {
-  const savedIssues = localStorage.getItem(LOCAL_STORAGE_KEY);
-
-  if (!savedIssues) {
-    return [];
-  }
-
-  const parsedIssues = JSON.parse(savedIssues) as unknown;
-
-  return Array.isArray(parsedIssues) ? (parsedIssues as IssueItem[]) : [];
-}
-
-function saveLocalIssues(issues: IssueItem[]) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(issues));
-}
-
 export async function loadIssuesFromStorage() {
   if (!isRemoteIssueStorageEnabled()) {
-    return loadLocalIssues();
+    throw new Error("Supabase storage is not configured.");
   }
 
   const rows = await requestSupabase<IssueRow[]>(
     "?select=*&order=registered_at.desc,id.desc",
   );
 
-  if (rows.length === 0) {
-    const localIssues = loadLocalIssues();
-
-    if (localIssues.length > 0) {
-      await requestSupabase<IssueRow[]>("", {
-        body: JSON.stringify(localIssues.map(toIssueRow)),
-        method: "POST",
-        headers: {
-          Prefer: "return=minimal",
-        },
-      });
-
-      return localIssues;
-    }
-  }
-
   return rows.map(toIssueItem);
 }
 
-export async function saveIssueToStorage(issue: IssueItem, nextIssues: IssueItem[]) {
+export async function saveIssueToStorage(issue: IssueItem) {
   if (!isRemoteIssueStorageEnabled()) {
-    saveLocalIssues(nextIssues);
-    return;
+    throw new Error("Supabase storage is not configured.");
   }
 
   await requestSupabase<IssueRow[]>("", {
@@ -194,8 +160,7 @@ export async function updateIssueInStorage(
   nextIssues: IssueItem[],
 ) {
   if (!isRemoteIssueStorageEnabled()) {
-    saveLocalIssues(nextIssues);
-    return;
+    throw new Error("Supabase storage is not configured.");
   }
 
   const currentIssue = nextIssues.find((issue) => issue.id === id);
@@ -213,13 +178,9 @@ export async function updateIssueInStorage(
   });
 }
 
-export async function deleteIssueFromStorage(
-  id: string,
-  nextIssues: IssueItem[],
-) {
+export async function deleteIssueFromStorage(id: string) {
   if (!isRemoteIssueStorageEnabled()) {
-    saveLocalIssues(nextIssues);
-    return;
+    throw new Error("Supabase storage is not configured.");
   }
 
   await requestSupabase<void>(`?id=eq.${encodeURIComponent(id)}`, {
