@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   FixStatus,
   IssueItem,
@@ -6,17 +6,30 @@ import type {
   Platform,
   ServiceName,
 } from "../../types/issue";
+import {
+  deleteIssueFromStorage,
+  loadIssuesFromStorage,
+  saveIssueToStorage,
+  updateIssueInStorage,
+} from "../../services/issueStorage";
 import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
 
 type IssueProviderProps = {
   children: React.ReactNode;
 };
 
-function createIssueId(sequence: number) {
-  return `ISS-${String(sequence).padStart(3, "0")}`;
+function createIssueId() {
+  const datePart = new Date()
+    .toISOString()
+    .replaceAll("-", "")
+    .replaceAll(":", "")
+    .replace(".", "")
+    .slice(0, 14);
+  const randomPart = crypto.randomUUID().slice(0, 4).toUpperCase();
+
+  return `ISS-${datePart}-${randomPart}`;
 }
 
-const STORAGE_KEY = "supporters-issues";
 const MOCK_REMOVAL_KEY = "supporters-issues-mock-data-removed";
 const MOCK_REMOVAL_V2_KEY = "supporters-issues-mock-data-removed-v2";
 
@@ -76,25 +89,17 @@ function removeSeedMockIssues(issues: IssueItem[]) {
   return issues.filter((issue) => !LEGACY_MOCK_ISSUE_IDS.has(issue.id));
 }
 
-function getInitialIssues() {
+async function getInitialIssues() {
   try {
-    const savedIssues = localStorage.getItem(STORAGE_KEY);
+    const savedIssues = await loadIssuesFromStorage();
 
-    if (!savedIssues) {
+    if (savedIssues.length === 0) {
       localStorage.setItem(MOCK_REMOVAL_KEY, "true");
       localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
       return [];
     }
 
-    const parsedIssues = JSON.parse(savedIssues) as IssueItem[];
-
-    if (!Array.isArray(parsedIssues)) {
-      localStorage.setItem(MOCK_REMOVAL_KEY, "true");
-      localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
-      return [];
-    }
-
-    return migrateLegacyValues(removeSeedMockIssues(parsedIssues));
+    return migrateLegacyValues(removeSeedMockIssues(savedIssues));
   } catch {
     localStorage.setItem(MOCK_REMOVAL_KEY, "true");
     localStorage.setItem(MOCK_REMOVAL_V2_KEY, "true");
@@ -102,44 +107,61 @@ function getInitialIssues() {
   }
 }
 
-function getNextSequence(issues: IssueItem[]) {
-  const maxSequence = issues.reduce((max, issue) => {
-    const sequence = Number(issue.id.replace("ISS-", ""));
-    return Number.isFinite(sequence) ? Math.max(max, sequence) : max;
-  }, 0);
-
-  return maxSequence + 1;
-}
-
 export function IssueProvider({ children }: IssueProviderProps) {
-  const [issues, setIssues] = useState<IssueItem[]>(getInitialIssues);
-  const nextSequence = useRef(getNextSequence(issues));
+  const [issues, setIssues] = useState<IssueItem[]>([]);
+
+  function reportStorageError(error: unknown) {
+    console.error("Failed to sync issue storage.", error);
+  }
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
-  }, [issues]);
+    let isMounted = true;
+
+    getInitialIssues().then((storedIssues) => {
+      if (isMounted) {
+        setIssues(storedIssues);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const addIssue = useCallback((issue: NewIssueItem) => {
     const newIssue = {
       ...issue,
-      id: createIssueId(nextSequence.current),
+      id: createIssueId(),
     };
 
-    nextSequence.current += 1;
-    setIssues((current) => [newIssue, ...current]);
+    setIssues((current) => {
+      const nextIssues = [newIssue, ...current];
+      void saveIssueToStorage(newIssue, nextIssues).catch(reportStorageError);
+
+      return nextIssues;
+    });
+
     return newIssue;
   }, []);
 
   const updateIssue = useCallback((id: string, updates: IssueUpdate) => {
-    setIssues((current) =>
-      current.map((issue) =>
+    setIssues((current) => {
+      const nextIssues = current.map((issue) =>
         issue.id === id ? { ...issue, ...updates } : issue,
-      ),
-    );
+      );
+      void updateIssueInStorage(id, nextIssues).catch(reportStorageError);
+
+      return nextIssues;
+    });
   }, []);
 
   const deleteIssue = useCallback((id: string) => {
-    setIssues((current) => current.filter((issue) => issue.id !== id));
+    setIssues((current) => {
+      const nextIssues = current.filter((issue) => issue.id !== id);
+      void deleteIssueFromStorage(id, nextIssues).catch(reportStorageError);
+
+      return nextIssues;
+    });
   }, []);
 
   const value = useMemo(
