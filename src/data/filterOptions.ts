@@ -39,6 +39,7 @@ export const ISSUE_FORM_PLATFORM_OPTIONS = [
   "WIN",
   "Watch",
   "Mac",
+  "기타",
 ] as const;
 
 export const PLATFORM_OPTIONS = ISSUE_FORM_PLATFORM_OPTIONS;
