@@ -31,10 +31,9 @@ export function Navbar() {
         </nav>
         <div className={styles.actions}>
           <div className={styles.profile} aria-label="관리자 프로필">
-            <span className={styles.avatar}>관</span>
+            <span className={styles.avatar}></span>
             <div>
               <strong>관리자</strong>
-              <span>운영 담당</span>
             </div>
           </div>
         </div>
