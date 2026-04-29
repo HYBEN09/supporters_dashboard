@@ -83,6 +83,10 @@
   grid-column: 1 / -1;
 }
 
+.chartGrid > section:nth-child(2) {
+  grid-column: 1 / -1;
+}
+
 .chartBox {
   min-height: 300px;
 }
@@ -239,6 +243,10 @@
   }
 
   .chartGrid > section:first-child {
+    grid-column: auto;
+  }
+
+  .chartGrid > section:nth-child(2) {
     grid-column: auto;
   }
 }
