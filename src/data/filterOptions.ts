@@ -50,7 +50,7 @@ export const FIX_STATUS_OPTIONS = ["수정 필요", "수정 완료"] as const;
 
 export const NOT_ISSUE_REASON_OPTIONS = [
   "정상 작동(이슈 재현 안됨)",
-  "실행 경로 불명확",
   "사용성 이슈",
+  "실행 경로 불명확",
   "기타",
 ] as const;

@@ -38,6 +38,7 @@ import {
   getPeriodById,
 } from "../utils/issueFilters";
 import {
+  getAuthorReportStatus,
   getKpis,
   getMonthlyStatus,
   getNotIssueReasonStatus,
@@ -69,6 +70,10 @@ export function DashboardPage() {
   const kpis = useMemo(() => getKpis(filteredIssues), [filteredIssues]);
   const monthlyStatus = useMemo(
     () => getMonthlyStatus(filteredIssues),
+    [filteredIssues],
+  );
+  const authorStatus = useMemo(
+    () => getAuthorReportStatus(filteredIssues),
     [filteredIssues],
   );
   const serviceStatus = useMemo(
@@ -298,6 +303,52 @@ export function DashboardPage() {
               </LineChart>
             </ResponsiveContainer>
           </div>
+        </SectionCard>
+
+        <SectionCard title="작성자별 제보 현황">
+          <div className={styles.chartBox}>
+            <ResponsiveContainer height={300} width="100%">
+              <BarChart data={authorStatus.slice(0, 10)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="authorName" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="totalReports" fill="#1f6feb" name="제보 수" />
+                <Bar dataKey="issueCount" fill="#f97316" name="이슈 수" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <table className={styles.summaryTable}>
+            <thead>
+              <tr>
+                <th>작성자</th>
+                <th>전체 제보</th>
+                <th>이슈</th>
+                <th>이슈 아님</th>
+                <th>수정 완료</th>
+              </tr>
+            </thead>
+            <tbody>
+              {authorStatus.length > 0 ? (
+                authorStatus.map((author) => (
+                  <tr key={author.authorName}>
+                    <td>{author.authorName}</td>
+                    <td>{author.totalReports}</td>
+                    <td>{author.issueCount}</td>
+                    <td>{author.notIssueCount}</td>
+                    <td>{author.fixedCount}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className={styles.empty} colSpan={5}>
+                    작성자별 제보 데이터가 없습니다.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </SectionCard>
 
         <SectionCard title="서비스별 현황">
