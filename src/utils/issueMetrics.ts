@@ -35,27 +35,37 @@ export function getKpis(items: IssueItem[]) {
 export function getMonthlyStatus(items: IssueItem[]) {
   const monthlyMap = new Map<
     string,
-    { month: string; issueCount: number; fixedCount: number; improvementRate: number }
+    {
+      month: string;
+      reportedIssueCount: number;
+      serviceDeliveryIssueCount: number;
+      fixedIssueCount: number;
+    }
   >();
 
   items.forEach((item) => {
     const month = item.registeredAt.slice(0, 7).replace("-", ".");
     const current =
       monthlyMap.get(month) ??
-      { month, issueCount: 0, fixedCount: 0, improvementRate: 0 };
+      {
+        month,
+        reportedIssueCount: 0,
+        serviceDeliveryIssueCount: 0,
+        fixedIssueCount: 0,
+      };
 
     if (item.issueStatus === "이슈") {
-      current.issueCount += 1;
+      current.reportedIssueCount += 1;
+    }
+
+    if (item.serviceJiraUrl) {
+      current.serviceDeliveryIssueCount += 1;
     }
 
     if (item.issueStatus === "이슈" && item.fixStatus === "수정 완료") {
-      current.fixedCount += 1;
+      current.fixedIssueCount += 1;
     }
 
-    current.improvementRate = calculateImprovementRate(
-      current.fixedCount,
-      current.issueCount,
-    );
     monthlyMap.set(month, current);
   });
 

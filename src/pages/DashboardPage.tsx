@@ -268,37 +268,29 @@ export function DashboardPage() {
               <LineChart data={monthlyStatus}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
-                <YAxis yAxisId="count" allowDecimals={false} />
-                <YAxis
-                  yAxisId="rate"
-                  orientation="right"
-                  tickFormatter={(value) => `${value}%`}
-                />
+                <YAxis allowDecimals={false} />
                 <Tooltip formatter={(value) => String(value)} />
                 <Legend />
                 <Line
-                  dataKey="issueCount"
-                  name="월별 이슈 수"
+                  dataKey="reportedIssueCount"
+                  name="제보 이슈 수"
                   stroke="#1f6feb"
                   strokeWidth={2}
                   type="monotone"
-                  yAxisId="count"
                 />
                 <Line
-                  dataKey="fixedCount"
-                  name="월별 수정 완료 수"
+                  dataKey="serviceDeliveryIssueCount"
+                  name="서비스 전달 이슈 수"
+                  stroke="#f97316"
+                  strokeWidth={2}
+                  type="monotone"
+                />
+                <Line
+                  dataKey="fixedIssueCount"
+                  name="수정 이슈 수"
                   stroke="#12b76a"
                   strokeWidth={2}
                   type="monotone"
-                  yAxisId="count"
-                />
-                <Line
-                  dataKey="improvementRate"
-                  name="월별 개선율"
-                  stroke="#f79009"
-                  strokeWidth={2}
-                  type="monotone"
-                  yAxisId="rate"
                 />
               </LineChart>
             </ResponsiveContainer>
