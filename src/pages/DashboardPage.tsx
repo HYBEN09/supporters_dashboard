@@ -307,7 +307,6 @@ export function DashboardPage() {
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="totalReports" fill="#1f6feb" name="제보 수" />
-                <Bar dataKey="issueCount" fill="#f97316" name="이슈 수" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -315,10 +314,7 @@ export function DashboardPage() {
             <thead>
               <tr>
                 <th>작성자</th>
-                <th>전체 제보</th>
-                <th>이슈</th>
-                <th>이슈 아님</th>
-                <th>수정 완료</th>
+                <th>제보 수</th>
               </tr>
             </thead>
             <tbody>
@@ -327,14 +323,11 @@ export function DashboardPage() {
                   <tr key={author.authorName}>
                     <td>{author.authorName}</td>
                     <td>{author.totalReports}</td>
-                    <td>{author.issueCount}</td>
-                    <td>{author.notIssueCount}</td>
-                    <td>{author.fixedCount}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td className={styles.empty} colSpan={5}>
+                  <td className={styles.empty} colSpan={2}>
                     작성자별 제보 데이터가 없습니다.
                   </td>
                 </tr>
