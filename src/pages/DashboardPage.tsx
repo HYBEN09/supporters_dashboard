@@ -279,14 +279,14 @@ export function DashboardPage() {
                   type="monotone"
                 />
                 <Line
-                  dataKey="serviceDeliveryIssueCount"
-                  name="서비스 전달 이슈 수"
+                  dataKey="finalDeliveredIssueCount"
+                  name="최종 전달 이슈 수"
                   stroke="#f97316"
                   strokeWidth={2}
                   type="monotone"
                 />
                 <Line
-                  dataKey="fixedIssueCount"
+                  dataKey="fixedDeliveredIssueCount"
                   name="수정 이슈 수"
                   stroke="#12b76a"
                   strokeWidth={2}

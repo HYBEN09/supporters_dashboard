@@ -32,14 +32,45 @@ export function getKpis(items: IssueItem[]) {
   };
 }
 
+function getMonthKeys(periodStart: string, periodEnd: string) {
+  const monthKeys: string[] = [];
+  const start = new Date(`${periodStart.slice(0, 7)}-01T00:00:00`);
+  const end = new Date(`${periodEnd.slice(0, 7)}-01T00:00:00`);
+
+  while (start <= end) {
+    const year = start.getFullYear();
+    const month = String(start.getMonth() + 1).padStart(2, "0");
+    monthKeys.push(`${year}.${month}`);
+    start.setMonth(start.getMonth() + 1);
+  }
+
+  return monthKeys;
+}
+
+function getMonthLabel(month: string) {
+  return `${Number(month.slice(5, 7))}월`;
+}
+
+function getFinalDeliveredIssueCount(item: IssueItem) {
+  return item.serviceJiraUrl ? 1 : 0;
+}
+
+function getFixedDeliveredIssueCount(item: IssueItem) {
+  if (item.fixStatus !== "수정 완료") {
+    return 0;
+  }
+
+  return getFinalDeliveredIssueCount(item);
+}
+
 export function getMonthlyStatus(items: IssueItem[]) {
   const monthlyMap = new Map<
     string,
     {
       month: string;
       reportedIssueCount: number;
-      serviceDeliveryIssueCount: number;
-      fixedIssueCount: number;
+      finalDeliveredIssueCount: number;
+      fixedDeliveredIssueCount: number;
     }
   >();
 
@@ -50,21 +81,16 @@ export function getMonthlyStatus(items: IssueItem[]) {
       {
         month,
         reportedIssueCount: 0,
-        serviceDeliveryIssueCount: 0,
-        fixedIssueCount: 0,
+        finalDeliveredIssueCount: 0,
+        fixedDeliveredIssueCount: 0,
       };
 
     if (item.issueStatus === "이슈") {
       current.reportedIssueCount += 1;
     }
 
-    if (item.serviceJiraUrl) {
-      current.serviceDeliveryIssueCount += 1;
-    }
-
-    if (item.issueStatus === "이슈" && item.fixStatus === "수정 완료") {
-      current.fixedIssueCount += 1;
-    }
+    current.finalDeliveredIssueCount += getFinalDeliveredIssueCount(item);
+    current.fixedDeliveredIssueCount += getFixedDeliveredIssueCount(item);
 
     monthlyMap.set(month, current);
   });
@@ -72,6 +98,56 @@ export function getMonthlyStatus(items: IssueItem[]) {
   return Array.from(monthlyMap.values()).sort((a, b) =>
     a.month.localeCompare(b.month),
   );
+}
+
+export function getMonthlyReportRows(
+  items: IssueItem[],
+  periodStart: string,
+  periodEnd: string,
+) {
+  const rowMap = new Map(
+    getMonthKeys(periodStart, periodEnd).map((month) => [
+      month,
+      {
+        month,
+        monthLabel: getMonthLabel(month),
+        totalReports: 0,
+        supporterIssues: 0,
+        notIssues: 0,
+        accessibilityIssues: 0,
+        deliveredIssues: 0,
+        fixedIssues: 0,
+      },
+    ]),
+  );
+
+  items.forEach((item) => {
+    const month = item.registeredAt.slice(0, 7).replace("-", ".");
+    const current = rowMap.get(month);
+
+    if (!current) {
+      return;
+    }
+
+    const supporterIssueCount = item.supporterJiraUrl || item.jiraKey ? 1 : 0;
+    const finalDeliveredCount = getFinalDeliveredIssueCount(item);
+    const fixedDeliveredCount =
+      item.fixStatus === "수정 완료" ? finalDeliveredCount : 0;
+
+    current.totalReports += 1;
+    current.supporterIssues += supporterIssueCount;
+    current.deliveredIssues += finalDeliveredCount;
+    current.fixedIssues += fixedDeliveredCount;
+
+    if (item.issueStatus === "이슈 아님") {
+      current.notIssues += 1;
+    }
+  });
+
+  return Array.from(rowMap.values()).map((row) => ({
+    ...row,
+    accessibilityIssues: Math.max(0, row.supporterIssues - row.notIssues),
+  }));
 }
 
 export function getAuthorReportStatus(items: IssueItem[]) {

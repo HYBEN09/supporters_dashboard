@@ -5,6 +5,7 @@ const navItems = [
   { end: true, label: "대시보드", to: "/dashboard" },
   { end: true, label: "이슈 입력", to: "/issues/new" },
   { end: true, label: "이슈 리스트", to: "/issues" },
+  { end: true, label: "월별 리포트", to: "/reports/monthly" },
 ];
 
 export function Navbar() {
