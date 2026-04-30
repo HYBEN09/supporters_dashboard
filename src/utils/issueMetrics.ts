@@ -156,9 +156,8 @@ export function getAuthorReportStatus(items: IssueItem[]) {
     {
       authorName: string;
       totalReports: number;
-      issueCount: number;
+      deliveredIssueCount: number;
       notIssueCount: number;
-      fixedCount: number;
     }
   >();
 
@@ -169,23 +168,18 @@ export function getAuthorReportStatus(items: IssueItem[]) {
       {
         authorName,
         totalReports: 0,
-        issueCount: 0,
+        deliveredIssueCount: 0,
         notIssueCount: 0,
-        fixedCount: 0,
       };
 
     current.totalReports += 1;
 
-    if (item.issueStatus === "이슈") {
-      current.issueCount += 1;
+    if (item.serviceJiraUrl) {
+      current.deliveredIssueCount += 1;
     }
 
     if (item.issueStatus === "이슈 아님") {
       current.notIssueCount += 1;
-    }
-
-    if (item.issueStatus === "이슈" && item.fixStatus === "수정 완료") {
-      current.fixedCount += 1;
     }
 
     authorMap.set(authorName, current);

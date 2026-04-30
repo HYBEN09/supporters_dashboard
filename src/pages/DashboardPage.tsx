@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
   Cell,
   Legend,
@@ -372,23 +370,13 @@ export function DashboardPage() {
         </SectionCard>
 
         <SectionCard title="작성자별 제보 현황">
-          <div className={styles.chartBox}>
-            <ResponsiveContainer height={300} width="100%">
-              <BarChart data={authorStatus.slice(0, 10)}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="authorName" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="totalReports" fill="#1f6feb" name="제보 수" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
           <table className={styles.summaryTable}>
             <thead>
               <tr>
                 <th>작성자</th>
                 <th>제보 수</th>
+                <th>최종 전달</th>
+                <th>이슈 아님</th>
               </tr>
             </thead>
             <tbody>
@@ -397,11 +385,13 @@ export function DashboardPage() {
                   <tr key={author.authorName}>
                     <td>{author.authorName}</td>
                     <td>{author.totalReports}</td>
+                    <td>{author.deliveredIssueCount}</td>
+                    <td>{author.notIssueCount}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td className={styles.empty} colSpan={2}>
+                  <td className={styles.empty} colSpan={4}>
                     작성자별 제보 데이터가 없습니다.
                   </td>
                 </tr>
