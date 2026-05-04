@@ -457,7 +457,7 @@ export function DashboardPage() {
                           {getIssueJiraLinks(issue).map((link) => (
                             <a
                               href={link.url}
-                              key={link.label}
+                              key={`${link.label}-${link.url}`}
                               rel="noreferrer"
                               target="_blank"
                             >
