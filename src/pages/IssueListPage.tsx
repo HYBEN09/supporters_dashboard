@@ -17,7 +17,11 @@ import type {
   SelectableFilter,
   ServiceName,
 } from "../types/issue";
-import { formatDate, getIssueJiraLinks } from "../utils/formatters";
+import {
+  formatDate,
+  getIssueJiraLinks,
+  getJiraIssueNumber,
+} from "../utils/formatters";
 import {
   DEFAULT_FILTERS,
   filterIssues,
@@ -31,7 +35,25 @@ import { Pagination } from "../components/ui/Pagination";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import styles from "./IssueListPage.module.css";
 
-type RegisteredAtSortOrder = "latest" | "oldest";
+type IssueListSortKey = "registeredAt" | "jiraNumber";
+type IssueListSortDirection = "asc" | "desc";
+
+type IssueListSort = {
+  key: IssueListSortKey;
+  direction: IssueListSortDirection;
+};
+
+function getPrimaryJiraNumber(issue: IssueItem) {
+  for (const link of getIssueJiraLinks(issue)) {
+    const issueNumber = getJiraIssueNumber(link.label);
+
+    if (issueNumber !== null) {
+      return issueNumber;
+    }
+  }
+
+  return null;
+}
 
 export function IssueListPage() {
   const { selectedPeriodId } = usePeriod();
@@ -46,8 +68,10 @@ export function IssueListPage() {
     useState<IssueFilters>(defaultFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<IssueFilters>(defaultFilters);
-  const [registeredAtSortOrder, setRegisteredAtSortOrder] =
-    useState<RegisteredAtSortOrder>("latest");
+  const [sortConfig, setSortConfig] = useState<IssueListSort>({
+    key: "registeredAt",
+    direction: "desc",
+  });
   const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
 
   const filteredIssues = useMemo(
@@ -56,18 +80,38 @@ export function IssueListPage() {
   );
   const sortedIssues = useMemo(() => {
     return [...filteredIssues].sort((a, b) => {
-      const dateCompare = a.registeredAt.localeCompare(b.registeredAt);
+      if (sortConfig.key === "jiraNumber") {
+        const aJiraNumber = getPrimaryJiraNumber(a);
+        const bJiraNumber = getPrimaryJiraNumber(b);
 
+        if (aJiraNumber !== null && bJiraNumber !== null) {
+          const jiraNumberCompare = aJiraNumber - bJiraNumber;
+
+          if (jiraNumberCompare !== 0) {
+            return sortConfig.direction === "asc"
+              ? jiraNumberCompare
+              : -jiraNumberCompare;
+          }
+        }
+
+        if (aJiraNumber !== null && bJiraNumber === null) {
+          return -1;
+        }
+
+        if (aJiraNumber === null && bJiraNumber !== null) {
+          return 1;
+        }
+      }
+
+      const dateCompare = a.registeredAt.localeCompare(b.registeredAt);
       if (dateCompare !== 0) {
-        return registeredAtSortOrder === "latest"
-          ? -dateCompare
-          : dateCompare;
+        return sortConfig.direction === "desc" ? -dateCompare : dateCompare;
       }
 
       const idCompare = a.id.localeCompare(b.id);
-      return registeredAtSortOrder === "latest" ? -idCompare : idCompare;
+      return sortConfig.direction === "desc" ? -idCompare : idCompare;
     });
-  }, [filteredIssues, registeredAtSortOrder]);
+  }, [filteredIssues, sortConfig]);
   const kpis = useMemo(() => getKpis(filteredIssues), [filteredIssues]);
   const pagination = usePagination(sortedIssues, 20);
   const periodSummary = `${appliedFilters.periodStart.replaceAll("-", ".")} - ${appliedFilters.periodEnd.replaceAll("-", ".")}`;
@@ -86,9 +130,24 @@ export function IssueListPage() {
   }
 
   function toggleRegisteredAtSortOrder() {
-    setRegisteredAtSortOrder((current) =>
-      current === "latest" ? "oldest" : "latest",
-    );
+    setSortConfig((current) => ({
+      key: "registeredAt",
+      direction:
+        current.key === "registeredAt" && current.direction === "desc"
+          ? "asc"
+          : "desc",
+    }));
+    pagination.goToPage(1);
+  }
+
+  function toggleJiraNumberSortOrder() {
+    setSortConfig((current) => ({
+      key: "jiraNumber",
+      direction:
+        current.key === "jiraNumber" && current.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
     pagination.goToPage(1);
   }
 
@@ -104,7 +163,7 @@ export function IssueListPage() {
     };
     setDraftFilters(nextFilters);
     setAppliedFilters(nextFilters);
-    setRegisteredAtSortOrder("latest");
+    setSortConfig({ key: "registeredAt", direction: "desc" });
     pagination.goToPage(1);
   }
 
@@ -277,7 +336,8 @@ export function IssueListPage() {
                 <th>
                   <button
                     aria-label={`등록일 ${
-                      registeredAtSortOrder === "latest"
+                      sortConfig.key === "registeredAt" &&
+                      sortConfig.direction === "desc"
                         ? "최신순"
                         : "오래된순"
                     }. 클릭하면 정렬 순서가 변경됩니다.`}
@@ -286,9 +346,7 @@ export function IssueListPage() {
                     onClick={toggleRegisteredAtSortOrder}
                   >
                     등록일
-                    <span aria-hidden="true">
-                      {registeredAtSortOrder === "latest" ? "▼" : "▲"}
-                    </span>
+                    <span aria-hidden="true">↕</span>
                   </button>
                 </th>
                 <th>작성자</th>
@@ -297,7 +355,22 @@ export function IssueListPage() {
                 <th>이슈 여부</th>
                 <th>수정 여부</th>
                 <th>이슈 아님 사유</th>
-                <th>Jira 링크</th>
+                <th>
+                  <button
+                    aria-label={`Jira 링크 ${
+                      sortConfig.key === "jiraNumber" &&
+                      sortConfig.direction === "desc"
+                        ? "큰 번호순"
+                        : "작은 번호순"
+                    }. 클릭하면 정렬 순서가 변경됩니다.`}
+                    className={styles.sortButton}
+                    type="button"
+                    onClick={toggleJiraNumberSortOrder}
+                  >
+                    Jira 링크
+                    <span aria-hidden="true">↕</span>
+                  </button>
+                </th>
                 <th>상세</th>
               </tr>
             </thead>

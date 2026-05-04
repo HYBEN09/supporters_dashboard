@@ -44,6 +44,13 @@ export function getJiraIssueKey(value?: string) {
   return normalizedValue;
 }
 
+export function getJiraIssueNumber(value?: string) {
+  const issueKey = getJiraIssueKey(value);
+  const issueNumberMatch = issueKey.match(/-(\d+)$/);
+
+  return issueNumberMatch ? Number(issueNumberMatch[1]) : null;
+}
+
 export function getIssueJiraLinks(issue: IssueItem) {
   const links = [];
 
