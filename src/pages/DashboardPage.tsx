@@ -330,26 +330,40 @@ export function DashboardPage() {
 
         <SectionCard title="이슈 아님 분석">
           <div className={styles.reasonGrid}>
-            <ResponsiveContainer height={260} width="100%">
-              <PieChart>
-                <Pie
-                  data={notIssueReasons}
-                  dataKey="count"
-                  innerRadius={52}
-                  nameKey="reason"
-                  outerRadius={86}
-                >
-                  {notIssueReasons.map((reason, index) => (
-                    <Cell
-                      fill={reasonColors[index % reasonColors.length]}
-                      key={reason.reason}
+            <div className={styles.reasonChart}>
+              <ResponsiveContainer height={220} width="100%">
+                <PieChart>
+                  <Pie
+                    data={notIssueReasons}
+                    dataKey="count"
+                    innerRadius={46}
+                    nameKey="reason"
+                    outerRadius={76}
+                  >
+                    {notIssueReasons.map((reason, index) => (
+                      <Cell
+                        fill={reasonColors[index % reasonColors.length]}
+                        key={reason.reason}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className={styles.reasonLegend}>
+                {notIssueReasons.map((reason, index) => (
+                  <span key={reason.reason}>
+                    <i
+                      style={{
+                        backgroundColor:
+                          reasonColors[index % reasonColors.length],
+                      }}
                     />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+                    {reason.reason}
+                  </span>
+                ))}
+              </div>
+            </div>
             <table className={styles.summaryTable}>
               <thead>
                 <tr>
