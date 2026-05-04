@@ -144,6 +144,35 @@
   text-align: left;
 }
 
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: #172033;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0;
+}
+
+.sortButton span {
+  color: #111827;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.sortButton:hover {
+  color: #1f6feb;
+}
+
+.sortButton:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid #1f6feb;
+  outline-offset: 3px;
+}
+
 .table th,
 .table td {
   border-bottom: 1px solid #edf1f6;

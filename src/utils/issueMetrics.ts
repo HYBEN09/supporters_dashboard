@@ -85,7 +85,7 @@ export function getMonthlyStatus(items: IssueItem[]) {
         fixedDeliveredIssueCount: 0,
       };
 
-    if (item.issueStatus === "이슈") {
+    if (item.issueStatus === "이슈" || item.issueStatus === "이슈 아님") {
       current.reportedIssueCount += 1;
     }
 

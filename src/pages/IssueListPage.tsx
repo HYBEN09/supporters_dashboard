@@ -31,6 +31,8 @@ import { Pagination } from "../components/ui/Pagination";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import styles from "./IssueListPage.module.css";
 
+type RegisteredAtSortOrder = "latest" | "oldest";
+
 export function IssueListPage() {
   const { selectedPeriodId } = usePeriod();
   const { deleteIssue, issues, updateIssue } = useIssues();
@@ -44,14 +46,30 @@ export function IssueListPage() {
     useState<IssueFilters>(defaultFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<IssueFilters>(defaultFilters);
+  const [registeredAtSortOrder, setRegisteredAtSortOrder] =
+    useState<RegisteredAtSortOrder>("latest");
   const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
 
   const filteredIssues = useMemo(
     () => filterIssues(issues, appliedFilters),
     [appliedFilters, issues],
   );
+  const sortedIssues = useMemo(() => {
+    return [...filteredIssues].sort((a, b) => {
+      const dateCompare = a.registeredAt.localeCompare(b.registeredAt);
+
+      if (dateCompare !== 0) {
+        return registeredAtSortOrder === "latest"
+          ? -dateCompare
+          : dateCompare;
+      }
+
+      const idCompare = a.id.localeCompare(b.id);
+      return registeredAtSortOrder === "latest" ? -idCompare : idCompare;
+    });
+  }, [filteredIssues, registeredAtSortOrder]);
   const kpis = useMemo(() => getKpis(filteredIssues), [filteredIssues]);
-  const pagination = usePagination(filteredIssues, 5);
+  const pagination = usePagination(sortedIssues, 5);
   const periodSummary = `${appliedFilters.periodStart.replaceAll("-", ".")} - ${appliedFilters.periodEnd.replaceAll("-", ".")}`;
   const currentSummary = `현재 조회: 전체 기간 · ${appliedFilters.serviceName} 서비스 · ${appliedFilters.platform} 플랫폼`;
 
@@ -67,6 +85,13 @@ export function IssueListPage() {
     pagination.goToPage(1);
   }
 
+  function toggleRegisteredAtSortOrder() {
+    setRegisteredAtSortOrder((current) =>
+      current === "latest" ? "oldest" : "latest",
+    );
+    pagination.goToPage(1);
+  }
+
   function resetFilters() {
     const nextFilters = {
       ...DEFAULT_FILTERS,
@@ -79,6 +104,7 @@ export function IssueListPage() {
     };
     setDraftFilters(nextFilters);
     setAppliedFilters(nextFilters);
+    setRegisteredAtSortOrder("latest");
     pagination.goToPage(1);
   }
 
@@ -248,7 +274,23 @@ export function IssueListPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>등록일</th>
+                <th>
+                  <button
+                    aria-label={`등록일 ${
+                      registeredAtSortOrder === "latest"
+                        ? "최신순"
+                        : "오래된순"
+                    }. 클릭하면 정렬 순서가 변경됩니다.`}
+                    className={styles.sortButton}
+                    type="button"
+                    onClick={toggleRegisteredAtSortOrder}
+                  >
+                    등록일
+                    <span aria-hidden="true">
+                      {registeredAtSortOrder === "latest" ? "▼" : "▲"}
+                    </span>
+                  </button>
+                </th>
                 <th>작성자</th>
                 <th>서비스</th>
                 <th>플랫폼</th>
