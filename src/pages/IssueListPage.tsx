@@ -69,7 +69,7 @@ export function IssueListPage() {
     });
   }, [filteredIssues, registeredAtSortOrder]);
   const kpis = useMemo(() => getKpis(filteredIssues), [filteredIssues]);
-  const pagination = usePagination(sortedIssues, 5);
+  const pagination = usePagination(sortedIssues, 20);
   const periodSummary = `${appliedFilters.periodStart.replaceAll("-", ".")} - ${appliedFilters.periodEnd.replaceAll("-", ".")}`;
   const currentSummary = `현재 조회: 전체 기간 · ${appliedFilters.serviceName} 서비스 · ${appliedFilters.platform} 플랫폼`;
 
