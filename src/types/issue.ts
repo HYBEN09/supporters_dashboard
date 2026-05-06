@@ -19,6 +19,7 @@ export type NotIssueReason =
   | "정상 작동(이슈 재현 안됨)"
   | "실행 경로 불명확"
   | "사용성 이슈"
+  | "기능 개발 요청"
   | "기타";
 
 export type IssueItem = {
