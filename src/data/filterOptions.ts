@@ -39,6 +39,7 @@ export const ISSUE_FORM_PLATFORM_OPTIONS = [
   "WIN",
   "Watch",
   "Mac",
+  "점자정보단말기 한소네6",
   "기타",
 ] as const;
 
