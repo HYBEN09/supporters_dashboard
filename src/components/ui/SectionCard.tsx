@@ -7,7 +7,11 @@ type SectionCardProps = {
   children: ReactNode;
 };
 
-export function SectionCard({ title, description, children }: SectionCardProps) {
+export function SectionCard({
+  title,
+  description,
+  children,
+}: SectionCardProps) {
   return (
     <section className={styles.card}>
       {title ? (

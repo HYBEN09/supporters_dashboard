@@ -1,12 +1,9 @@
 import { useMemo, useState } from "react";
 import {
   CartesianGrid,
-  Cell,
   Legend,
   Line,
   LineChart,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -23,13 +20,19 @@ import { usePeriod } from "../features/period/usePeriod";
 import type {
   FixStatus,
   IssueFilters,
+  IssueItem,
   IssueStatus,
   Platform,
   SelectableFilter,
   ServiceName,
 } from "../types/issue";
 import { usePagination } from "../hooks/usePagination";
-import { formatDate, formatPercent, getIssueJiraLinks } from "../utils/formatters";
+import {
+  formatDate,
+  formatPercent,
+  getIssueJiraLinks,
+  getJiraIssueNumber,
+} from "../utils/formatters";
 import {
   DEFAULT_FILTERS,
   filterIssues,
@@ -51,6 +54,26 @@ import styles from "./DashboardPage.module.css";
 
 const reasonColors = ["#1f6feb", "#12b76a", "#f79009", "#f04438", "#667085"];
 
+type DetailSortKey = "registeredAt" | "jiraNumber";
+type DetailSortDirection = "asc" | "desc";
+
+type DetailSort = {
+  key: DetailSortKey;
+  direction: DetailSortDirection;
+};
+
+function getPrimaryJiraNumber(issue: IssueItem) {
+  for (const link of getIssueJiraLinks(issue)) {
+    const jiraNumber = getJiraIssueNumber(link.label);
+
+    if (jiraNumber !== null) {
+      return jiraNumber;
+    }
+  }
+
+  return null;
+}
+
 export function DashboardPage() {
   const { selectedPeriodId } = usePeriod();
   const { issues } = useIssues();
@@ -59,6 +82,10 @@ export function DashboardPage() {
     ...DEFAULT_FILTERS,
     periodStart: selectedPeriod.start,
     periodEnd: selectedPeriod.end,
+  });
+  const [detailSort, setDetailSort] = useState<DetailSort>({
+    key: "registeredAt",
+    direction: "desc",
   });
 
   const filteredIssues = useMemo(
@@ -82,7 +109,64 @@ export function DashboardPage() {
     () => getNotIssueReasonStatus(filteredIssues),
     [filteredIssues],
   );
-  const detailPagination = usePagination(filteredIssues, 5);
+  const rankedNotIssueReasons = useMemo(
+    () =>
+      [...notIssueReasons].sort((a, b) => {
+        if (b.count !== a.count) {
+          return b.count - a.count;
+        }
+
+        return a.reason.localeCompare(b.reason);
+      }),
+    [notIssueReasons],
+  );
+  const notIssueTotal = useMemo(
+    () => notIssueReasons.reduce((total, reason) => total + reason.count, 0),
+    [notIssueReasons],
+  );
+  const topNotIssueReason = rankedNotIssueReasons[0];
+  const maxNotIssueReasonCount = Math.max(
+    ...rankedNotIssueReasons.map((reason) => reason.count),
+    1,
+  );
+  const topNotIssueRate =
+    notIssueTotal > 0 && topNotIssueReason
+      ? (topNotIssueReason.count / notIssueTotal) * 100
+      : 0;
+  const sortedDetailIssues = useMemo(() => {
+    return [...filteredIssues].sort((a, b) => {
+      if (detailSort.key === "jiraNumber") {
+        const aJiraNumber = getPrimaryJiraNumber(a);
+        const bJiraNumber = getPrimaryJiraNumber(b);
+
+        if (aJiraNumber !== null && bJiraNumber !== null) {
+          const jiraCompare = aJiraNumber - bJiraNumber;
+
+          if (jiraCompare !== 0) {
+            return detailSort.direction === "asc" ? jiraCompare : -jiraCompare;
+          }
+        }
+
+        if (aJiraNumber !== null && bJiraNumber === null) {
+          return -1;
+        }
+
+        if (aJiraNumber === null && bJiraNumber !== null) {
+          return 1;
+        }
+      }
+
+      const dateCompare = a.registeredAt.localeCompare(b.registeredAt);
+
+      if (dateCompare !== 0) {
+        return detailSort.direction === "desc" ? -dateCompare : dateCompare;
+      }
+
+      const idCompare = a.id.localeCompare(b.id);
+      return detailSort.direction === "desc" ? -idCompare : idCompare;
+    });
+  }, [detailSort, filteredIssues]);
+  const detailPagination = usePagination(sortedDetailIssues, 10);
 
   const periodSummary = `${filters.periodStart.replaceAll("-", ".")} - ${filters.periodEnd.replaceAll("-", ".")}`;
   const currentSummary = `현재 조회: 전체 기간 · ${filters.serviceName} 서비스 · ${filters.platform} 플랫폼`;
@@ -104,6 +188,30 @@ export function DashboardPage() {
       issueStatus: DEFAULT_FILTERS.issueStatus,
       fixStatus: DEFAULT_FILTERS.fixStatus,
     });
+    setDetailSort({ key: "registeredAt", direction: "desc" });
+    detailPagination.goToPage(1);
+  }
+
+  function toggleDetailRegisteredAtSort() {
+    setDetailSort((current) => ({
+      key: "registeredAt",
+      direction:
+        current.key === "registeredAt" && current.direction === "desc"
+          ? "asc"
+          : "desc",
+    }));
+    detailPagination.goToPage(1);
+  }
+
+  function toggleDetailJiraNumberSort() {
+    setDetailSort((current) => ({
+      key: "jiraNumber",
+      direction:
+        current.key === "jiraNumber" && current.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
+    detailPagination.goToPage(1);
   }
 
   return (
@@ -296,95 +404,139 @@ export function DashboardPage() {
         </SectionCard>
 
         <SectionCard title="서비스별 현황">
-          <table className={styles.summaryTable}>
-            <thead>
-              <tr>
-                <th>서비스</th>
-                <th>서포터즈 제보 이슈 수</th>
-                <th>접근성 이슈 수</th>
-                <th>수정된 이슈 수</th>
-                <th>이슈 아님 수</th>
-              </tr>
-            </thead>
-            <tbody>
-              {serviceStatus.length > 0 ? (
-                serviceStatus.map((service) => (
-                  <tr key={service.serviceName}>
-                    <td>{service.serviceName}</td>
-                    <td>{service.supporterIssueCount}</td>
-                    <td>{service.accessibilityIssueCount}</td>
-                    <td>{service.fixedIssueCount}</td>
-                    <td>{service.notIssueCount}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className={styles.empty} colSpan={5}>
-                    생성된 이슈가 없습니다.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </SectionCard>
-
-        <SectionCard title="이슈 아님 분석">
-          <div className={styles.reasonGrid}>
-            <div className={styles.reasonChart}>
-              <ResponsiveContainer height={220} width="100%">
-                <PieChart>
-                  <Pie
-                    data={notIssueReasons}
-                    dataKey="count"
-                    innerRadius={46}
-                    nameKey="reason"
-                    outerRadius={76}
-                  >
-                    {notIssueReasons.map((reason, index) => (
-                      <Cell
-                        fill={reasonColors[index % reasonColors.length]}
-                        key={reason.reason}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className={styles.reasonLegend}>
-                {notIssueReasons.map((reason, index) => (
-                  <span key={reason.reason}>
-                    <i
-                      style={{
-                        backgroundColor:
-                          reasonColors[index % reasonColors.length],
-                      }}
-                    />
-                    {reason.reason}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <table className={styles.summaryTable}>
+          <div className={styles.serviceTableWrap}>
+            <table className={`${styles.summaryTable} ${styles.serviceTable}`}>
               <thead>
                 <tr>
-                  <th>사유</th>
-                  <th>건수</th>
+                  <th>서비스</th>
+                  <th>서포터즈 제보 이슈 수</th>
+                  <th>접근성 이슈 수</th>
+                  <th>수정된 이슈 수</th>
+                  <th>이슈 아님 수</th>
                 </tr>
               </thead>
               <tbody>
-                {notIssueReasons.map((reason) => (
-                  <tr key={reason.reason}>
-                    <td>{reason.reason}</td>
-                    <td>{reason.count}</td>
+                {serviceStatus.length > 0 ? (
+                  serviceStatus.map((service) => (
+                    <tr key={service.serviceName}>
+                      <td>{service.serviceName}</td>
+                      <td>{service.supporterIssueCount}</td>
+                      <td>{service.accessibilityIssueCount}</td>
+                      <td>{service.fixedIssueCount}</td>
+                      <td>{service.notIssueCount}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td className={styles.empty} colSpan={5}>
+                      생성된 이슈가 없습니다.
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </SectionCard>
 
+        <SectionCard title="이슈 아님 분석">
+          <div className={styles.reasonAnalysis}>
+            <div className={styles.reasonSummaryGrid}>
+              <article className={styles.reasonSummaryCard}>
+                <span className={styles.reasonSummaryIcon}>▣</span>
+                <div>
+                  <strong>전체 건수</strong>
+                  <p>
+                    {notIssueTotal}
+                    <small>건</small>
+                  </p>
+                </div>
+              </article>
+              <article className={styles.reasonSummaryCard}>
+                <span className={styles.reasonSummaryIcon}>★</span>
+                <div>
+                  <strong>최다 유형</strong>
+                  <p>{topNotIssueReason?.reason ?? "-"}</p>
+                  <em>
+                    {topNotIssueReason?.count ?? 0}건 (
+                    {formatPercent(topNotIssueRate)})
+                  </em>
+                </div>
+              </article>
+            </div>
+
+            <div className={styles.reasonContentGrid}>
+              <div className={styles.reasonBarPanel}>
+                <h3>유형별 건수</h3>
+                <div className={styles.reasonBars}>
+                  {rankedNotIssueReasons.map((reason, index) => {
+                    const barWidth =
+                      reason.count === 0
+                        ? 0
+                        : (reason.count / maxNotIssueReasonCount) * 100;
+
+                    return (
+                      <div className={styles.reasonBarRow} key={reason.reason}>
+                        <span
+                          className={styles.reasonRank}
+                          style={{
+                            backgroundColor:
+                              reasonColors[index % reasonColors.length],
+                          }}
+                        >
+                          {index + 1}
+                        </span>
+                        <strong>{reason.reason}</strong>
+                        <div className={styles.reasonTrack}>
+                          <span
+                            style={{
+                              backgroundColor:
+                                reasonColors[index % reasonColors.length],
+                              width: `${barWidth}%`,
+                            }}
+                          />
+                        </div>
+                        <b>{reason.count}</b>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <table className={`${styles.summaryTable} ${styles.reportTable}`}>
+                <thead>
+                  <tr>
+                    <th>유형</th>
+                    <th>건수</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rankedNotIssueReasons.map((reason, index) => (
+                    <tr key={reason.reason}>
+                      <td>
+                        <span className={styles.reasonTableType}>
+                          <i
+                            style={{
+                              backgroundColor:
+                                reasonColors[index % reasonColors.length],
+                            }}
+                          >
+                            {index + 1}
+                          </i>
+                          {reason.reason}
+                        </span>
+                      </td>
+                      <td>{reason.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </SectionCard>
+
         <SectionCard title="작성자별 제보 현황">
-          <table className={styles.summaryTable}>
+          <table
+            className={`${styles.summaryTable} ${styles.reportTable} ${styles.authorTable}`}
+          >
             <thead>
               <tr>
                 <th>작성자</th>
@@ -426,14 +578,44 @@ export function DashboardPage() {
           <table className={styles.detailTable}>
             <thead>
               <tr>
-                <th>등록일</th>
+                <th>
+                  <button
+                    aria-label={`등록일 ${
+                      detailSort.key === "registeredAt" &&
+                      detailSort.direction === "desc"
+                        ? "최신순"
+                        : "오래된순"
+                    }. 클릭하면 정렬 순서가 변경됩니다.`}
+                    className={styles.detailSortButton}
+                    type="button"
+                    onClick={toggleDetailRegisteredAtSort}
+                  >
+                    등록일
+                    <span aria-hidden="true">↕</span>
+                  </button>
+                </th>
                 <th>작성자</th>
                 <th>서비스</th>
                 <th>플랫폼</th>
                 <th>이슈 여부</th>
                 <th>수정 여부</th>
                 <th>이슈 아님 사유</th>
-                <th>Jira 링크</th>
+                <th>
+                  <button
+                    aria-label={`Jira 링크 ${
+                      detailSort.key === "jiraNumber" &&
+                      detailSort.direction === "desc"
+                        ? "큰 번호순"
+                        : "작은 번호순"
+                    }. 클릭하면 정렬 순서가 변경됩니다.`}
+                    className={styles.detailSortButton}
+                    type="button"
+                    onClick={toggleDetailJiraNumberSort}
+                  >
+                    Jira 링크
+                    <span aria-hidden="true">↕</span>
+                  </button>
+                </th>
               </tr>
             </thead>
             <tbody>
