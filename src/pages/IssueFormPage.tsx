@@ -44,9 +44,10 @@ export function IssueFormPage() {
   } = useForm<IssueFormValues>({ defaultValues });
   const issueStatus = useWatch({ control, name: "issueStatus" });
   const isNotIssue = issueStatus === "이슈 아님";
+  const isFixStatusLocked = issueStatus === "이슈 아님" || issueStatus === "보류";
 
   useEffect(() => {
-    if (isNotIssue) {
+    if (isFixStatusLocked) {
       setValue("fixStatus", "-");
       return;
     }
@@ -54,7 +55,7 @@ export function IssueFormPage() {
     if (getValues("fixStatus") === "-") {
       setValue("fixStatus", "수정 필요");
     }
-  }, [getValues, isNotIssue, setValue]);
+  }, [getValues, isFixStatusLocked, setValue]);
 
   function toIssueItem(values: IssueFormValues): Omit<IssueItem, "id"> {
     return {
@@ -64,7 +65,10 @@ export function IssueFormPage() {
       platform: values.platform,
       path: "-",
       issueStatus: values.issueStatus || "이슈",
-      fixStatus: values.issueStatus === "이슈 아님" ? "-" : values.fixStatus,
+      fixStatus:
+        values.issueStatus === "이슈 아님" || values.issueStatus === "보류"
+          ? "-"
+          : values.fixStatus,
       notIssueReason:
         values.issueStatus === "이슈 아님" && values.notIssueReason
           ? values.notIssueReason
@@ -225,14 +229,14 @@ export function IssueFormPage() {
               <label className={styles.field}>
                 <span>
                   수정 여부
-                  {isNotIssue ? (
+                  {isFixStatusLocked ? (
                     <small className={styles.locked}>
-                      이슈 아님 선택 시 비활성
+                      이슈 아님/보류 선택 시 비활성
                     </small>
                   ) : null}
                 </span>
-                <select disabled={isNotIssue} {...register("fixStatus")}>
-                  {isNotIssue ? <option value="-">-</option> : null}
+                <select disabled={isFixStatusLocked} {...register("fixStatus")}>
+                  {isFixStatusLocked ? <option value="-">-</option> : null}
                   {FIX_STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status}>
                       {status}

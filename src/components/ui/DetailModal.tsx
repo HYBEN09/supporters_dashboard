@@ -204,9 +204,10 @@ function DetailModalContent({
   });
   const issueStatus = useWatch({ control, name: "issueStatus" });
   const isNotIssue = issueStatus === "이슈 아님";
+  const isFixStatusLocked = issueStatus === "이슈 아님" || issueStatus === "보류";
 
   useEffect(() => {
-    if (isNotIssue) {
+    if (isFixStatusLocked) {
       setValue("fixStatus", "-");
       return;
     }
@@ -214,7 +215,7 @@ function DetailModalContent({
     if (getValues("fixStatus") === "-") {
       setValue("fixStatus", "수정 필요");
     }
-  }, [getValues, isNotIssue, setValue]);
+  }, [getValues, isFixStatusLocked, setValue]);
 
   function cancelEditing() {
     reset(getDefaultValues(issue));
@@ -228,7 +229,10 @@ function DetailModalContent({
       serviceName: values.serviceName || issue.serviceName,
       platform: values.platform,
       issueStatus: values.issueStatus || issue.issueStatus,
-      fixStatus: values.issueStatus === "이슈 아님" ? "-" : values.fixStatus,
+      fixStatus:
+        values.issueStatus === "이슈 아님" || values.issueStatus === "보류"
+          ? "-"
+          : values.fixStatus,
       notIssueReason:
         values.issueStatus === "이슈 아님" && values.notIssueReason
           ? values.notIssueReason
@@ -482,8 +486,8 @@ function DetailModalContent({
             </label>
             <label>
               <span>수정 여부</span>
-              <select disabled={isNotIssue} {...register("fixStatus")}>
-                {isNotIssue ? <option value="-">-</option> : null}
+              <select disabled={isFixStatusLocked} {...register("fixStatus")}>
+                {isFixStatusLocked ? <option value="-">-</option> : null}
                 {FIX_STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
                     {status}
