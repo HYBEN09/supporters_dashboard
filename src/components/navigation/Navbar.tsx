@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useTheme } from "../../features/theme/useTheme";
 import styles from "./Navbar.module.css";
 
 const navItems = [
@@ -9,6 +10,8 @@ const navItems = [
 ];
 
 export function Navbar() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -31,6 +34,19 @@ export function Navbar() {
           ))}
         </nav>
         <div className={styles.actions}>
+          <button
+            aria-label={
+              theme === "dark"
+                ? "라이트 모드로 전환"
+                : "다크 모드로 전환"
+            }
+            className={styles.themeButton}
+            type="button"
+            onClick={toggleTheme}
+          >
+            <span aria-hidden="true">{theme === "dark" ? "☀" : "◐"}</span>
+            {theme === "dark" ? "라이트" : "다크"}
+          </button>
           <div className={styles.profile} aria-label="관리자 프로필">
             <span className={styles.avatar}></span>
             <div>
