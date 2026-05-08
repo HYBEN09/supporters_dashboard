@@ -74,6 +74,22 @@ function getPrimaryJiraNumber(issue: IssueItem) {
   return null;
 }
 
+function getMonthlyStatusLabel(dataKey: string) {
+  if (dataKey === "reportedIssueCount") {
+    return "서포터즈 이슈 수";
+  }
+
+  if (dataKey === "finalDeliveredIssueCount") {
+    return "최종 전달 이슈 수";
+  }
+
+  if (dataKey === "fixedDeliveredIssueCount") {
+    return "수정 이슈 수";
+  }
+
+  return dataKey;
+}
+
 export function DashboardPage() {
   const { selectedPeriodId } = usePeriod();
   const { issues } = useIssues();
@@ -375,11 +391,16 @@ export function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis allowDecimals={false} />
-                <Tooltip formatter={(value) => String(value)} />
-                <Legend />
+                <Tooltip
+                  formatter={(value, _name, item) => [
+                    String(value),
+                    getMonthlyStatusLabel(String(item.dataKey)),
+                  ]}
+                />
+                <Legend formatter={(value) => getMonthlyStatusLabel(String(value))} />
                 <Line
                   dataKey="reportedIssueCount"
-                  name="제보 이슈 수"
+                  name="서포터즈 이슈 수"
                   stroke="#1f6feb"
                   strokeWidth={2}
                   type="monotone"

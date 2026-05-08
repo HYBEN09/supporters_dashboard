@@ -29,15 +29,16 @@ export function MonthlyReportPage() {
       }),
     [issues, period.end, period.start],
   );
+
   const rows = useMemo(
     () => getMonthlyReportRows(periodIssues, period.start, period.end),
     [period.end, period.start, periodIssues],
   );
+
   const totals = useMemo(
     () =>
       rows.reduce(
         (sum, row) => ({
-          totalReports: sum.totalReports + row.totalReports,
           supporterIssues: sum.supporterIssues + row.supporterIssues,
           notIssues: sum.notIssues + row.notIssues,
           accessibilityIssues:
@@ -46,7 +47,6 @@ export function MonthlyReportPage() {
           fixedIssues: sum.fixedIssues + row.fixedIssues,
         }),
         {
-          totalReports: 0,
           supporterIssues: 0,
           notIssues: 0,
           accessibilityIssues: 0,
@@ -86,12 +86,12 @@ export function MonthlyReportPage() {
 
       <section className={styles.summaryGrid} aria-label="월별 리포트 요약">
         <article>
-          <span>이슈 제보</span>
-          <strong>{formatCount(totals.totalReports)}</strong>
-        </article>
-        <article>
           <span>서포터즈 이슈</span>
           <strong>{formatCount(totals.supporterIssues)}</strong>
+        </article>
+        <article>
+          <span>이슈 아님</span>
+          <strong>{formatCount(totals.notIssues)}</strong>
         </article>
         <article>
           <span>접근성 이슈</span>
@@ -120,7 +120,6 @@ export function MonthlyReportPage() {
             <thead>
               <tr>
                 <th>해당 월</th>
-                <th>이슈 제보</th>
                 <th>서포터즈 이슈</th>
                 <th>이슈 아님</th>
                 <th>접근성 이슈</th>
@@ -132,7 +131,6 @@ export function MonthlyReportPage() {
               {rows.map((row) => (
                 <tr key={row.month}>
                   <th scope="row">{row.monthLabel}</th>
-                  <td>{formatCount(row.totalReports)}</td>
                   <td>{formatCount(row.supporterIssues)}</td>
                   <td>{formatCount(row.notIssues)}</td>
                   <td>{formatCount(row.accessibilityIssues)}</td>
