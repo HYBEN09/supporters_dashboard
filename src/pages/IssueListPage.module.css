@@ -184,6 +184,11 @@
   background: #f8fbff;
 }
 
+:global(:root[data-theme="dark"]) .table th,
+:global(:root[data-theme="dark"]) .table td {
+  border-bottom-color: #334155;
+}
+
 .table a {
   color: #1f6feb;
   font-weight: 800;

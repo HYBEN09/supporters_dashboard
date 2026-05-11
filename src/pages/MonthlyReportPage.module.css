@@ -162,25 +162,25 @@
 }
 
 :global(:root[data-theme="dark"]) .reportTable thead th {
-  border-color: #334155;
-  background: #1e293b;
-  color: #f8fafc;
+  border-color: #334155 !important;
+  background: #1e293b !important;
+  color: #f8fafc !important;
 }
 
 :global(:root[data-theme="dark"]) .reportTable tbody th,
 :global(:root[data-theme="dark"]) .reportTable tbody td {
-  border-color: #26364f;
-  color: #e5edf7;
+  border-color: #26364f !important;
+  color: #e5edf7 !important;
 }
 
 :global(:root[data-theme="dark"]) .reportTable tbody tr:nth-child(odd) > th,
 :global(:root[data-theme="dark"]) .reportTable tbody tr:nth-child(odd) > td {
-  background: #1e293b;
+  background: #162033 !important;
 }
 
 :global(:root[data-theme="dark"]) .reportTable tbody tr:nth-child(even) > th,
 :global(:root[data-theme="dark"]) .reportTable tbody tr:nth-child(even) > td {
-  background: #162033;
+  background: #1e293b !important;
 }
 
 @media (max-width: 1180px) {
