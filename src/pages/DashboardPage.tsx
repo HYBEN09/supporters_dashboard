@@ -39,7 +39,7 @@ import {
   getPeriodById,
 } from "../utils/issueFilters";
 import {
-  getAuthorReportStatus,
+  getAuthorReportStatusByVisibleReporter,
   getKpis,
   getMonthlyStatus,
   getNotIssueReasonStatus,
@@ -114,7 +114,7 @@ export function DashboardPage() {
     [filteredIssues],
   );
   const authorStatus = useMemo(
-    () => getAuthorReportStatus(filteredIssues),
+    () => getAuthorReportStatusByVisibleReporter(filteredIssues),
     [filteredIssues],
   );
   const serviceStatus = useMemo(

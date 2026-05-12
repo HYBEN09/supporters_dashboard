@@ -198,6 +198,54 @@ export function getAuthorReportStatus(items: IssueItem[]) {
   });
 }
 
+export function getAuthorReportStatusByVisibleReporter(items: IssueItem[]) {
+  const authorMap = new Map<
+    string,
+    {
+      authorName: string;
+      totalReports: number;
+      deliveredIssueCount: number;
+      notIssueCount: number;
+    }
+  >();
+
+  items.forEach((item) => {
+    const rawAuthorName = item.authorName.trim();
+    const isAliasAuthor = /_\d+$/.test(rawAuthorName);
+    const authorName = rawAuthorName.replace(/_\d+$/, "").trim() || "미입력";
+    const current =
+      authorMap.get(authorName) ??
+      {
+        authorName,
+        totalReports: 0,
+        deliveredIssueCount: 0,
+        notIssueCount: 0,
+      };
+
+    if (!isAliasAuthor) {
+      current.totalReports += 1;
+    }
+
+    if (item.serviceJiraUrl) {
+      current.deliveredIssueCount += 1;
+    }
+
+    if (item.issueStatus === "이슈 아님") {
+      current.notIssueCount += 1;
+    }
+
+    authorMap.set(authorName, current);
+  });
+
+  return Array.from(authorMap.values()).sort((a, b) => {
+    if (b.totalReports !== a.totalReports) {
+      return b.totalReports - a.totalReports;
+    }
+
+    return a.authorName.localeCompare(b.authorName);
+  });
+}
+
 export function getServiceStatus(items: IssueItem[]) {
   return SERVICE_OPTIONS.flatMap((serviceName) => {
     const serviceItems = items.filter((item) => item.serviceName === serviceName);
