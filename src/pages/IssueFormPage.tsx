@@ -150,9 +150,7 @@ export function IssueFormPage() {
                 </span>
                 <input
                   placeholder="예: 김민준"
-                  {...register("authorName", {
-                    required: "작성자 이름은 필수입니다.",
-                  })}
+                  {...register("authorName")}
                 />
                 {errors.authorName ? (
                   <em>{errors.authorName.message}</em>

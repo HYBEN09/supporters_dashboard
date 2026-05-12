@@ -162,6 +162,10 @@ export function getAuthorReportStatus(items: IssueItem[]) {
   >();
 
   items.forEach((item) => {
+    if (/_\d+$/.test(item.authorName.trim())) {
+      return;
+    }
+
     const authorName = item.authorName.trim() || "미입력";
     const current =
       authorMap.get(authorName) ??

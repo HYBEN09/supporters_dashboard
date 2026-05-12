@@ -438,9 +438,7 @@ function DetailModalContent({
             <label>
               <span>작성자</span>
               <input
-                {...register("authorName", {
-                  required: "작성자 이름은 필수입니다.",
-                })}
+                {...register("authorName")}
               />
               {errors.authorName ? <em>{errors.authorName.message}</em> : null}
             </label>
