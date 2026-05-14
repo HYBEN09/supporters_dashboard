@@ -1,4 +1,4 @@
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { IssueProvider } from "./features/issues/IssueProvider";
 import { PeriodProvider } from "./features/period/PeriodProvider";
 import { ThemeProvider } from "./features/theme/ThemeProvider";
@@ -6,7 +6,7 @@ import { AppRoutes } from "./routes/AppRoutes";
 
 function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter basename={import.meta.env.BASE_URL}>
       <ThemeProvider>
         <PeriodProvider>
           <IssueProvider>
@@ -14,7 +14,7 @@ function App() {
           </IssueProvider>
         </PeriodProvider>
       </ThemeProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
