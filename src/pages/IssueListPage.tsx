@@ -55,6 +55,11 @@ function getPrimaryJiraNumber(issue: IssueItem) {
   return null;
 }
 
+function escapeCsvValue(value: string) {
+  const normalizedValue = value.replaceAll('"', '""');
+  return `"${normalizedValue}"`;
+}
+
 export function IssueListPage() {
   const { selectedPeriodId } = usePeriod();
   const { deleteIssue, issues, updateIssue } = useIssues();
@@ -165,6 +170,57 @@ export function IssueListPage() {
     setAppliedFilters(nextFilters);
     setSortConfig({ key: "registeredAt", direction: "desc" });
     pagination.goToPage(1);
+  }
+
+  function exportIssuesToCsv() {
+    const headers = [
+      "ID",
+      "등록일",
+      "작성자",
+      "서비스명",
+      "플랫폼",
+      "이슈 여부",
+      "수정 여부",
+      "이슈 아님 사유",
+      "서포터즈 Jira 링크",
+      "서비스 전달 링크",
+      "메모",
+    ];
+
+    const rows = sortedIssues.map((issue) => [
+      issue.id,
+      issue.registeredAt,
+      issue.authorName,
+      issue.serviceName,
+      issue.platform,
+      issue.issueStatus,
+      issue.fixStatus,
+      issue.notIssueReason ?? "",
+      issue.supporterJiraUrl ?? "",
+      issue.serviceJiraUrl ?? "",
+      issue.memo ?? "",
+    ]);
+
+    const csv = [
+      headers.map(escapeCsvValue).join(","),
+      ...rows.map((row) =>
+        row.map((value) => escapeCsvValue(String(value))).join(","),
+      ),
+    ].join("\r\n");
+
+    const blob = new Blob([`\uFEFF${csv}`], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const today = new Date().toISOString().slice(0, 10);
+
+    link.href = url;
+    link.download = `issue-list-${today}.csv`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -283,6 +339,9 @@ export function IssueListPage() {
             </Button>
             <Button variant="secondary" onClick={resetFilters}>
               초기화
+            </Button>
+            <Button variant="secondary" onClick={exportIssuesToCsv}>
+              CSV 내보내기
             </Button>
           </div>
         </div>

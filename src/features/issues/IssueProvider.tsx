@@ -12,10 +12,6 @@ import {
   saveIssueToStorage,
   updateIssueInStorage,
 } from "../../services/issueStorage";
-import {
-  isGoogleSheetsSyncEnabled,
-  syncIssuesToGoogleSheets,
-} from "../../services/googleSheetsSync";
 import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
 
 type IssueProviderProps = {
@@ -100,14 +96,9 @@ async function getInitialIssues() {
 
 export function IssueProvider({ children }: IssueProviderProps) {
   const [issues, setIssues] = useState<IssueItem[]>([]);
-  const [isHydrated, setIsHydrated] = useState(false);
 
   function reportStorageError(error: unknown) {
     console.error("Failed to sync issue storage.", error);
-  }
-
-  function reportGoogleSheetsSyncError(error: unknown) {
-    console.error("Failed to sync Google Sheets.", error);
   }
 
   useEffect(() => {
@@ -116,7 +107,6 @@ export function IssueProvider({ children }: IssueProviderProps) {
     getInitialIssues().then((storedIssues) => {
       if (isMounted) {
         setIssues(storedIssues);
-        setIsHydrated(true);
       }
     });
 
@@ -124,14 +114,6 @@ export function IssueProvider({ children }: IssueProviderProps) {
       isMounted = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (!isHydrated || !isGoogleSheetsSyncEnabled()) {
-      return;
-    }
-
-    void syncIssuesToGoogleSheets(issues).catch(reportGoogleSheetsSyncError);
-  }, [isHydrated, issues]);
 
   const addIssue = useCallback((issue: NewIssueItem) => {
     const newIssue = {
