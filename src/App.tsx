@@ -6,7 +6,7 @@ import { AppRoutes } from "./routes/AppRoutes";
 
 function App() {
   return (
-    <HashRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <ThemeProvider>
         <PeriodProvider>
           <IssueProvider>
