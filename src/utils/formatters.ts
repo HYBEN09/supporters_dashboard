@@ -51,6 +51,13 @@ export function getJiraIssueNumber(value?: string) {
   return issueNumberMatch ? Number(issueNumberMatch[1]) : null;
 }
 
+export function getServiceJiraUrls(value?: string) {
+  return (value ?? "")
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export function getIssueJiraLinks(issue: IssueItem) {
   const links = [];
 
@@ -64,13 +71,21 @@ export function getIssueJiraLinks(issue: IssueItem) {
     });
   }
 
-  if (issue.serviceJiraUrl || issue.jiraKey) {
-    const jiraValue = issue.serviceJiraUrl ?? issue.jiraKey ?? "";
+  const serviceJiraUrls = getServiceJiraUrls(issue.serviceJiraUrl);
 
+  if (serviceJiraUrls.length > 0) {
+    serviceJiraUrls.forEach((jiraValue) => {
+      links.push({
+        label: getJiraIssueKey(jiraValue) || "서비스 전달",
+        url: createServiceJiraUrl(jiraValue),
+        text: jiraValue,
+      });
+    });
+  } else if (issue.jiraKey) {
     links.push({
-      label: getJiraIssueKey(jiraValue) || "서비스 전달",
-      url: createServiceJiraUrl(jiraValue),
-      text: jiraValue,
+      label: getJiraIssueKey(issue.jiraKey) || "서비스 전달",
+      url: createServiceJiraUrl(issue.jiraKey),
+      text: issue.jiraKey,
     });
   }
 

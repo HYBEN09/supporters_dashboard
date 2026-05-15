@@ -171,6 +171,37 @@
   gap: 12px;
 }
 
+.serviceJiraGroup {
+  display: grid;
+  gap: 10px;
+}
+
+.serviceJiraFieldRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.serviceJiraAddButton,
+.serviceJiraRemoveButton {
+  height: 36px;
+  border: 1px solid #cfd8e6;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #2f6fed;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 12px;
+}
+
+.serviceJiraAddButton {
+  justify-self: start;
+}
+
+.serviceJiraRemoveButton {
+  color: #667085;
+}
+
 .jiraLinks strong {
   display: inline-flex;
   align-items: center;
@@ -332,6 +363,10 @@
   .jiraLinks label {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .serviceJiraFieldRow {
+    grid-template-columns: 1fr;
   }
 
   .footer {

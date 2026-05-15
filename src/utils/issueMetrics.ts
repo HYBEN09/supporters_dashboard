@@ -3,6 +3,7 @@ import {
   SERVICE_OPTIONS,
 } from "../data/filterOptions";
 import type { IssueItem, NotIssueReason, ServiceName } from "../types/issue";
+import { getServiceJiraUrls } from "./formatters";
 
 export function calculateImprovementRate(fixedCount: number, issueCount: number) {
   if (issueCount === 0) {
@@ -52,7 +53,7 @@ function getMonthLabel(month: string) {
 }
 
 function getFinalDeliveredIssueCount(item: IssueItem) {
-  return item.serviceJiraUrl ? 1 : 0;
+  return getServiceJiraUrls(item.serviceJiraUrl).length;
 }
 
 function getFixedDeliveredIssueCount(item: IssueItem) {
@@ -177,10 +178,7 @@ export function getAuthorReportStatus(items: IssueItem[]) {
       };
 
     current.totalReports += 1;
-
-    if (item.serviceJiraUrl) {
-      current.deliveredIssueCount += 1;
-    }
+    current.deliveredIssueCount += getFinalDeliveredIssueCount(item);
 
     if (item.issueStatus === "이슈 아님") {
       current.notIssueCount += 1;
@@ -226,9 +224,7 @@ export function getAuthorReportStatusByVisibleReporter(items: IssueItem[]) {
       current.totalReports += 1;
     }
 
-    if (item.serviceJiraUrl) {
-      current.deliveredIssueCount += 1;
-    }
+    current.deliveredIssueCount += getFinalDeliveredIssueCount(item);
 
     if (item.issueStatus === "이슈 아님") {
       current.notIssueCount += 1;
@@ -259,9 +255,13 @@ export function getServiceStatus(items: IssueItem[]) {
       0,
       supporterIssueCount - notIssueCount,
     );
-    const fixedIssueCount = serviceItems.filter(
-      (item) => item.serviceJiraUrl && item.fixStatus === "수정 완료",
-    ).length;
+    const fixedIssueCount = serviceItems.reduce((count, item) => {
+      if (item.fixStatus !== "수정 완료") {
+        return count;
+      }
+
+      return count + getFinalDeliveredIssueCount(item);
+    }, 0);
 
     if (
       supporterIssueCount === 0 &&

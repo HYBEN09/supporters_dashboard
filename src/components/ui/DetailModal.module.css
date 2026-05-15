@@ -298,6 +298,37 @@
   gap: 10px;
 }
 
+.serviceJiraEditorGroup {
+  display: grid;
+  gap: 10px;
+}
+
+.serviceJiraEditorRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.serviceJiraEditorAddButton,
+.serviceJiraEditorRemoveButton {
+  height: 34px;
+  border: 1px solid #b9c6d8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1459b8;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 12px;
+}
+
+.serviceJiraEditorAddButton {
+  justify-self: start;
+}
+
+.serviceJiraEditorRemoveButton {
+  color: #475569;
+}
+
 .jiraEditor strong {
   display: inline-flex;
   align-items: center;
@@ -439,6 +470,13 @@
   color: #bfdbfe;
 }
 
+:global(:root[data-theme="dark"]) .serviceJiraEditorAddButton,
+:global(:root[data-theme="dark"]) .serviceJiraEditorRemoveButton {
+  border-color: #334155;
+  background: #1f2937;
+  color: #dbeafe;
+}
+
 @media (max-width: 640px) {
   .backdrop {
     align-items: stretch;
@@ -503,6 +541,10 @@
   }
 
   .jiraEditor label {
+    grid-template-columns: 1fr;
+  }
+
+  .serviceJiraEditorRow {
     grid-template-columns: 1fr;
   }
 

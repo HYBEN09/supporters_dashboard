@@ -60,6 +60,6 @@ export type IssueFormValues = {
   fixStatus: FixStatus;
   notIssueReason: NotIssueReason | "";
   supporterJiraUrl: string;
-  serviceJiraUrl: string;
+  serviceJiraUrls: { value: string }[];
   memo: string;
 };

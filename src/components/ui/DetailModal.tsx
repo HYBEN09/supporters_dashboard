@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import {
   FIX_STATUS_OPTIONS,
   ISSUE_FORM_PLATFORM_OPTIONS,
@@ -10,7 +10,11 @@ import {
 } from "../../data/filterOptions";
 import type { IssueUpdate } from "../../features/issues/issueContext";
 import type { IssueFormValues, IssueItem } from "../../types/issue";
-import { formatDate, getIssueJiraLinks } from "../../utils/formatters";
+import {
+  formatDate,
+  getIssueJiraLinks,
+  getServiceJiraUrls,
+} from "../../utils/formatters";
 import { Button } from "./Button";
 import { StatusBadge } from "./StatusBadge";
 import styles from "./DetailModal.module.css";
@@ -20,10 +24,7 @@ const editableServiceOptions = [
   ...ISSUE_FORM_SERVICE_OPTIONS,
 ] as const;
 
-const editablePlatformOptions = [
-  ...ISSUE_FORM_PLATFORM_OPTIONS,
-] as const;
-
+const editablePlatformOptions = [...ISSUE_FORM_PLATFORM_OPTIONS] as const;
 const uniqueServiceOptions = Array.from(new Set(editableServiceOptions));
 const uniquePlatformOptions = Array.from(new Set(editablePlatformOptions));
 
@@ -76,12 +77,8 @@ function DetailIcon({ name }: { name: DetailIconName }) {
           <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
         </>
       ) : null}
-      {name === "circle" ? (
-        <circle cx="12" cy="12" r="8" />
-      ) : null}
-      {name === "check" ? (
-        <path d="m5 12 4 4L19 6" />
-      ) : null}
+      {name === "circle" ? <circle cx="12" cy="12" r="8" /> : null}
+      {name === "check" ? <path d="m5 12 4 4L19 6" /> : null}
       {name === "ban" ? (
         <>
           <circle cx="12" cy="12" r="9" />
@@ -112,9 +109,7 @@ function DetailIcon({ name }: { name: DetailIconName }) {
           <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
         </>
       ) : null}
-      {name === "x" ? (
-        <path d="M18 6 6 18M6 6l12 12" />
-      ) : null}
+      {name === "x" ? <path d="M18 6 6 18M6 6l12 12" /> : null}
       {name === "external" ? (
         <>
           <path d="M15 3h6v6" />
@@ -146,7 +141,15 @@ type DetailModalProps = {
   onSave?: (id: string, updates: IssueUpdate) => void;
 };
 
+function createServiceJiraField(value = "") {
+  return { value };
+}
+
 function getDefaultValues(issue: IssueItem): IssueFormValues {
+  const serviceJiraUrls = getServiceJiraUrls(issue.serviceJiraUrl).map((value) =>
+    createServiceJiraField(value),
+  );
+
   return {
     registeredAt: issue.registeredAt,
     authorName: issue.authorName,
@@ -156,9 +159,18 @@ function getDefaultValues(issue: IssueItem): IssueFormValues {
     fixStatus: issue.fixStatus,
     notIssueReason: issue.notIssueReason ?? "",
     supporterJiraUrl: issue.supporterJiraUrl ?? issue.jiraKey ?? "",
-    serviceJiraUrl: issue.serviceJiraUrl ?? "",
+    serviceJiraUrls: serviceJiraUrls.length > 0 ? serviceJiraUrls : [createServiceJiraField()],
     memo: issue.memo ?? "",
   };
+}
+
+function getJoinedServiceJiraUrls(values: IssueFormValues) {
+  const joinedValue = values.serviceJiraUrls
+    .map((item) => item.value.trim())
+    .filter(Boolean)
+    .join("\n");
+
+  return joinedValue || undefined;
 }
 
 export function DetailModal({ issue, onClose, onDelete, onSave }: DetailModalProps) {
@@ -202,6 +214,14 @@ function DetailModalContent({
   } = useForm<IssueFormValues>({
     defaultValues: getDefaultValues(issue),
   });
+  const {
+    fields: serviceJiraFields,
+    append: appendServiceJiraField,
+    remove: removeServiceJiraField,
+  } = useFieldArray({
+    control,
+    name: "serviceJiraUrls",
+  });
   const issueStatus = useWatch({ control, name: "issueStatus" });
   const isNotIssue = issueStatus === "이슈 아님";
   const isFixStatusLocked = issueStatus === "이슈 아님" || issueStatus === "보류";
@@ -239,7 +259,7 @@ function DetailModalContent({
           : undefined,
       jiraKey: undefined,
       supporterJiraUrl: values.supporterJiraUrl.trim() || undefined,
-      serviceJiraUrl: values.serviceJiraUrl.trim() || undefined,
+      serviceJiraUrl: getJoinedServiceJiraUrls(values),
       memo: values.memo.trim() || undefined,
     });
     setIsEditing(false);
@@ -252,7 +272,7 @@ function DetailModalContent({
     const text = [
       `제보 번호: ${issue.id}`,
       `등록일: ${formatDate(issue.registeredAt)}`,
-      `작성자: ${issue.authorName}`,
+      `작성자: ${issue.authorName || "-"}`,
       `서비스명: ${issue.serviceName}`,
       `플랫폼: ${issue.platform}`,
       `이슈 여부: ${issue.issueStatus}`,
@@ -312,6 +332,7 @@ function DetailModalContent({
             </Button>
           </div>
         </div>
+
         {!isEditing ? (
           <>
             <dl className={styles.details}>
@@ -327,7 +348,7 @@ function DetailModalContent({
                   <DetailIcon name="user" />
                   작성자
                 </dt>
-                <dd>{issue.authorName}</dd>
+                <dd>{issue.authorName || "-"}</dd>
               </div>
               <div>
                 <dt>
@@ -437,9 +458,7 @@ function DetailModalContent({
             </label>
             <label>
               <span>작성자</span>
-              <input
-                {...register("authorName")}
-              />
+              <input {...register("authorName")} />
               {errors.authorName ? <em>{errors.authorName.message}</em> : null}
             </label>
             <label>
@@ -513,13 +532,36 @@ function DetailModalContent({
                   {...register("supporterJiraUrl")}
                 />
               </label>
-              <label>
-                <strong>서비스 전달</strong>
-                <input
-                  placeholder="https://jira.daumkakao.com/browse/..."
-                  {...register("serviceJiraUrl")}
-                />
-              </label>
+              <div className={styles.serviceJiraEditorGroup}>
+                {serviceJiraFields.map((field, index) => (
+                  <label key={field.id}>
+                    <strong>서비스 전달</strong>
+                    <div className={styles.serviceJiraEditorRow}>
+                      <input
+                        placeholder="https://jira.daumkakao.com/browse/..."
+                        {...register(`serviceJiraUrls.${index}.value`)}
+                      />
+                      {serviceJiraFields.length > 1 ? (
+                        <button
+                          className={styles.serviceJiraEditorRemoveButton}
+                          type="button"
+                          onClick={() => removeServiceJiraField(index)}
+                        >
+                          삭제
+                        </button>
+                      ) : null}
+                    </div>
+                  </label>
+                ))}
+
+                <button
+                  className={styles.serviceJiraEditorAddButton}
+                  type="button"
+                  onClick={() => appendServiceJiraField(createServiceJiraField())}
+                >
+                  + 서비스 전달 링크 추가
+                </button>
+              </div>
             </div>
             <label className={styles.memoEditor}>
               <span>비고 / 전달 메모</span>

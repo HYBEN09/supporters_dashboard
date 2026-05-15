@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
   FIX_STATUS_OPTIONS,
@@ -24,9 +24,22 @@ const defaultValues: IssueFormValues = {
   fixStatus: "수정 필요",
   notIssueReason: "",
   supporterJiraUrl: "",
-  serviceJiraUrl: "",
+  serviceJiraUrls: [{ value: "" }],
   memo: "",
 };
+
+function createServiceJiraField(value = "") {
+  return { value };
+}
+
+function getJoinedServiceJiraUrls(values: IssueFormValues) {
+  const joinedValue = values.serviceJiraUrls
+    .map((item) => item.value.trim())
+    .filter(Boolean)
+    .join("\n");
+
+  return joinedValue || undefined;
+}
 
 export function IssueFormPage() {
   const { addIssue } = useIssues();
@@ -42,6 +55,14 @@ export function IssueFormPage() {
     reset,
     setValue,
   } = useForm<IssueFormValues>({ defaultValues });
+  const {
+    fields: serviceJiraFields,
+    append: appendServiceJiraField,
+    remove: removeServiceJiraField,
+  } = useFieldArray({
+    control,
+    name: "serviceJiraUrls",
+  });
   const issueStatus = useWatch({ control, name: "issueStatus" });
   const isNotIssue = issueStatus === "이슈 아님";
   const isFixStatusLocked = issueStatus === "이슈 아님" || issueStatus === "보류";
@@ -74,7 +95,7 @@ export function IssueFormPage() {
           ? values.notIssueReason
           : undefined,
       supporterJiraUrl: values.supporterJiraUrl.trim() || undefined,
-      serviceJiraUrl: values.serviceJiraUrl.trim() || undefined,
+      serviceJiraUrl: getJoinedServiceJiraUrls(values),
       memo: values.memo.trim() || undefined,
     };
   }
@@ -99,7 +120,7 @@ export function IssueFormPage() {
   function saveDraft() {
     const values = getValues();
     console.info("임시 저장", values);
-    setMessage("임시 저장은 브라우저에 저장하지 않고 콘솔 로그로만 기록됩니다.");
+    setMessage("임시 저장은 브라우저 로컬 저장소에 보관되지 않고 콘솔 기록만 남깁니다.");
   }
 
   function resetForm() {
@@ -148,13 +169,8 @@ export function IssueFormPage() {
                 <span>
                   작성자 이름 <small>선택</small>
                 </span>
-                <input
-                  placeholder="예: 김민준"
-                  {...register("authorName")}
-                />
-                {errors.authorName ? (
-                  <em>{errors.authorName.message}</em>
-                ) : null}
+                <input placeholder="예: 김민준" {...register("authorName")} />
+                {errors.authorName ? <em>{errors.authorName.message}</em> : null}
               </label>
 
               <label className={styles.field}>
@@ -173,9 +189,7 @@ export function IssueFormPage() {
                     </option>
                   ))}
                 </select>
-                {errors.serviceName ? (
-                  <em>{errors.serviceName.message}</em>
-                ) : null}
+                {errors.serviceName ? <em>{errors.serviceName.message}</em> : null}
               </label>
             </div>
           </fieldset>
@@ -219,9 +233,7 @@ export function IssueFormPage() {
                   ))}
                 </select>
 
-                {errors.issueStatus ? (
-                  <em>{errors.issueStatus.message}</em>
-                ) : null}
+                {errors.issueStatus ? <em>{errors.issueStatus.message}</em> : null}
               </label>
 
               <label className={styles.field}>
@@ -229,7 +241,7 @@ export function IssueFormPage() {
                   수정 여부
                   {isFixStatusLocked ? (
                     <small className={styles.locked}>
-                      이슈 아님/보류 선택 시 비활성
+                      이슈 아님/보류 선택 시 비활성화
                     </small>
                   ) : null}
                 </span>
@@ -255,9 +267,7 @@ export function IssueFormPage() {
                 <span>
                   이슈 아님 사유
                   {!isNotIssue ? (
-                    <small className={styles.locked}>
-                      이슈 아님 선택 시 활성
-                    </small>
+                    <small className={styles.locked}>이슈 아님 선택 시 활성</small>
                   ) : null}
                 </span>
                 <select disabled={!isNotIssue} {...register("notIssueReason")}>
@@ -283,13 +293,37 @@ export function IssueFormPage() {
                       {...register("supporterJiraUrl")}
                     />
                   </label>
-                  <label>
-                    <strong>서비스 전달</strong>
-                    <input
-                      placeholder="https://jira.daumkakao.com/browse/..."
-                      {...register("serviceJiraUrl")}
-                    />
-                  </label>
+
+                  <div className={styles.serviceJiraGroup}>
+                    {serviceJiraFields.map((field, index) => (
+                      <label key={field.id}>
+                        <strong>서비스 전달</strong>
+                        <div className={styles.serviceJiraFieldRow}>
+                          <input
+                            placeholder="https://jira.daumkakao.com/browse/..."
+                            {...register(`serviceJiraUrls.${index}.value`)}
+                          />
+                          {serviceJiraFields.length > 1 ? (
+                            <button
+                              className={styles.serviceJiraRemoveButton}
+                              type="button"
+                              onClick={() => removeServiceJiraField(index)}
+                            >
+                              삭제
+                            </button>
+                          ) : null}
+                        </div>
+                      </label>
+                    ))}
+
+                    <button
+                      className={styles.serviceJiraAddButton}
+                      type="button"
+                      onClick={() => appendServiceJiraField(createServiceJiraField())}
+                    >
+                      + 서비스 전달 링크 추가
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -321,10 +355,10 @@ export function IssueFormPage() {
                 초기화
               </Button>
               <Button variant="secondary" onClick={saveDraft}>
-                ▣ 임시 저장
+                임시 저장
               </Button>
               <Button type="submit" variant="primary">
-                ✓ 등록
+                등록
               </Button>
             </div>
           </div>
