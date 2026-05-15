@@ -390,6 +390,17 @@ export function IssueListPage() {
         </div>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
+            <colgroup>
+              <col className={styles.dateColumn} />
+              <col className={styles.authorColumn} />
+              <col className={styles.serviceColumn} />
+              <col className={styles.platformColumn} />
+              <col className={styles.statusColumn} />
+              <col className={styles.statusColumn} />
+              <col className={styles.reasonColumn} />
+              <col className={styles.jiraColumn} />
+              <col className={styles.detailColumn} />
+            </colgroup>
             <thead>
               <tr>
                 <th>
@@ -437,18 +448,18 @@ export function IssueListPage() {
               {pagination.paginatedItems.length > 0 ? (
                 pagination.paginatedItems.map((issue) => (
                   <tr key={issue.id}>
-                    <td>{formatDate(issue.registeredAt)}</td>
-                    <td>{issue.authorName}</td>
+                    <td className={styles.nowrapCell}>{formatDate(issue.registeredAt)}</td>
+                    <td className={styles.authorCell}>{issue.authorName}</td>
                     <td>{issue.serviceName}</td>
-                    <td>{issue.platform}</td>
+                    <td className={styles.platformCell}>{issue.platform}</td>
                     <td>
                       <StatusBadge value={issue.issueStatus} />
                     </td>
                     <td>
                       <StatusBadge value={issue.fixStatus} />
                     </td>
-                    <td>{issue.notIssueReason ?? "-"}</td>
-                    <td>
+                    <td className={styles.reasonCell}>{issue.notIssueReason ?? "-"}</td>
+                    <td className={styles.jiraCell}>
                       {getIssueJiraLinks(issue).length > 0 ? (
                         <div className={styles.jiraLinks}>
                           {getIssueJiraLinks(issue).map((link) => (
@@ -466,7 +477,7 @@ export function IssueListPage() {
                         "-"
                       )}
                     </td>
-                    <td>
+                    <td className={styles.detailCell}>
                       <button
                         className={styles.detailButton}
                         type="button"

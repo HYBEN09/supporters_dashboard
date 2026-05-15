@@ -131,9 +131,42 @@
 
 .table {
   width: 100%;
-  min-width: 1000px;
+  min-width: 1180px;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
+}
+
+.dateColumn {
+  width: 96px;
+}
+
+.authorColumn {
+  width: 72px;
+}
+
+.serviceColumn {
+  width: 120px;
+}
+
+.platformColumn {
+  width: 84px;
+}
+
+.statusColumn {
+  width: 92px;
+}
+
+.reasonColumn {
+  width: 170px;
+}
+
+.jiraColumn {
+  width: 340px;
+}
+
+.detailColumn {
+  width: 76px;
 }
 
 .table th {
@@ -180,6 +213,30 @@
   vertical-align: middle;
 }
 
+.nowrapCell {
+  white-space: nowrap;
+}
+
+.authorCell {
+  word-break: keep-all;
+}
+
+.platformCell {
+  white-space: normal;
+  word-break: keep-all;
+  line-height: 1.4;
+}
+
+.reasonCell {
+  word-break: keep-all;
+  line-height: 1.45;
+}
+
+.jiraCell {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 .table tbody tr:hover {
   background: #f8fbff;
 }
@@ -203,6 +260,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  align-items: flex-start;
 }
 
 .jiraLinks a {
@@ -214,18 +272,26 @@
   color: #1f6feb;
   font-size: 12px;
   font-weight: 900;
-  padding: 0 9px;
+  line-height: 1.25;
+  padding: 4px 9px;
+  white-space: nowrap;
 }
 
 .detailButton {
   height: 28px;
+  min-width: 46px;
   border: 1px solid #cfd8e6;
   border-radius: 6px;
   background: #ffffff;
   color: #344054;
   font-size: 12px;
   font-weight: 900;
+  white-space: nowrap;
   padding: 0 10px;
+}
+
+.detailCell {
+  text-align: center;
 }
 
 .detailButton:hover {
