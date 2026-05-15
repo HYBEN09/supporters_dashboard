@@ -54,5 +54,6 @@ export const NOT_ISSUE_REASON_OPTIONS = [
   "사용성 이슈",
   "실행 경로 불명확",
   "기능 개발 요청",
+  "접근성 이슈 아님",
   "기타",
 ] as const;
