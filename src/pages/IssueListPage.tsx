@@ -25,6 +25,7 @@ import {
 import {
   DEFAULT_FILTERS,
   filterIssues,
+  getInitialPeriodStart,
   getPeriodById,
 } from "../utils/issueFilters";
 import { getKpis } from "../utils/issueMetrics";
@@ -66,7 +67,7 @@ export function IssueListPage() {
   const selectedPeriod = getPeriodById(selectedPeriodId);
   const defaultFilters: IssueFilters = {
     ...DEFAULT_FILTERS,
-    periodStart: selectedPeriod.start,
+    periodStart: getInitialPeriodStart(selectedPeriod.id),
     periodEnd: selectedPeriod.end,
   };
   const [draftFilters, setDraftFilters] =
@@ -159,7 +160,7 @@ export function IssueListPage() {
   function resetFilters() {
     const nextFilters = {
       ...DEFAULT_FILTERS,
-      periodStart: selectedPeriod.start,
+      periodStart: getInitialPeriodStart(selectedPeriod.id),
       periodEnd: selectedPeriod.end,
       serviceName: DEFAULT_FILTERS.serviceName,
       platform: DEFAULT_FILTERS.platform,

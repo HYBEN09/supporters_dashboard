@@ -36,6 +36,7 @@ import {
 import {
   DEFAULT_FILTERS,
   filterIssues,
+  getInitialPeriodStart,
   getPeriodById,
 } from "../utils/issueFilters";
 import {
@@ -96,7 +97,7 @@ export function DashboardPage() {
   const selectedPeriod = getPeriodById(selectedPeriodId);
   const [filters, setFilters] = useState<IssueFilters>({
     ...DEFAULT_FILTERS,
-    periodStart: selectedPeriod.start,
+    periodStart: getInitialPeriodStart(selectedPeriod.id),
     periodEnd: selectedPeriod.end,
   });
   const [detailSort, setDetailSort] = useState<DetailSort>({
@@ -197,7 +198,7 @@ export function DashboardPage() {
   function resetFilters() {
     setFilters({
       ...DEFAULT_FILTERS,
-      periodStart: selectedPeriod.start,
+      periodStart: getInitialPeriodStart(selectedPeriod.id),
       periodEnd: selectedPeriod.end,
       serviceName: DEFAULT_FILTERS.serviceName,
       platform: DEFAULT_FILTERS.platform,

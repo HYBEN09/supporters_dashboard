@@ -1,23 +1,55 @@
 import { PERIOD_OPTIONS } from "../data/filterOptions";
 import type { IssueFilters, IssueItem } from "../types/issue";
 
-const DEFAULT_PERIOD = PERIOD_OPTIONS[1];
+export function getTodayDateString() {
+  return new Date().toISOString().slice(0, 10);
+}
 
-export const DEFAULT_FILTERS: IssueFilters = {
-  keyword: "",
-  periodStart: DEFAULT_PERIOD.start,
-  periodEnd: DEFAULT_PERIOD.end,
-  serviceName: "전체",
-  platform: "전체",
-  issueStatus: "전체",
-  fixStatus: "전체",
-};
+function getCurrentMonthStartDateString() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+
+  return `${year}-${month}-01`;
+}
+
+function getDefaultPeriod() {
+  const today = getTodayDateString();
+
+  return (
+    PERIOD_OPTIONS.find((period) => today >= period.start && today <= period.end) ??
+    PERIOD_OPTIONS[1]
+  );
+}
+
+const DEFAULT_PERIOD = getDefaultPeriod();
 
 export function getPeriodById(periodId: string) {
   return (
     PERIOD_OPTIONS.find((period) => period.id === periodId) ?? DEFAULT_PERIOD
   );
 }
+
+export function getInitialPeriodStart(periodId: string) {
+  const period = getPeriodById(periodId);
+  const currentMonthStart = getCurrentMonthStartDateString();
+
+  if (currentMonthStart >= period.start && currentMonthStart <= period.end) {
+    return currentMonthStart;
+  }
+
+  return period.start;
+}
+
+export const DEFAULT_FILTERS: IssueFilters = {
+  keyword: "",
+  periodStart: getInitialPeriodStart(DEFAULT_PERIOD.id),
+  periodEnd: DEFAULT_PERIOD.end,
+  serviceName: "전체",
+  platform: "전체",
+  issueStatus: "전체",
+  fixStatus: "전체",
+};
 
 export function isWithinPeriod(
   registeredAt: string,
