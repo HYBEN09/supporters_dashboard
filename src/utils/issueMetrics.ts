@@ -16,16 +16,28 @@ export function calculateImprovementRate(
   return (fixedCount / issueCount) * 100;
 }
 
-function getFinalDeliveredIssueCount(item: IssueItem) {
-  return getServiceJiraUrls(item.serviceJiraUrl).length;
+function getNormalizedServiceJiraUrls(item: IssueItem) {
+  return Array.from(
+    new Set(
+      getServiceJiraUrls(item.serviceJiraUrl)
+        .map((url) => url.trim())
+        .filter(Boolean),
+    ),
+  );
 }
 
-function getFixedDeliveredIssueCount(item: IssueItem) {
-  if (item.fixStatus !== "수정 완료") {
-    return 0;
-  }
+function getUniqueDeliveredIssueCount(items: IssueItem[]) {
+  return new Set(
+    items.flatMap((item) => getNormalizedServiceJiraUrls(item)),
+  ).size;
+}
 
-  return getFinalDeliveredIssueCount(item);
+function getUniqueFixedDeliveredIssueCount(items: IssueItem[]) {
+  return new Set(
+    items.flatMap((item) =>
+      item.fixStatus === "수정 완료" ? getNormalizedServiceJiraUrls(item) : [],
+    ),
+  ).size;
 }
 
 export function getKpis(items: IssueItem[]) {
@@ -34,14 +46,8 @@ export function getKpis(items: IssueItem[]) {
   const fixedIssues = items.filter(
     (item) => item.issueStatus === "이슈" && item.fixStatus === "수정 완료",
   ).length;
-  const deliveredIssues = items.reduce(
-    (count, item) => count + getFinalDeliveredIssueCount(item),
-    0,
-  );
-  const fixedDeliveredIssues = items.reduce(
-    (count, item) => count + getFixedDeliveredIssueCount(item),
-    0,
-  );
+  const deliveredIssues = getUniqueDeliveredIssueCount(items);
+  const fixedDeliveredIssues = getUniqueFixedDeliveredIssueCount(items);
   const notIssues = items.filter(
     (item) => item.issueStatus === "이슈 아님",
   ).length;
@@ -81,39 +87,25 @@ function getMonthLabel(month: string) {
 }
 
 export function getMonthlyStatus(items: IssueItem[]) {
-  const monthlyMap = new Map<
-    string,
-    {
-      month: string;
-      reportedIssueCount: number;
-      finalDeliveredIssueCount: number;
-      fixedDeliveredIssueCount: number;
-    }
-  >();
+  const months = new Map<string, IssueItem[]>();
 
   items.forEach((item) => {
     const month = item.registeredAt.slice(0, 7).replace("-", ".");
-    const current =
-      monthlyMap.get(month) ?? {
-        month,
-        reportedIssueCount: 0,
-        finalDeliveredIssueCount: 0,
-        fixedDeliveredIssueCount: 0,
-      };
-
-    if (item.issueStatus === "이슈" || item.issueStatus === "이슈 아님") {
-      current.reportedIssueCount += 1;
-    }
-
-    current.finalDeliveredIssueCount += getFinalDeliveredIssueCount(item);
-    current.fixedDeliveredIssueCount += getFixedDeliveredIssueCount(item);
-
-    monthlyMap.set(month, current);
+    const monthItems = months.get(month) ?? [];
+    monthItems.push(item);
+    months.set(month, monthItems);
   });
 
-  return Array.from(monthlyMap.values()).sort((a, b) =>
-    a.month.localeCompare(b.month),
-  );
+  return Array.from(months.entries())
+    .map(([month, monthItems]) => ({
+      month,
+      reportedIssueCount: monthItems.filter(
+        (item) => item.issueStatus === "이슈" || item.issueStatus === "이슈 아님",
+      ).length,
+      finalDeliveredIssueCount: getUniqueDeliveredIssueCount(monthItems),
+      fixedDeliveredIssueCount: getUniqueFixedDeliveredIssueCount(monthItems),
+    }))
+    .sort((a, b) => a.month.localeCompare(b.month));
 }
 
 export function getMonthlyReportRows(
@@ -127,7 +119,6 @@ export function getMonthlyReportRows(
       {
         month,
         monthLabel: getMonthLabel(month),
-        totalReports: 0,
         supporterIssues: 0,
         notIssues: 0,
         accessibilityIssues: 0,
@@ -137,44 +128,38 @@ export function getMonthlyReportRows(
     ]),
   );
 
+  const groupedItems = new Map<string, IssueItem[]>();
+
   items.forEach((item) => {
     const month = item.registeredAt.slice(0, 7).replace("-", ".");
-    const current = rowMap.get(month);
+    const monthItems = groupedItems.get(month) ?? [];
+    monthItems.push(item);
+    groupedItems.set(month, monthItems);
+  });
 
-    if (!current) {
+  groupedItems.forEach((monthItems, month) => {
+    const row = rowMap.get(month);
+
+    if (!row) {
       return;
     }
 
-    const supporterIssueCount = item.supporterJiraUrl || item.jiraKey ? 1 : 0;
-    const finalDeliveredCount = getFinalDeliveredIssueCount(item);
-    const fixedDeliveredCount = getFixedDeliveredIssueCount(item);
-
-    current.totalReports += 1;
-    current.supporterIssues += supporterIssueCount;
-    current.deliveredIssues += finalDeliveredCount;
-    current.fixedIssues += fixedDeliveredCount;
-
-    if (item.issueStatus === "이슈 아님") {
-      current.notIssues += 1;
-    }
+    row.supporterIssues = monthItems.filter(
+      (item) => item.supporterJiraUrl || item.jiraKey,
+    ).length;
+    row.notIssues = monthItems.filter(
+      (item) => item.issueStatus === "이슈 아님",
+    ).length;
+    row.deliveredIssues = getUniqueDeliveredIssueCount(monthItems);
+    row.fixedIssues = getUniqueFixedDeliveredIssueCount(monthItems);
+    row.accessibilityIssues = Math.max(0, row.supporterIssues - row.notIssues);
   });
 
-  return Array.from(rowMap.values()).map((row) => ({
-    ...row,
-    accessibilityIssues: Math.max(0, row.supporterIssues - row.notIssues),
-  }));
+  return Array.from(rowMap.values());
 }
 
 export function getAuthorReportStatus(items: IssueItem[]) {
-  const authorMap = new Map<
-    string,
-    {
-      authorName: string;
-      totalReports: number;
-      deliveredIssueCount: number;
-      notIssueCount: number;
-    }
-  >();
+  const authorMap = new Map<string, IssueItem[]>();
 
   items.forEach((item) => {
     if (/_\d+$/.test(item.authorName.trim())) {
@@ -182,76 +167,62 @@ export function getAuthorReportStatus(items: IssueItem[]) {
     }
 
     const authorName = item.authorName.trim() || "미입력";
-    const current =
-      authorMap.get(authorName) ?? {
-        authorName,
-        totalReports: 0,
-        deliveredIssueCount: 0,
-        notIssueCount: 0,
-      };
-
-    current.totalReports += 1;
-    current.deliveredIssueCount += getFinalDeliveredIssueCount(item);
-
-    if (item.issueStatus === "이슈 아님") {
-      current.notIssueCount += 1;
-    }
-
-    authorMap.set(authorName, current);
+    const authorItems = authorMap.get(authorName) ?? [];
+    authorItems.push(item);
+    authorMap.set(authorName, authorItems);
   });
 
-  return Array.from(authorMap.values()).sort((a, b) => {
-    if (b.totalReports !== a.totalReports) {
-      return b.totalReports - a.totalReports;
-    }
+  return Array.from(authorMap.entries())
+    .map(([authorName, authorItems]) => ({
+      authorName,
+      totalReports: authorItems.length,
+      deliveredIssueCount: getUniqueDeliveredIssueCount(authorItems),
+      notIssueCount: authorItems.filter(
+        (item) => item.issueStatus === "이슈 아님",
+      ).length,
+    }))
+    .sort((a, b) => {
+      if (b.totalReports !== a.totalReports) {
+        return b.totalReports - a.totalReports;
+      }
 
-    return a.authorName.localeCompare(b.authorName);
-  });
+      return a.authorName.localeCompare(b.authorName);
+    });
 }
 
 export function getAuthorReportStatusByVisibleReporter(items: IssueItem[]) {
-  const authorMap = new Map<
-    string,
-    {
-      authorName: string;
-      totalReports: number;
-      deliveredIssueCount: number;
-      notIssueCount: number;
-    }
-  >();
+  const authorMap = new Map<string, IssueItem[]>();
+  const reportCountMap = new Map<string, number>();
 
   items.forEach((item) => {
     const rawAuthorName = item.authorName.trim();
     const isAliasAuthor = /_\d+$/.test(rawAuthorName);
     const authorName = rawAuthorName.replace(/_\d+$/, "").trim() || "미입력";
-    const current =
-      authorMap.get(authorName) ?? {
-        authorName,
-        totalReports: 0,
-        deliveredIssueCount: 0,
-        notIssueCount: 0,
-      };
+    const authorItems = authorMap.get(authorName) ?? [];
+    authorItems.push(item);
+    authorMap.set(authorName, authorItems);
 
     if (!isAliasAuthor) {
-      current.totalReports += 1;
+      reportCountMap.set(authorName, (reportCountMap.get(authorName) ?? 0) + 1);
     }
-
-    current.deliveredIssueCount += getFinalDeliveredIssueCount(item);
-
-    if (item.issueStatus === "이슈 아님") {
-      current.notIssueCount += 1;
-    }
-
-    authorMap.set(authorName, current);
   });
 
-  return Array.from(authorMap.values()).sort((a, b) => {
-    if (b.totalReports !== a.totalReports) {
-      return b.totalReports - a.totalReports;
-    }
+  return Array.from(authorMap.entries())
+    .map(([authorName, authorItems]) => ({
+      authorName,
+      totalReports: reportCountMap.get(authorName) ?? 0,
+      deliveredIssueCount: getUniqueDeliveredIssueCount(authorItems),
+      notIssueCount: authorItems.filter(
+        (item) => item.issueStatus === "이슈 아님",
+      ).length,
+    }))
+    .sort((a, b) => {
+      if (b.totalReports !== a.totalReports) {
+        return b.totalReports - a.totalReports;
+      }
 
-    return a.authorName.localeCompare(b.authorName);
-  });
+      return a.authorName.localeCompare(b.authorName);
+    });
 }
 
 export function getServiceStatus(items: IssueItem[]) {
@@ -267,10 +238,7 @@ export function getServiceStatus(items: IssueItem[]) {
       0,
       supporterIssueCount - notIssueCount,
     );
-    const fixedIssueCount = serviceItems.reduce(
-      (count, item) => count + getFixedDeliveredIssueCount(item),
-      0,
-    );
+    const fixedIssueCount = getUniqueFixedDeliveredIssueCount(serviceItems);
 
     if (
       supporterIssueCount === 0 &&
