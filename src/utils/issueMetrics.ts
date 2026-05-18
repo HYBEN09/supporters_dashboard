@@ -5,12 +5,27 @@ import {
 import type { IssueItem, NotIssueReason, ServiceName } from "../types/issue";
 import { getServiceJiraUrls } from "./formatters";
 
-export function calculateImprovementRate(fixedCount: number, issueCount: number) {
+export function calculateImprovementRate(
+  fixedCount: number,
+  issueCount: number,
+) {
   if (issueCount === 0) {
     return 0;
   }
 
   return (fixedCount / issueCount) * 100;
+}
+
+function getFinalDeliveredIssueCount(item: IssueItem) {
+  return getServiceJiraUrls(item.serviceJiraUrl).length;
+}
+
+function getFixedDeliveredIssueCount(item: IssueItem) {
+  if (item.fixStatus !== "수정 완료") {
+    return 0;
+  }
+
+  return getFinalDeliveredIssueCount(item);
 }
 
 export function getKpis(items: IssueItem[]) {
@@ -19,15 +34,28 @@ export function getKpis(items: IssueItem[]) {
   const fixedIssues = items.filter(
     (item) => item.issueStatus === "이슈" && item.fixStatus === "수정 완료",
   ).length;
+  const deliveredIssues = items.reduce(
+    (count, item) => count + getFinalDeliveredIssueCount(item),
+    0,
+  );
+  const fixedDeliveredIssues = items.reduce(
+    (count, item) => count + getFixedDeliveredIssueCount(item),
+    0,
+  );
   const notIssues = items.filter(
     (item) => item.issueStatus === "이슈 아님",
   ).length;
-  const improvementRate = calculateImprovementRate(fixedIssues, totalIssues);
+  const improvementRate = calculateImprovementRate(
+    fixedDeliveredIssues,
+    deliveredIssues,
+  );
 
   return {
     totalReports,
     totalIssues,
     fixedIssues,
+    deliveredIssues,
+    fixedDeliveredIssues,
     improvementRate,
     notIssues,
   };
@@ -52,18 +80,6 @@ function getMonthLabel(month: string) {
   return `${Number(month.slice(5, 7))}월`;
 }
 
-function getFinalDeliveredIssueCount(item: IssueItem) {
-  return getServiceJiraUrls(item.serviceJiraUrl).length;
-}
-
-function getFixedDeliveredIssueCount(item: IssueItem) {
-  if (item.fixStatus !== "수정 완료") {
-    return 0;
-  }
-
-  return getFinalDeliveredIssueCount(item);
-}
-
 export function getMonthlyStatus(items: IssueItem[]) {
   const monthlyMap = new Map<
     string,
@@ -78,8 +94,7 @@ export function getMonthlyStatus(items: IssueItem[]) {
   items.forEach((item) => {
     const month = item.registeredAt.slice(0, 7).replace("-", ".");
     const current =
-      monthlyMap.get(month) ??
-      {
+      monthlyMap.get(month) ?? {
         month,
         reportedIssueCount: 0,
         finalDeliveredIssueCount: 0,
@@ -132,8 +147,7 @@ export function getMonthlyReportRows(
 
     const supporterIssueCount = item.supporterJiraUrl || item.jiraKey ? 1 : 0;
     const finalDeliveredCount = getFinalDeliveredIssueCount(item);
-    const fixedDeliveredCount =
-      item.fixStatus === "수정 완료" ? finalDeliveredCount : 0;
+    const fixedDeliveredCount = getFixedDeliveredIssueCount(item);
 
     current.totalReports += 1;
     current.supporterIssues += supporterIssueCount;
@@ -169,8 +183,7 @@ export function getAuthorReportStatus(items: IssueItem[]) {
 
     const authorName = item.authorName.trim() || "미입력";
     const current =
-      authorMap.get(authorName) ??
-      {
+      authorMap.get(authorName) ?? {
         authorName,
         totalReports: 0,
         deliveredIssueCount: 0,
@@ -212,8 +225,7 @@ export function getAuthorReportStatusByVisibleReporter(items: IssueItem[]) {
     const isAliasAuthor = /_\d+$/.test(rawAuthorName);
     const authorName = rawAuthorName.replace(/_\d+$/, "").trim() || "미입력";
     const current =
-      authorMap.get(authorName) ??
-      {
+      authorMap.get(authorName) ?? {
         authorName,
         totalReports: 0,
         deliveredIssueCount: 0,
@@ -255,13 +267,10 @@ export function getServiceStatus(items: IssueItem[]) {
       0,
       supporterIssueCount - notIssueCount,
     );
-    const fixedIssueCount = serviceItems.reduce((count, item) => {
-      if (item.fixStatus !== "수정 완료") {
-        return count;
-      }
-
-      return count + getFinalDeliveredIssueCount(item);
-    }, 0);
+    const fixedIssueCount = serviceItems.reduce(
+      (count, item) => count + getFixedDeliveredIssueCount(item),
+      0,
+    );
 
     if (
       supporterIssueCount === 0 &&

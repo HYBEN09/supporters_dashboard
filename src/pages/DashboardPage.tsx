@@ -54,6 +54,8 @@ import { StatusBadge } from "../components/ui/StatusBadge";
 import styles from "./DashboardPage.module.css";
 
 const reasonColors = ["#1f6feb", "#12b76a", "#f79009", "#f04438", "#667085"];
+const SUPPORTERS_SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1eWtMOa5PvyaLjpHM_W4IdTe-sy0c069T7pQka6yjPF8/edit?gid=765303742#gid=765303742";
 
 type DetailSortKey = "registeredAt" | "jiraNumber";
 type DetailSortDirection = "asc" | "desc";
@@ -117,6 +119,23 @@ export function DashboardPage() {
   const authorStatus = useMemo(
     () => getAuthorReportStatusByVisibleReporter(filteredIssues),
     [filteredIssues],
+  );
+  const authorTotals = useMemo(
+    () =>
+      authorStatus.reduce(
+        (total, author) => ({
+          totalReports: total.totalReports + author.totalReports,
+          deliveredIssueCount:
+            total.deliveredIssueCount + author.deliveredIssueCount,
+          notIssueCount: total.notIssueCount + author.notIssueCount,
+        }),
+        {
+          totalReports: 0,
+          deliveredIssueCount: 0,
+          notIssueCount: 0,
+        },
+      ),
+    [authorStatus],
   );
   const serviceStatus = useMemo(
     () => getServiceStatus(filteredIssues),
@@ -343,32 +362,38 @@ export function DashboardPage() {
         <p className={styles.currentSummary}>
           {currentSummary} · 기준 기간 {periodSummary}
         </p>
+        <p className={styles.referenceLink}>
+          서포터즈 3기 구글시트:{" "}
+          <a href={SUPPORTERS_SHEET_URL} rel="noreferrer" target="_blank">
+            {SUPPORTERS_SHEET_URL}
+          </a>
+        </p>
       </section>
 
       <div className={styles.kpiGrid}>
         <KpiCard
-          helper="조회 기간 내 등록된 총 제보"
+          helper="조회 기간 내 등록된 서포터즈 이슈"
           icon="▣"
-          label="전체 제보 수"
+          label="서포터즈 이슈 수"
           tone="blue"
           value={kpis.totalReports}
         />
         <KpiCard
-          helper="접근성 또는 사용성 이슈로 판정된 제보"
+          helper="서비스 전달 링크가 등록된 이슈"
           icon="!"
-          label="전체 이슈 수"
+          label="최종 전달 이슈 수"
           tone="orange"
-          value={kpis.totalIssues}
+          value={kpis.deliveredIssues}
         />
         <KpiCard
-          helper="이슈 중 수정이 완료된 건수"
+          helper="전달 이슈 중 수정이 완료된 건수"
           icon="✓"
           label="수정 완료 수"
           tone="green"
-          value={kpis.fixedIssues}
+          value={kpis.fixedDeliveredIssues}
         />
         <KpiCard
-          helper={`전체 이슈 중 수정 완료 비율 (${kpis.fixedIssues} / ${kpis.totalIssues})`}
+          helper={`전체 전달 이슈 중 수정 완료 비율 (${kpis.fixedDeliveredIssues} / ${kpis.deliveredIssues})`}
           icon="↗"
           label="개선율"
           progressValue={kpis.improvementRate}
@@ -569,14 +594,22 @@ export function DashboardPage() {
             </thead>
             <tbody>
               {authorStatus.length > 0 ? (
-                authorStatus.map((author) => (
-                  <tr key={author.authorName}>
-                    <td>{author.authorName}</td>
-                    <td>{author.totalReports}</td>
-                    <td>{author.deliveredIssueCount}</td>
-                    <td>{author.notIssueCount}</td>
+                <>
+                  {authorStatus.map((author) => (
+                    <tr key={author.authorName}>
+                      <td>{author.authorName}</td>
+                      <td>{author.totalReports}</td>
+                      <td>{author.deliveredIssueCount}</td>
+                      <td>{author.notIssueCount}</td>
+                    </tr>
+                  ))}
+                  <tr className={styles.totalRow}>
+                    <td>총 건수</td>
+                    <td>{authorTotals.totalReports}</td>
+                    <td>{authorTotals.deliveredIssueCount}</td>
+                    <td>{authorTotals.notIssueCount}</td>
                   </tr>
-                ))
+                </>
               ) : (
                 <tr>
                   <td className={styles.empty} colSpan={4}>

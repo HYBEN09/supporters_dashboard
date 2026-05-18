@@ -353,18 +353,18 @@ export function IssueListPage() {
 
       <div className={styles.summaryGrid}>
         <KpiCard
-          helper="조회 기간 내 등록된 전체 제보"
+          helper="조회 기간 내 등록된 서포터즈 이슈"
           icon="▣"
-          label="전체"
+          label="서포터즈 이슈 수"
           tone="blue"
           value={kpis.totalReports}
         />
         <KpiCard
-          helper="접근성·사용성 이슈로 판정된 건수"
+          helper="서비스 전달 링크가 등록된 이슈"
           icon="!"
-          label="이슈"
+          label="최종 전달 이슈 수"
           tone="orange"
-          value={kpis.totalIssues}
+          value={kpis.deliveredIssues}
         />
         <KpiCard
           helper="검토 후 이슈 아님으로 판정된 건수"
@@ -374,11 +374,11 @@ export function IssueListPage() {
           value={kpis.notIssues}
         />
         <KpiCard
-          helper="이슈 중 수정이 완료된 건수"
+          helper="전달 이슈 중 수정이 완료된 건수"
           icon="✓"
           label="수정 완료"
           tone="green"
-          value={kpis.fixedIssues}
+          value={kpis.fixedDeliveredIssues}
         />
       </div>
 

@@ -40,17 +40,14 @@ export function MonthlyReportPage() {
       rows.reduce(
         (sum, row) => ({
           supporterIssues: sum.supporterIssues + row.supporterIssues,
-          notIssues: sum.notIssues + row.notIssues,
-          accessibilityIssues:
-            sum.accessibilityIssues + row.accessibilityIssues,
           deliveredIssues: sum.deliveredIssues + row.deliveredIssues,
+          notIssues: sum.notIssues + row.notIssues,
           fixedIssues: sum.fixedIssues + row.fixedIssues,
         }),
         {
           supporterIssues: 0,
-          notIssues: 0,
-          accessibilityIssues: 0,
           deliveredIssues: 0,
+          notIssues: 0,
           fixedIssues: 0,
         },
       ),
@@ -90,19 +87,15 @@ export function MonthlyReportPage() {
           <strong>{formatCount(totals.supporterIssues)}</strong>
         </article>
         <article>
-          <span>이슈 아님</span>
-          <strong>{formatCount(totals.notIssues)}</strong>
-        </article>
-        <article>
-          <span>접근성 이슈</span>
-          <strong>{formatCount(totals.accessibilityIssues)}</strong>
-        </article>
-        <article>
           <span>최종 전달 이슈</span>
           <strong>{formatCount(totals.deliveredIssues)}</strong>
         </article>
         <article>
-          <span>수정된 이슈</span>
+          <span>이슈 아님</span>
+          <strong>{formatCount(totals.notIssues)}</strong>
+        </article>
+        <article>
+          <span>수정 완료 이슈</span>
           <strong>{formatCount(totals.fixedIssues)}</strong>
         </article>
       </section>
@@ -121,10 +114,9 @@ export function MonthlyReportPage() {
               <tr>
                 <th>해당 월</th>
                 <th>서포터즈 이슈</th>
-                <th>이슈 아님</th>
-                <th>접근성 이슈</th>
                 <th>최종 전달 이슈</th>
-                <th>수정된 이슈</th>
+                <th>이슈 아님</th>
+                <th>수정 완료 이슈</th>
               </tr>
             </thead>
             <tbody>
@@ -132,9 +124,8 @@ export function MonthlyReportPage() {
                 <tr key={row.month}>
                   <th scope="row">{row.monthLabel}</th>
                   <td>{formatCount(row.supporterIssues)}</td>
-                  <td>{formatCount(row.notIssues)}</td>
-                  <td>{formatCount(row.accessibilityIssues)}</td>
                   <td>{formatCount(row.deliveredIssues)}</td>
+                  <td>{formatCount(row.notIssues)}</td>
                   <td>{formatCount(row.fixedIssues)}</td>
                 </tr>
               ))}
