@@ -26,16 +26,20 @@ function getNormalizedServiceJiraUrls(item: IssueItem) {
   );
 }
 
+function getDeliveredIssueKeys(item: IssueItem) {
+  const monthKey = item.registeredAt.slice(0, 7);
+
+  return getNormalizedServiceJiraUrls(item).map((url) => `${monthKey}::${url}`);
+}
+
 function getUniqueDeliveredIssueCount(items: IssueItem[]) {
-  return new Set(
-    items.flatMap((item) => getNormalizedServiceJiraUrls(item)),
-  ).size;
+  return new Set(items.flatMap((item) => getDeliveredIssueKeys(item))).size;
 }
 
 function getUniqueFixedDeliveredIssueCount(items: IssueItem[]) {
   return new Set(
     items.flatMap((item) =>
-      item.fixStatus === "수정 완료" ? getNormalizedServiceJiraUrls(item) : [],
+      item.fixStatus === "수정 완료" ? getDeliveredIssueKeys(item) : [],
     ),
   ).size;
 }
