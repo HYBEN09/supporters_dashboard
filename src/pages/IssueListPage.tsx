@@ -357,28 +357,28 @@ export function IssueListPage() {
           icon="▣"
           label="서포터즈 이슈 수"
           tone="blue"
-          value={kpis.totalReports}
+          value={`${kpis.totalReports}건`}
         />
         <KpiCard
           helper="서비스 전달 링크가 등록된 이슈"
           icon="!"
           label="최종 전달 이슈 수"
           tone="orange"
-          value={kpis.deliveredIssues}
+          value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
           helper="검토 후 이슈 아님으로 판정된 건수"
           icon="⊘"
           label="이슈 아님"
           tone="gray"
-          value={kpis.notIssues}
+          value={`${kpis.notIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
           icon="✓"
           label="수정 완료"
           tone="green"
-          value={kpis.fixedDeliveredIssues}
+          value={`${kpis.fixedDeliveredIssues}건`}
         />
       </div>
 

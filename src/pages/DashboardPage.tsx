@@ -376,21 +376,21 @@ export function DashboardPage() {
           icon="▣"
           label="서포터즈 이슈 수"
           tone="blue"
-          value={kpis.totalReports}
+          value={`${kpis.totalReports}건`}
         />
         <KpiCard
           helper="서비스 전달 링크가 등록된 이슈"
           icon="!"
           label="최종 전달 이슈 수"
           tone="orange"
-          value={kpis.deliveredIssues}
+          value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
           icon="✓"
           label="수정 완료 수"
           tone="green"
-          value={kpis.fixedDeliveredIssues}
+          value={`${kpis.fixedDeliveredIssues}건`}
         />
         <KpiCard
           helper={`전체 전달 이슈 중 수정 완료 비율 (${kpis.fixedDeliveredIssues} / ${kpis.deliveredIssues})`}
@@ -405,7 +405,7 @@ export function DashboardPage() {
           icon="⊘"
           label="이슈 아님 수"
           tone="gray"
-          value={kpis.notIssues}
+          value={`${kpis.notIssues}건`}
         />
       </div>
 
@@ -467,10 +467,10 @@ export function DashboardPage() {
                   serviceStatus.map((service) => (
                     <tr key={service.serviceName}>
                       <td>{service.serviceName}</td>
-                      <td>{service.supporterIssueCount}</td>
-                      <td>{service.accessibilityIssueCount}</td>
-                      <td>{service.fixedIssueCount}</td>
-                      <td>{service.notIssueCount}</td>
+                      <td>{service.supporterIssueCount}건</td>
+                      <td>{service.accessibilityIssueCount}건</td>
+                      <td>{service.fixedIssueCount}건</td>
+                      <td>{service.notIssueCount}건</td>
                     </tr>
                   ))
                 ) : (
@@ -542,7 +542,7 @@ export function DashboardPage() {
                             }}
                           />
                         </div>
-                        <b>{reason.count}</b>
+                        <b>{reason.count}건</b>
                       </div>
                     );
                   })}
@@ -571,7 +571,7 @@ export function DashboardPage() {
                           {reason.reason}
                         </span>
                       </td>
-                      <td>{reason.count}</td>
+                      <td>{reason.count}건</td>
                     </tr>
                   ))}
                 </tbody>
@@ -598,16 +598,16 @@ export function DashboardPage() {
                   {authorStatus.map((author) => (
                     <tr key={author.authorName}>
                       <td>{author.authorName}</td>
-                      <td>{author.totalReports}</td>
-                      <td>{author.deliveredIssueCount}</td>
-                      <td>{author.notIssueCount}</td>
+                      <td>{author.totalReports}건</td>
+                      <td>{author.deliveredIssueCount}건</td>
+                      <td>{author.notIssueCount}건</td>
                     </tr>
                   ))}
                   <tr className={styles.totalRow}>
                     <td>총 건수</td>
-                    <td>{authorTotals.totalReports}</td>
-                    <td>{authorTotals.deliveredIssueCount}</td>
-                    <td>{authorTotals.notIssueCount}</td>
+                    <td>{authorTotals.totalReports}건</td>
+                    <td>{authorTotals.deliveredIssueCount}건</td>
+                    <td>{authorTotals.notIssueCount}건</td>
                   </tr>
                 </>
               ) : (
