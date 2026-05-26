@@ -239,7 +239,7 @@
 
 .reasonBarRow {
   display: grid;
-  grid-template-columns: 32px minmax(120px, 1.1fr) minmax(120px, 1.8fr) 32px;
+  grid-template-columns: 32px minmax(120px, 1.1fr) minmax(120px, 1.8fr) 52px;
   align-items: center;
   gap: 10px;
 }
@@ -282,6 +282,7 @@
   color: #06152b;
   font-size: 16px;
   font-weight: 900;
+  white-space: nowrap;
   text-align: right;
 }
 
