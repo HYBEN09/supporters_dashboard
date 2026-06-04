@@ -51,9 +51,11 @@ export const FIX_STATUS_OPTIONS = ["수정 필요", "수정 완료"] as const;
 
 export const NOT_ISSUE_REASON_OPTIONS = [
   "정상 작동(이슈 재현 안됨)",
+  "접근성 이슈 아님",
   "사용성 이슈",
   "실행 경로 불명확",
   "기능 개발 요청",
-  "접근성 이슈 아님",
+  "보조기술 이슈",
+  "윈도우/브라우저 자체 기능",
   "기타",
 ] as const;
