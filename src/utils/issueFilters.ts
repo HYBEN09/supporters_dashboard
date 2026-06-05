@@ -17,8 +17,9 @@ function getDefaultPeriod() {
   const today = getTodayDateString();
 
   return (
-    PERIOD_OPTIONS.find((period) => today >= period.start && today <= period.end) ??
-    PERIOD_OPTIONS[1]
+    PERIOD_OPTIONS.find(
+      (period) => today >= period.start && today <= period.end,
+    ) ?? PERIOD_OPTIONS[1]
   );
 }
 
@@ -32,11 +33,6 @@ export function getPeriodById(periodId: string) {
 
 export function getInitialPeriodStart(periodId: string) {
   const period = getPeriodById(periodId);
-  const currentMonthStart = getCurrentMonthStartDateString();
-
-  if (currentMonthStart >= period.start && currentMonthStart <= period.end) {
-    return currentMonthStart;
-  }
 
   return period.start;
 }
@@ -91,7 +87,8 @@ export function filterIssues(items: IssueItem[], filters: IssueFilters) {
       filters.periodEnd,
     );
     const matchesService =
-      filters.serviceName === "전체" || item.serviceName === filters.serviceName;
+      filters.serviceName === "전체" ||
+      item.serviceName === filters.serviceName;
     const matchesPlatform =
       filters.platform === "전체" || item.platform === filters.platform;
     const matchesIssueStatus =
