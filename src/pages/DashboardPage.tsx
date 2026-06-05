@@ -53,7 +53,18 @@ import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import styles from "./DashboardPage.module.css";
 
-const reasonColors = ["#1f6feb", "#12b76a", "#f79009", "#f04438", "#667085"];
+const reasonColors = [
+  "#1f6feb",
+  "#12b76a",
+  "#f79009",
+  "#f04438",
+  "#667085",
+  "#ec4899",
+  "#8b5cf6",
+  "#06b6d4",
+  "#14b8a6",
+  "#eab308",
+];
 const SUPPORTERS_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1eWtMOa5PvyaLjpHM_W4IdTe-sy0c069T7pQka6yjPF8/edit?gid=765303742#gid=765303742";
 
@@ -423,7 +434,9 @@ export function DashboardPage() {
                     getMonthlyStatusLabel(String(item.dataKey)),
                   ]}
                 />
-                <Legend formatter={(value) => getMonthlyStatusLabel(String(value))} />
+                <Legend
+                  formatter={(value) => getMonthlyStatusLabel(String(value))}
+                />
                 <Line
                   dataKey="reportedIssueCount"
                   name="서포터즈 이슈 수"

@@ -57,5 +57,4 @@ export const NOT_ISSUE_REASON_OPTIONS = [
   "기능 개발 요청",
   "보조기술 이슈",
   "윈도우/브라우저 자체 기능",
-  "기타",
 ] as const;
