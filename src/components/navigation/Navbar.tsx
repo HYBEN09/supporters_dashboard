@@ -47,12 +47,6 @@ export function Navbar() {
             <span aria-hidden="true">{theme === "dark" ? "☀" : "◐"}</span>
             {theme === "dark" ? "라이트" : "다크"}
           </button>
-          <div className={styles.profile} aria-label="관리자 프로필">
-            <span className={styles.avatar}></span>
-            <div>
-              <strong>관리자</strong>
-            </div>
-          </div>
         </div>
       </div>
     </header>
