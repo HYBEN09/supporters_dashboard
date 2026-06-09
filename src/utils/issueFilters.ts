@@ -5,14 +5,6 @@ export function getTodayDateString() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function getCurrentMonthStartDateString() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-
-  return `${year}-${month}-01`;
-}
-
 function getDefaultPeriod() {
   const today = getTodayDateString();
 
