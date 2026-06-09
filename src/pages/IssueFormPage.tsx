@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import {
   FIX_STATUS_OPTIONS,
   ISSUE_FORM_PLATFORM_OPTIONS,
@@ -44,7 +43,6 @@ function getJoinedServiceJiraUrls(values: IssueFormValues) {
 export function IssueFormPage() {
   const { addIssue } = useIssues();
   const { setSelectedPeriodId } = usePeriod();
-  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const {
     formState: { errors },
@@ -114,7 +112,6 @@ export function IssueFormPage() {
 
     setMessage(`${createdIssue.id} 제보가 등록되었습니다.`);
     reset(defaultValues);
-    navigate("/issues");
   }
 
   function saveDraft() {
