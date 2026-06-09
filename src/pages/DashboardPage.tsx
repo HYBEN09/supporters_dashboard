@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CartesianGrid,
   Legend,
@@ -67,6 +67,7 @@ const reasonColors = [
 ];
 const SUPPORTERS_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/1eWtMOa5PvyaLjpHM_W4IdTe-sy0c069T7pQka6yjPF8/edit?gid=765303742#gid=765303742";
+const DASHBOARD_FILTERS_STORAGE_KEY = "supporters-dashboard-filters";
 
 type DetailSortKey = "registeredAt" | "jiraNumber";
 type DetailSortDirection = "asc" | "desc";
@@ -75,6 +76,37 @@ type DetailSort = {
   key: DetailSortKey;
   direction: DetailSortDirection;
 };
+
+function createDefaultDashboardFilters(periodId: string, periodEnd: string) {
+  return {
+    ...DEFAULT_FILTERS,
+    periodStart: getInitialPeriodStart(periodId),
+    periodEnd,
+  };
+}
+
+function getStoredDashboardFilters(fallbackFilters: IssueFilters) {
+  if (typeof window === "undefined") {
+    return fallbackFilters;
+  }
+
+  try {
+    const storedFilters = window.sessionStorage.getItem(
+      DASHBOARD_FILTERS_STORAGE_KEY,
+    );
+
+    if (!storedFilters) {
+      return fallbackFilters;
+    }
+
+    return {
+      ...fallbackFilters,
+      ...(JSON.parse(storedFilters) as Partial<IssueFilters>),
+    };
+  } catch {
+    return fallbackFilters;
+  }
+}
 
 function getPrimaryJiraNumber(issue: IssueItem) {
   for (const link of getIssueJiraLinks(issue)) {
@@ -108,15 +140,24 @@ export function DashboardPage() {
   const { selectedPeriodId } = usePeriod();
   const { issues } = useIssues();
   const selectedPeriod = getPeriodById(selectedPeriodId);
-  const [filters, setFilters] = useState<IssueFilters>({
-    ...DEFAULT_FILTERS,
-    periodStart: getInitialPeriodStart(selectedPeriod.id),
-    periodEnd: selectedPeriod.end,
-  });
+  const defaultFilters = createDefaultDashboardFilters(
+    selectedPeriod.id,
+    selectedPeriod.end,
+  );
+  const [filters, setFilters] = useState<IssueFilters>(() =>
+    getStoredDashboardFilters(defaultFilters),
+  );
   const [detailSort, setDetailSort] = useState<DetailSort>({
     key: "registeredAt",
     direction: "desc",
   });
+
+  useEffect(() => {
+    window.sessionStorage.setItem(
+      DASHBOARD_FILTERS_STORAGE_KEY,
+      JSON.stringify(filters),
+    );
+  }, [filters]);
 
   const filteredIssues = useMemo(
     () => filterIssues(issues, filters),
