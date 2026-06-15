@@ -14,21 +14,23 @@ import type { IssueFormValues, IssueItem } from "../types/issue";
 import { Button } from "../components/ui/Button";
 import styles from "./IssueFormPage.module.css";
 
-const defaultValues: IssueFormValues = {
-  registeredAt: new Date().toISOString().slice(0, 10),
-  authorName: "",
-  serviceName: "",
-  platform: "선택 안 함",
-  issueStatus: "",
-  fixStatus: "수정 필요",
-  notIssueReason: "",
-  supporterJiraUrl: "",
-  serviceJiraUrls: [{ value: "" }],
-  memo: "",
-};
-
 function createServiceJiraField(value = "") {
   return { value };
+}
+
+function createDefaultValues(): IssueFormValues {
+  return {
+    registeredAt: new Date().toISOString().slice(0, 10),
+    authorName: "",
+    serviceName: "",
+    platform: "선택 안 함",
+    issueStatus: "",
+    fixStatus: "수정 필요",
+    notIssueReason: "",
+    supporterJiraUrl: "",
+    serviceJiraUrls: [createServiceJiraField()],
+    memo: "",
+  };
 }
 
 function getJoinedServiceJiraUrls(values: IssueFormValues) {
@@ -44,6 +46,7 @@ export function IssueFormPage() {
   const { addIssue } = useIssues();
   const { setSelectedPeriodId } = usePeriod();
   const [message, setMessage] = useState("");
+  const [formResetKey, setFormResetKey] = useState(0);
   const {
     formState: { errors },
     control,
@@ -52,11 +55,12 @@ export function IssueFormPage() {
     register,
     reset,
     setValue,
-  } = useForm<IssueFormValues>({ defaultValues });
+  } = useForm<IssueFormValues>({ defaultValues: createDefaultValues() });
   const {
     fields: serviceJiraFields,
     append: appendServiceJiraField,
     remove: removeServiceJiraField,
+    replace: replaceServiceJiraFields,
   } = useFieldArray({
     control,
     name: "serviceJiraUrls",
@@ -98,6 +102,24 @@ export function IssueFormPage() {
     };
   }
 
+  function resetIssueForm() {
+    const nextDefaultValues = createDefaultValues();
+
+    reset(nextDefaultValues);
+    replaceServiceJiraFields(nextDefaultValues.serviceJiraUrls);
+    setValue("registeredAt", nextDefaultValues.registeredAt);
+    setValue("authorName", nextDefaultValues.authorName);
+    setValue("serviceName", nextDefaultValues.serviceName);
+    setValue("platform", nextDefaultValues.platform);
+    setValue("issueStatus", nextDefaultValues.issueStatus);
+    setValue("fixStatus", nextDefaultValues.fixStatus);
+    setValue("notIssueReason", nextDefaultValues.notIssueReason);
+    setValue("supporterJiraUrl", nextDefaultValues.supporterJiraUrl);
+    setValue("serviceJiraUrls", nextDefaultValues.serviceJiraUrls);
+    setValue("memo", nextDefaultValues.memo);
+    setFormResetKey((current) => current + 1);
+  }
+
   function onSubmit(values: IssueFormValues) {
     const createdIssue = addIssue(toIssueItem(values));
     const period = PERIOD_OPTIONS.find(
@@ -111,7 +133,7 @@ export function IssueFormPage() {
     }
 
     setMessage(`${createdIssue.id} 제보가 등록되었습니다.`);
-    reset(defaultValues);
+    resetIssueForm();
   }
 
   function saveDraft() {
@@ -121,7 +143,7 @@ export function IssueFormPage() {
   }
 
   function resetForm() {
-    reset(defaultValues);
+    resetIssueForm();
     setMessage("");
   }
 
@@ -140,7 +162,11 @@ export function IssueFormPage() {
           <span className={styles.requiredGuide}>* 표시는 필수입니다</span>
         </div>
 
-        <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className={styles.form}
+          key={formResetKey}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <fieldset className={styles.section}>
             <legend>
               <span>1</span>

@@ -20,7 +20,7 @@ export const ISSUE_FORM_SERVICE_OPTIONS = [
   "카카오페이지",
   "카카오맵",
   "카카오T",
-  "카카오메이커스",
+  "메이커스",
   "카카오지하철",
   "카카오뱅크",
   "카카오버스",
@@ -28,6 +28,7 @@ export const ISSUE_FORM_SERVICE_OPTIONS = [
   "카카오내비",
   "카카오택시",
   "톡딜",
+  "헤이카카오",
 ] as const;
 
 export const SERVICE_OPTIONS = ISSUE_FORM_SERVICE_OPTIONS;
