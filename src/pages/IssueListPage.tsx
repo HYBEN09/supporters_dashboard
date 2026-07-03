@@ -380,6 +380,13 @@ export function IssueListPage() {
           tone="green"
           value={`${kpis.fixedDeliveredIssues}건`}
         />
+        <KpiCard
+          helper="전달 이슈 중 수정이 불가한 건수"
+          icon="×"
+          label="수정 불가"
+          tone="rose"
+          value={`${kpis.unfixableDeliveredIssues}건`}
+        />
       </div>
 
       <section className={styles.listPanel}>
