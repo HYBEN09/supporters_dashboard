@@ -184,8 +184,8 @@ a {
 :root[data-theme="dark"] [class*="jiraLinks"] a,
 :root[data-theme="dark"] [class*="links"] a,
 :root[data-theme="dark"] [class*="link"] {
-  background: #1e3a5f;
-  color: #93c5fd;
+  background: #223653;
+  color: #d7e8ff;
 }
 
 :root[data-theme="dark"] [class*="secondary"],
@@ -203,63 +203,63 @@ a {
 }
 
 :root[data-theme="dark"] [class*="StatusBadge_danger"] {
-  border-color: #7f1d1d;
-  background: #fee2e2;
-  color: #991b1b;
+  border-color: #b85c61;
+  background: #3b2529;
+  color: #ffd7d5;
 }
 
 :root[data-theme="dark"] [class*="StatusBadge_neutral"] {
-  border-color: #475569;
-  background: #e2e8f0;
-  color: #334155;
+  border-color: #64748b;
+  background: #2b3442;
+  color: #e2e8f0;
 }
 
 :root[data-theme="dark"] [class*="StatusBadge_success"] {
-  border-color: #047857;
-  background: #dcfce7;
-  color: #047857;
+  border-color: #4f9a78;
+  background: #20372f;
+  color: #c8f3df;
 }
 
 :root[data-theme="dark"] [class*="StatusBadge_warning"] {
-  border-color: #d97706;
-  background: #fef3c7;
-  color: #92400e;
+  border-color: #b98232;
+  background: #3b3020;
+  color: #ffe3a3;
 }
 
 :root[data-theme="dark"] [class*="StatusBadge_pending"] {
-  border-color: #7e22ce;
-  background: #f3e8ff;
-  color: #6b21a8;
+  border-color: #8a6bb8;
+  background: #342b45;
+  color: #eadcff;
 }
 
 :root[data-theme="dark"] [class*="badge"][class*="danger"] {
-  border: 1px solid #7f1d1d;
-  background: #fee2e2;
-  color: #991b1b;
+  border: 1px solid #b85c61;
+  background: #3b2529;
+  color: #ffd7d5;
 }
 
 :root[data-theme="dark"] [class*="badge"][class*="neutral"] {
-  border: 1px solid #475569;
-  background: #e2e8f0;
-  color: #334155;
+  border: 1px solid #64748b;
+  background: #2b3442;
+  color: #e2e8f0;
 }
 
 :root[data-theme="dark"] [class*="badge"][class*="success"] {
-  border: 1px solid #047857;
-  background: #dcfce7;
-  color: #047857;
+  border: 1px solid #4f9a78;
+  background: #20372f;
+  color: #c8f3df;
 }
 
 :root[data-theme="dark"] [class*="badge"][class*="warning"] {
-  border: 1px solid #d97706;
-  background: #fef3c7;
-  color: #92400e;
+  border: 1px solid #b98232;
+  background: #3b3020;
+  color: #ffe3a3;
 }
 
 :root[data-theme="dark"] [class*="badge"][class*="pending"] {
-  border: 1px solid #7e22ce;
-  background: #f3e8ff;
-  color: #6b21a8;
+  border: 1px solid #8a6bb8;
+  background: #342b45;
+  color: #eadcff;
 }
 
 :root[data-theme="dark"] [class*="sortButton"],

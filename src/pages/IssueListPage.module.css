@@ -277,6 +277,10 @@
   white-space: nowrap;
 }
 
+:global(:root[data-theme="dark"]) .jiraLinks a {
+  border: 1px solid #5276a3;
+}
+
 .detailButton {
   height: 28px;
   min-width: 46px;
