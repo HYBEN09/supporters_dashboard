@@ -521,6 +521,7 @@ export function DashboardPage() {
                   <th>접근성 이슈 수</th>
                   <th>수정된 이슈 수</th>
                   <th>이슈 아님 수</th>
+                  <th>수정 불가 이슈 수</th>
                 </tr>
               </thead>
               <tbody>
@@ -532,11 +533,12 @@ export function DashboardPage() {
                       <td>{service.accessibilityIssueCount}건</td>
                       <td>{service.fixedIssueCount}건</td>
                       <td>{service.notIssueCount}건</td>
+                      <td>{service.unfixableIssueCount}건</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td className={styles.empty} colSpan={5}>
+                    <td className={styles.empty} colSpan={6}>
                       생성된 이슈가 없습니다.
                     </td>
                   </tr>

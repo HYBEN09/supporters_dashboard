@@ -375,9 +375,11 @@
 }
 
 .serviceTable {
-  min-width: 900px;
+  width: 100%;
+  min-width: 1040px;
   border-collapse: separate;
   border-spacing: 0;
+  table-layout: fixed;
 }
 
 .serviceTable th {
@@ -413,8 +415,9 @@
 .serviceTable td:first-child {
   color: #0f2344;
   font-size: 14px;
-  text-align: left;
-  padding-left: 22px;
+  text-align: center;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 .serviceTable td:last-child {
