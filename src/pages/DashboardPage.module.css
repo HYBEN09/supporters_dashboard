@@ -88,29 +88,9 @@
 
 .kpiGrid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 18px;
-}
-
-.kpiGrid > :nth-child(1) {
-  order: 1;
-}
-
-.kpiGrid > :nth-child(2) {
-  order: 2;
-}
-
-.kpiGrid > :nth-child(5) {
-  order: 3;
-}
-
-.kpiGrid > :nth-child(3) {
-  order: 4;
-}
-
-.kpiGrid > :nth-child(4) {
-  order: 5;
 }
 
 .chartGrid {

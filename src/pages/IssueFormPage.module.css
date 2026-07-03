@@ -219,6 +219,23 @@
   color: #0369a1;
 }
 
+:global(:root[data-theme="dark"]) .jiraLinks .serviceJiraGroup strong {
+  border: 1px solid #5276a3;
+  background: #29476e;
+  color: #d7e8ff;
+}
+
+:global(:root[data-theme="dark"]) .serviceJiraAddButton {
+  border-color: #5276a3;
+  background: #223653;
+  color: #d7e8ff;
+}
+
+:global(:root[data-theme="dark"]) .serviceJiraAddButton:hover {
+  border-color: #6f9dd1;
+  background: #29476e;
+}
+
 .field input::placeholder {
   color: #98a2b3;
 }

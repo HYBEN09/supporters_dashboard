@@ -33,3 +33,8 @@
   background: #e9d7fe;
   color: #6941c6;
 }
+
+.blocked {
+  background: #f2e7e7;
+  color: #7a3e3e;
+}

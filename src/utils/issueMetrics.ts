@@ -44,6 +44,14 @@ function getUniqueFixedDeliveredIssueCount(items: IssueItem[]) {
   ).size;
 }
 
+function getUniqueUnfixableDeliveredIssueCount(items: IssueItem[]) {
+  return new Set(
+    items.flatMap((item) =>
+      item.fixStatus === "수정 불가" ? getDeliveredIssueKeys(item) : [],
+    ),
+  ).size;
+}
+
 export function getKpis(items: IssueItem[]) {
   const totalReports = items.length;
   const totalIssues = items.filter((item) => item.issueStatus === "이슈").length;
@@ -52,6 +60,8 @@ export function getKpis(items: IssueItem[]) {
   ).length;
   const deliveredIssues = getUniqueDeliveredIssueCount(items);
   const fixedDeliveredIssues = getUniqueFixedDeliveredIssueCount(items);
+  const unfixableDeliveredIssues =
+    getUniqueUnfixableDeliveredIssueCount(items);
   const notIssues = items.filter(
     (item) => item.issueStatus === "이슈 아님",
   ).length;
@@ -66,6 +76,7 @@ export function getKpis(items: IssueItem[]) {
     fixedIssues,
     deliveredIssues,
     fixedDeliveredIssues,
+    unfixableDeliveredIssues,
     improvementRate,
     notIssues,
   };
@@ -128,6 +139,7 @@ export function getMonthlyReportRows(
         accessibilityIssues: 0,
         deliveredIssues: 0,
         fixedIssues: 0,
+        unfixableIssues: 0,
       },
     ]),
   );
@@ -156,6 +168,7 @@ export function getMonthlyReportRows(
     ).length;
     row.deliveredIssues = getUniqueDeliveredIssueCount(monthItems);
     row.fixedIssues = getUniqueFixedDeliveredIssueCount(monthItems);
+    row.unfixableIssues = getUniqueUnfixableDeliveredIssueCount(monthItems);
     row.accessibilityIssues = Math.max(0, row.supporterIssues - row.notIssues);
   });
 

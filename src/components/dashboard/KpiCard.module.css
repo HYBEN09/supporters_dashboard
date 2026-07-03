@@ -108,3 +108,13 @@
   background: #eef2f6;
   color: #586174;
 }
+
+.rose {
+  border-top-color: #a8556a;
+  color: #0f172a;
+}
+
+.rose .icon {
+  background: #f7e8ec;
+  color: #98445a;
+}

@@ -438,11 +438,25 @@ export function DashboardPage() {
           value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
+          helper="검토 후 이슈 아님으로 판정된 건수"
+          icon="⊘"
+          label="이슈 아님"
+          tone="gray"
+          value={`${kpis.notIssues}건`}
+        />
+        <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
           icon="✓"
           label="수정 완료"
           tone="green"
           value={`${kpis.fixedDeliveredIssues}건`}
+        />
+        <KpiCard
+          helper="전달 이슈 중 수정이 불가한 건수"
+          icon="×"
+          label="수정 불가"
+          tone="rose"
+          value={`${kpis.unfixableDeliveredIssues}건`}
         />
         <KpiCard
           helper={`전체 전달 이슈 중 수정 완료 비율 (${kpis.fixedDeliveredIssues} / ${kpis.deliveredIssues})`}
@@ -451,13 +465,6 @@ export function DashboardPage() {
           progressValue={kpis.improvementRate}
           tone="purple"
           value={formatPercent(kpis.improvementRate)}
-        />
-        <KpiCard
-          helper="검토 후 이슈 아님으로 판정된 건수"
-          icon="⊘"
-          label="이슈 아님"
-          tone="gray"
-          value={`${kpis.notIssues}건`}
         />
       </div>
 

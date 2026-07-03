@@ -52,12 +52,14 @@ export function MonthlyReportPage() {
           deliveredIssues: sum.deliveredIssues + row.deliveredIssues,
           notIssues: sum.notIssues + row.notIssues,
           fixedIssues: sum.fixedIssues + row.fixedIssues,
+          unfixableIssues: sum.unfixableIssues + row.unfixableIssues,
         }),
         {
           supporterIssues: 0,
           deliveredIssues: 0,
           notIssues: 0,
           fixedIssues: 0,
+          unfixableIssues: 0,
         },
       ),
     [rows],
@@ -107,6 +109,10 @@ export function MonthlyReportPage() {
           <span>수정 완료 이슈</span>
           <strong>{formatCount(totals.fixedIssues)}</strong>
         </article>
+        <article>
+          <span>수정 불가 이슈</span>
+          <strong>{formatCount(totals.unfixableIssues)}</strong>
+        </article>
       </section>
 
       <section className={styles.reportPanel}>
@@ -126,6 +132,7 @@ export function MonthlyReportPage() {
                 <th>최종 전달 이슈</th>
                 <th>이슈 아님</th>
                 <th>수정 완료 이슈</th>
+                <th>수정 불가 이슈</th>
               </tr>
             </thead>
             <tbody>
@@ -143,6 +150,9 @@ export function MonthlyReportPage() {
                   </td>
                   <td>
                     <ReportCount value={row.fixedIssues} />
+                  </td>
+                  <td>
+                    <ReportCount value={row.unfixableIssues} />
                   </td>
                 </tr>
               ))}

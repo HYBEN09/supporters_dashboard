@@ -380,6 +380,12 @@
   color: #0369a1;
 }
 
+:global(:root[data-theme="dark"]) .jiraEditor .serviceJiraEditorGroup strong {
+  border: 1px solid #5276a3;
+  background: #29476e;
+  color: #d7e8ff;
+}
+
 .editForm span {
   color: #344054;
   font-size: 13px;
@@ -522,6 +528,17 @@
   border-color: #334155;
   background: #1f2937;
   color: #dbeafe;
+}
+
+:global(:root[data-theme="dark"]) .serviceJiraEditorAddButton {
+  border-color: #5276a3;
+  background: #223653;
+  color: #d7e8ff;
+}
+
+:global(:root[data-theme="dark"]) .serviceJiraEditorAddButton:hover {
+  border-color: #6f9dd1;
+  background: #29476e;
 }
 
 @media (max-width: 640px) {

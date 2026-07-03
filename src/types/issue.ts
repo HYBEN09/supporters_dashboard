@@ -13,7 +13,7 @@ export type Platform = IssueFormPlatform;
 
 export type IssueStatus = "이슈" | "이슈 아님" | "보류";
 
-export type FixStatus = "-" | "수정 필요" | "수정 완료";
+export type FixStatus = "-" | "수정 필요" | "수정 완료" | "수정 불가";
 
 export type NotIssueReason =
   | "정상 작동(이슈 재현 안됨)"

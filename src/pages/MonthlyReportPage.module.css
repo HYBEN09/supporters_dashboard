@@ -48,7 +48,7 @@
 
 .summaryGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -115,7 +115,7 @@
 
 .reportTable {
   width: 100%;
-  min-width: 920px;
+  min-width: 1080px;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 14px;

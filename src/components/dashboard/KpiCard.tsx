@@ -6,7 +6,7 @@ type KpiCardProps = {
   helper?: string;
   icon?: string;
   progressValue?: number;
-  tone?: "blue" | "orange" | "green" | "purple" | "gray";
+  tone?: "blue" | "orange" | "green" | "purple" | "gray" | "rose";
 };
 
 export function KpiCard({
