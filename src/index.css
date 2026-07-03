@@ -320,11 +320,8 @@ a {
   color: #bfdbfe;
 }
 
-:root[data-theme="dark"]
-  [class*="jiraLinks"]:has(label)
-  label:nth-child(2)
-  strong,
-:root[data-theme="dark"] [class*="jiraEditor"] label:nth-child(3) strong {
+:root[data-theme="dark"] [class*="serviceJiraGroup"] strong,
+:root[data-theme="dark"] [class*="serviceJiraEditorGroup"] strong {
   background: #164e63;
   color: #bae6fd;
 }

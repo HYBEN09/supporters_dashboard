@@ -225,6 +225,19 @@ function DetailModalContent({
   const issueStatus = useWatch({ control, name: "issueStatus" });
   const isNotIssue = issueStatus === "이슈 아님";
   const isFixStatusLocked = issueStatus === "이슈 아님" || issueStatus === "보류";
+  const jiraLinks = getIssueJiraLinks(issue);
+  const jiraLinkGroups = [
+    {
+      kind: "supporter",
+      label: "서포터즈",
+      links: jiraLinks.filter((link) => link.kind === "supporter"),
+    },
+    {
+      kind: "service",
+      label: "서비스 전달",
+      links: jiraLinks.filter((link) => link.kind === "service"),
+    },
+  ].filter((group) => group.links.length > 0);
 
   useEffect(() => {
     if (isFixStatusLocked) {
@@ -395,18 +408,25 @@ function DetailModalContent({
                   Jira 링크
                 </dt>
                 <dd>
-                  {getIssueJiraLinks(issue).length > 0 ? (
-                    <div className={styles.jiraLinkList}>
-                      {getIssueJiraLinks(issue).map((link) => (
-                        <a
-                          href={link.url}
-                          key={`${link.label}-${link.url}`}
-                          rel="noreferrer"
-                          target="_blank"
-                        >
-                          <DetailIcon name="external" />
-                          {link.label}
-                        </a>
+                  {jiraLinkGroups.length > 0 ? (
+                    <div className={styles.jiraLinkGroups}>
+                      {jiraLinkGroups.map((group) => (
+                        <div className={styles.jiraLinkGroup} key={group.kind}>
+                          <span className={styles.jiraLinkGroupLabel}>{group.label}</span>
+                          <div className={styles.jiraLinkList}>
+                            {group.links.map((link) => (
+                              <a
+                                href={link.url}
+                                key={`${link.label}-${link.url}`}
+                                rel="noreferrer"
+                                target="_blank"
+                              >
+                                <DetailIcon name="external" />
+                                {link.label}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   ) : (

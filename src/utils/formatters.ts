@@ -65,6 +65,7 @@ export function getIssueJiraLinks(issue: IssueItem) {
     const jiraValue = issue.supporterJiraUrl ?? issue.jiraKey ?? "";
 
     links.push({
+      kind: "supporter" as const,
       label: getJiraIssueKey(jiraValue) || "서포터즈",
       url: createJiraUrl(jiraValue),
       text: jiraValue,
@@ -76,6 +77,7 @@ export function getIssueJiraLinks(issue: IssueItem) {
   if (serviceJiraUrls.length > 0) {
     serviceJiraUrls.forEach((jiraValue) => {
       links.push({
+        kind: "service" as const,
         label: getJiraIssueKey(jiraValue) || "서비스 전달",
         url: createServiceJiraUrl(jiraValue),
         text: jiraValue,
@@ -83,6 +85,7 @@ export function getIssueJiraLinks(issue: IssueItem) {
     });
   } else if (issue.jiraKey) {
     links.push({
+      kind: "service" as const,
       label: getJiraIssueKey(issue.jiraKey) || "서비스 전달",
       url: createServiceJiraUrl(issue.jiraKey),
       text: issue.jiraKey,
