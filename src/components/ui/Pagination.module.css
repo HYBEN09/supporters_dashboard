@@ -30,9 +30,39 @@
   cursor: not-allowed;
 }
 
+.pageButton:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
 .active,
 .active:hover:not(:disabled) {
   border-color: #1f6feb;
   background: #1f6feb;
+  color: #ffffff;
+}
+
+:global(:root[data-theme="dark"]) .pageButton {
+  border-color: #4a5b72;
+  background: #202b3d;
+  color: #e5edf7;
+}
+
+:global(:root[data-theme="dark"]) .pageButton:hover:not(:disabled) {
+  border-color: #6f9dd1;
+  background: #29405f;
+  color: #e6f1ff;
+}
+
+:global(:root[data-theme="dark"]) .pageButton:disabled {
+  border-color: #344258;
+  background: #182235;
+  color: #8291a6;
+}
+
+:global(:root[data-theme="dark"]) .active,
+:global(:root[data-theme="dark"]) .active:hover:not(:disabled) {
+  border-color: #77a8df;
+  background: #2f66a3;
   color: #ffffff;
 }

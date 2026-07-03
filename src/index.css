@@ -272,27 +272,6 @@ a {
   color: #93c5fd;
 }
 
-:root[data-theme="dark"] [class*="Pagination_pageButton"] {
-  border-color: #334155;
-  background: #1f2937;
-  color: #e5edf7;
-}
-
-:root[data-theme="dark"] [class*="Pagination_pageButton"]:hover:not(:disabled) {
-  border-color: #60a5fa;
-  color: #93c5fd;
-}
-
-:root[data-theme="dark"] [class*="Pagination_pageButton"]:disabled {
-  color: #64748b;
-}
-
-:root[data-theme="dark"] [class*="Pagination_active"] {
-  border-color: #1f6feb;
-  background: #1f6feb;
-  color: #ffffff;
-}
-
 :root[data-theme="dark"] [class*="panelHeader"],
 :root[data-theme="dark"] [class*="reportHeader"] {
   background: #111827;
