@@ -13,12 +13,12 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
     <nav className={styles.pagination} aria-label="페이지네이션">
       <button
         aria-label="이전 페이지"
-        className={styles.pageButton}
+        className={`${styles.pageButton} ${styles.arrowButton}`}
         disabled={page === 1}
         type="button"
         onClick={() => onChange(page - 1)}
       >
-        ‹
+        <span aria-hidden="true">‹</span>
       </button>
       {pages.map((pageNumber) => (
         <button
@@ -37,12 +37,12 @@ export function Pagination({ page, totalPages, onChange }: PaginationProps) {
       ))}
       <button
         aria-label="다음 페이지"
-        className={styles.pageButton}
+        className={`${styles.pageButton} ${styles.arrowButton}`}
         disabled={page === totalPages}
         type="button"
         onClick={() => onChange(page + 1)}
       >
-        ›
+        <span aria-hidden="true">›</span>
       </button>
     </nav>
   );

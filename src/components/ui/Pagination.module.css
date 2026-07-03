@@ -20,6 +20,18 @@
   font-weight: 800;
 }
 
+.arrowButton {
+  padding: 0;
+}
+
+.arrowButton span {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
 .pageButton:hover:not(:disabled) {
   border-color: #1f6feb;
   color: #1f6feb;
