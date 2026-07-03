@@ -426,21 +426,21 @@ export function DashboardPage() {
         <KpiCard
           helper="조회 기간 내 등록된 서포터즈 이슈"
           icon="▣"
-          label="서포터즈 이슈 수"
+          label="서포터즈 이슈"
           tone="blue"
           value={`${kpis.totalReports}건`}
         />
         <KpiCard
           helper="서비스 전달 링크가 등록된 이슈"
           icon="!"
-          label="최종 전달 이슈 수"
+          label="최종 전달 이슈"
           tone="orange"
           value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
           icon="✓"
-          label="수정 완료 수"
+          label="수정 완료"
           tone="green"
           value={`${kpis.fixedDeliveredIssues}건`}
         />
@@ -455,7 +455,7 @@ export function DashboardPage() {
         <KpiCard
           helper="검토 후 이슈 아님으로 판정된 건수"
           icon="⊘"
-          label="이슈 아님 수"
+          label="이슈 아님"
           tone="gray"
           value={`${kpis.notIssues}건`}
         />

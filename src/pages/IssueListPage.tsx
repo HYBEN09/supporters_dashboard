@@ -355,14 +355,14 @@ export function IssueListPage() {
         <KpiCard
           helper="조회 기간 내 등록된 서포터즈 이슈"
           icon="▣"
-          label="서포터즈 이슈 수"
+          label="서포터즈 이슈"
           tone="blue"
           value={`${kpis.totalReports}건`}
         />
         <KpiCard
           helper="서비스 전달 링크가 등록된 이슈"
           icon="!"
-          label="최종 전달 이슈 수"
+          label="최종 전달 이슈"
           tone="orange"
           value={`${kpis.deliveredIssues}건`}
         />

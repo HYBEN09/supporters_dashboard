@@ -10,6 +10,15 @@ function formatCount(value: number) {
   return `${value}건`;
 }
 
+function ReportCount({ value }: { value: number }) {
+  return (
+    <span className={styles.reportCount}>
+      <strong>{value}</strong>
+      <small>건</small>
+    </span>
+  );
+}
+
 export function MonthlyReportPage() {
   const { selectedPeriodId, setSelectedPeriodId } = usePeriod();
   const { issues } = useIssues();
@@ -123,10 +132,18 @@ export function MonthlyReportPage() {
               {rows.map((row) => (
                 <tr key={row.month}>
                   <th scope="row">{row.monthLabel}</th>
-                  <td>{formatCount(row.supporterIssues)}</td>
-                  <td>{formatCount(row.deliveredIssues)}</td>
-                  <td>{formatCount(row.notIssues)}</td>
-                  <td>{formatCount(row.fixedIssues)}</td>
+                  <td>
+                    <ReportCount value={row.supporterIssues} />
+                  </td>
+                  <td>
+                    <ReportCount value={row.deliveredIssues} />
+                  </td>
+                  <td>
+                    <ReportCount value={row.notIssues} />
+                  </td>
+                  <td>
+                    <ReportCount value={row.fixedIssues} />
+                  </td>
                 </tr>
               ))}
             </tbody>

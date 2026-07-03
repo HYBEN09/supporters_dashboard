@@ -138,6 +138,7 @@
 .reportTable tbody th {
   border: 1px solid #d4d9e2;
   color: #06152b;
+  font-size: 16px;
   font-weight: 900;
   text-align: center;
 }
@@ -149,6 +150,25 @@
   font-weight: 700;
   text-align: center;
   vertical-align: middle;
+}
+
+.reportCount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  color: #06152b;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.reportCount strong {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.reportCount small {
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .reportTable tbody tr:nth-child(odd) > th,
@@ -171,6 +191,10 @@
 :global(:root[data-theme="dark"]) .reportTable tbody td {
   border-color: #26364f !important;
   color: #e5edf7 !important;
+}
+
+:global(:root[data-theme="dark"]) .reportCount {
+  color: #e5edf7;
 }
 
 :global(:root[data-theme="dark"]) .reportTable tbody tr:nth-child(odd) > th,
