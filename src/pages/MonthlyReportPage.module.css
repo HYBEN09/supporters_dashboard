@@ -49,32 +49,7 @@
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.summaryGrid article {
-  min-height: 92px;
-  border: 1px solid #d2d9e6;
-  border-top: 3px solid #1f6feb;
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
-  padding: 16px;
-}
-
-.summaryGrid span {
-  display: block;
-  color: #344054;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.summaryGrid strong {
-  display: block;
-  margin-top: 12px;
-  color: #06152b;
-  font-size: 26px;
-  font-weight: 900;
+  gap: 14px;
 }
 
 .reportPanel {

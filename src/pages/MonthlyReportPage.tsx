@@ -1,14 +1,11 @@
 import { useMemo, useState } from "react";
+import { KpiCard } from "../components/dashboard/KpiCard";
 import { PERIOD_OPTIONS } from "../data/filterOptions";
 import { useIssues } from "../features/issues/useIssues";
 import { usePeriod } from "../features/period/usePeriod";
 import { filterIssues, getPeriodById } from "../utils/issueFilters";
 import { getMonthlyReportRows } from "../utils/issueMetrics";
 import styles from "./MonthlyReportPage.module.css";
-
-function formatCount(value: number) {
-  return `${value}건`;
-}
 
 function ReportCount({ value }: { value: number }) {
   return (
@@ -93,26 +90,41 @@ export function MonthlyReportPage() {
       </header>
 
       <section className={styles.summaryGrid} aria-label="월별 리포트 요약">
-        <article>
-          <span>서포터즈 이슈</span>
-          <strong>{formatCount(totals.supporterIssues)}</strong>
-        </article>
-        <article>
-          <span>최종 전달 이슈</span>
-          <strong>{formatCount(totals.deliveredIssues)}</strong>
-        </article>
-        <article>
-          <span>이슈 아님</span>
-          <strong>{formatCount(totals.notIssues)}</strong>
-        </article>
-        <article>
-          <span>수정 완료 이슈</span>
-          <strong>{formatCount(totals.fixedIssues)}</strong>
-        </article>
-        <article>
-          <span>수정 불가 이슈</span>
-          <strong>{formatCount(totals.unfixableIssues)}</strong>
-        </article>
+        <KpiCard
+          helper="서포터즈 스프린트 내 생성된 건수"
+          icon="▣"
+          label="서포터즈 이슈"
+          tone="blue"
+          value={`${totals.supporterIssues}건`}
+        />
+        <KpiCard
+          helper="검토 후 이슈 아님으로 판정된 건수"
+          icon="⊘"
+          label="이슈 아님"
+          tone="gray"
+          value={`${totals.notIssues}건`}
+        />
+        <KpiCard
+          helper="아지트 및 서비스팀에 전달된 건수"
+          icon="!"
+          label="최종 전달 건 수"
+          tone="orange"
+          value={`${totals.deliveredIssues}건`}
+        />
+        <KpiCard
+          helper="전달 이슈 중 수정이 완료된 건수"
+          icon="✓"
+          label="수정 완료"
+          tone="green"
+          value={`${totals.fixedIssues}건`}
+        />
+        <KpiCard
+          helper="전달 이슈 중 수정이 불가한 건수"
+          icon="×"
+          label="수정 불가"
+          tone="rose"
+          value={`${totals.unfixableIssues}건`}
+        />
       </section>
 
       <section className={styles.reportPanel}>
