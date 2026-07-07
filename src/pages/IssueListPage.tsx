@@ -369,7 +369,7 @@ export function IssueListPage() {
         <KpiCard
           helper="아지트 및 서비스팀에 전달된 건수"
           icon="!"
-          label="최종 전달 건 수"
+          label="최종 전달 건수"
           tone="orange"
           value={`${kpis.deliveredIssues}건`}
         />

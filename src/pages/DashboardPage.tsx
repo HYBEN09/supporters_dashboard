@@ -122,15 +122,15 @@ function getPrimaryJiraNumber(issue: IssueItem) {
 
 function getMonthlyStatusLabel(dataKey: string) {
   if (dataKey === "reportedIssueCount") {
-    return "서포터즈 이슈 수";
+    return "서포터즈 이슈";
   }
 
   if (dataKey === "finalDeliveredIssueCount") {
-    return "최종 전달 건 수";
+    return "최종 전달 건수";
   }
 
   if (dataKey === "fixedDeliveredIssueCount") {
-    return "수정 이슈 수";
+    return "수정 완료";
   }
 
   return dataKey;
@@ -468,7 +468,7 @@ export function DashboardPage() {
         <KpiCard
           helper="아지트 및 서비스팀에 전달된 건수"
           icon="!"
-          label="최종 전달 건 수"
+          label="최종 전달 건수"
           tone="orange"
           value={`${kpis.deliveredIssues}건`}
         />
@@ -596,11 +596,11 @@ export function DashboardPage() {
 
               <div className={styles.metricFormula}>
                 <strong>개선율 계산식</strong>
-                <code>수정 완료 / 최종 전달 건 수 × 100</code>
+                <code>수정 완료 / 최종 전달 건수 × 100</code>
               </div>
 
               <aside className={styles.metricNote}>
-                <strong>서포터즈 이슈 수와 최종 전달 건 수가 다른 이유</strong>
+                <strong>서포터즈 이슈 수와 최종 전달 건수가 다른 이유</strong>
                 <p>
                   하나의 서포터즈 이슈가 여러 서비스팀 이슈로 분리 전달될 수
                   있어, 두 숫자는 1:1로 일치하지 않을 수 있습니다.
@@ -642,7 +642,7 @@ export function DashboardPage() {
                     fontWeight: 800,
                   }}
                   formatter={(value, _name, item) => [
-                    String(value),
+                    `${value}건`,
                     getMonthlyStatusLabel(String(item.dataKey)),
                   ]}
                   itemStyle={{
@@ -662,21 +662,21 @@ export function DashboardPage() {
                 />
                 <Line
                   dataKey="reportedIssueCount"
-                  name="서포터즈 이슈 수"
+                  name="서포터즈 이슈"
                   stroke="#1f6feb"
                   strokeWidth={2}
                   type="monotone"
                 />
                 <Line
                   dataKey="finalDeliveredIssueCount"
-                  name="최종 전달 건 수"
+                  name="최종 전달 건수"
                   stroke="#f97316"
                   strokeWidth={2}
                   type="monotone"
                 />
                 <Line
                   dataKey="fixedDeliveredIssueCount"
-                  name="수정 이슈 수"
+                  name="수정 완료"
                   stroke="#12b76a"
                   strokeWidth={2}
                   type="monotone"
