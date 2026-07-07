@@ -473,14 +473,46 @@ export function DashboardPage() {
           <div className={styles.chartBox}>
             <ResponsiveContainer height={300} width="100%">
               <LineChart data={monthlyStatus}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis allowDecimals={false} />
+                <CartesianGrid
+                  stroke="var(--chart-grid-color)"
+                  strokeDasharray="3 3"
+                />
+                <XAxis
+                  axisLine={{ stroke: "var(--chart-axis-color)" }}
+                  dataKey="month"
+                  tick={{ fill: "var(--chart-axis-color)" }}
+                  tickLine={{ stroke: "var(--chart-axis-color)" }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  axisLine={{ stroke: "var(--chart-axis-color)" }}
+                  tick={{ fill: "var(--chart-axis-color)" }}
+                  tickLine={{ stroke: "var(--chart-axis-color)" }}
+                />
                 <Tooltip
+                  contentStyle={{
+                    backgroundColor: "var(--chart-tooltip-bg)",
+                    border: "1px solid var(--chart-tooltip-border)",
+                    borderRadius: 8,
+                    boxShadow: "var(--chart-tooltip-shadow)",
+                    color: "var(--chart-tooltip-label)",
+                    fontWeight: 800,
+                  }}
                   formatter={(value, _name, item) => [
                     String(value),
                     getMonthlyStatusLabel(String(item.dataKey)),
                   ]}
+                  itemStyle={{
+                    fontSize: 14,
+                    fontWeight: 800,
+                    padding: "3px 0",
+                  }}
+                  labelStyle={{
+                    color: "var(--chart-tooltip-label)",
+                    fontSize: 13,
+                    fontWeight: 900,
+                    marginBottom: 6,
+                  }}
                 />
                 <Legend
                   formatter={(value) => getMonthlyStatusLabel(String(value))}

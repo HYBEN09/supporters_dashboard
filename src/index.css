@@ -13,12 +13,24 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --chart-axis-color: #526174;
+  --chart-grid-color: #d8e0ee;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: #cfd8e6;
+  --chart-tooltip-label: #172033;
+  --chart-tooltip-shadow: 0 10px 24px rgba(16, 24, 40, 0.14);
 }
 
 :root[data-theme="dark"] {
   color: #e5edf7;
   background: #0f172a;
   color-scheme: dark;
+  --chart-axis-color: #b9c6d8;
+  --chart-grid-color: #3a465a;
+  --chart-tooltip-bg: #111827;
+  --chart-tooltip-border: #3b4b66;
+  --chart-tooltip-label: #e5edf7;
+  --chart-tooltip-shadow: 0 14px 32px rgba(0, 0, 0, 0.36);
 }
 
 * {
