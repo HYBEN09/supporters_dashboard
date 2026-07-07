@@ -126,7 +126,7 @@ function getMonthlyStatusLabel(dataKey: string) {
   }
 
   if (dataKey === "finalDeliveredIssueCount") {
-    return "최종 전달 이슈 수";
+    return "최종 전달 건 수";
   }
 
   if (dataKey === "fixedDeliveredIssueCount") {
@@ -424,18 +424,11 @@ export function DashboardPage() {
 
       <div className={styles.kpiGrid}>
         <KpiCard
-          helper="조회 기간 내 등록된 서포터즈 이슈"
+          helper="서포터즈 스프린트 내 생성된 건수"
           icon="▣"
           label="서포터즈 이슈"
           tone="blue"
           value={`${kpis.totalReports}건`}
-        />
-        <KpiCard
-          helper="서비스 전달 링크가 등록된 이슈"
-          icon="!"
-          label="최종 전달 이슈"
-          tone="orange"
-          value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
           helper="검토 후 이슈 아님으로 판정된 건수"
@@ -443,6 +436,13 @@ export function DashboardPage() {
           label="이슈 아님"
           tone="gray"
           value={`${kpis.notIssues}건`}
+        />
+        <KpiCard
+          helper="아지트 및 서비스팀에 전달된 건수"
+          icon="!"
+          label="최종 전달 건 수"
+          tone="orange"
+          value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
@@ -459,7 +459,7 @@ export function DashboardPage() {
           value={`${kpis.unfixableDeliveredIssues}건`}
         />
         <KpiCard
-          helper={`전체 전달 이슈 중 수정 완료 비율 (${kpis.fixedDeliveredIssues} / ${kpis.deliveredIssues})`}
+          helper={`최종 전달 이슈 중 수정 완료 비율 (${kpis.fixedDeliveredIssues} / ${kpis.deliveredIssues})`}
           icon="↗"
           label="개선율"
           progressValue={kpis.improvementRate}
@@ -526,7 +526,7 @@ export function DashboardPage() {
                 />
                 <Line
                   dataKey="finalDeliveredIssueCount"
-                  name="최종 전달 이슈 수"
+                  name="최종 전달 건 수"
                   stroke="#f97316"
                   strokeWidth={2}
                   type="monotone"
