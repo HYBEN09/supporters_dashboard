@@ -139,6 +139,7 @@ function getMonthlyStatusLabel(dataKey: string) {
 export function DashboardPage() {
   const { selectedPeriodId } = usePeriod();
   const { issues } = useIssues();
+  const [isMetricInfoOpen, setIsMetricInfoOpen] = useState(false);
   const selectedPeriod = getPeriodById(selectedPeriodId);
   const defaultFilters = createDefaultDashboardFilters(
     selectedPeriod.id,
@@ -158,6 +159,22 @@ export function DashboardPage() {
       JSON.stringify(filters),
     );
   }, [filters]);
+
+  useEffect(() => {
+    if (!isMetricInfoOpen) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsMetricInfoOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isMetricInfoOpen]);
 
   const filteredIssues = useMemo(
     () => filterIssues(issues, filters),
@@ -422,6 +439,17 @@ export function DashboardPage() {
         </p>
       </section>
 
+      <div className={styles.kpiHeader}>
+        <h2>핵심 지표</h2>
+        <Button
+          className={styles.metricInfoButton}
+          variant="secondary"
+          onClick={() => setIsMetricInfoOpen(true)}
+        >
+          집계 기준 보기
+        </Button>
+      </div>
+
       <div className={styles.kpiGrid}>
         <KpiCard
           helper="서포터즈 스프린트 내 생성된 건수"
@@ -467,6 +495,121 @@ export function DashboardPage() {
           value={formatPercent(kpis.improvementRate)}
         />
       </div>
+
+      {isMetricInfoOpen ? (
+        <div
+          className={styles.metricModalBackdrop}
+          role="presentation"
+          onClick={() => setIsMetricInfoOpen(false)}
+        >
+          <section
+            aria-labelledby="metric-info-title"
+            aria-modal="true"
+            className={styles.metricModal}
+            role="dialog"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header className={styles.metricModalHeader}>
+              <div>
+                <span>Dashboard Guide</span>
+                <h2 id="metric-info-title">이슈 개수 산정 기준</h2>
+              </div>
+              <button
+                aria-label="집계 기준 안내 닫기"
+                className={styles.metricModalClose}
+                type="button"
+                onClick={() => setIsMetricInfoOpen(false)}
+              >
+                ×
+              </button>
+            </header>
+            <div className={styles.metricModalBody}>
+              <section className={styles.metricCriteriaSection}>
+                <h3>서포터즈 이슈</h3>
+                <ul>
+                  <li>서포터즈 Jira에 생성한 이슈 카드 수를 기준으로 산정합니다.</li>
+                  <li>
+                    하나의 제보에서 여러 개의 Jira 이슈를 생성한 경우, 생성된
+                    이슈 수만큼 집계합니다.
+                    <ul>
+                      <li>
+                        예: 하나의 제보에서 3개 이슈 생성 시, 대시보드에는
+                        이슈 3건으로 집계
+                      </li>
+                      <li>
+                        제보 시트 기준 집계와 실제 Jira 이슈 수는 다를 수
+                        있습니다.
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    플랫폼이나 실행 경로가 달라 별도 이슈로 관리되는 경우에도
+                    각각 독립 이슈로 집계합니다.
+                  </li>
+                </ul>
+              </section>
+
+              <section className={styles.metricCriteriaSection}>
+                <h3>최종 전달 이슈</h3>
+                <ul>
+                  <li>아지트 또는 서비스팀에 전달한 이슈를 포함합니다.</li>
+                  <li>
+                    서비스팀으로 직접 전달되지는 않았지만, 헤빠에게 오픈한
+                    이슈도 포함합니다.
+                  </li>
+                </ul>
+                <p>
+                  위 두 경우를 모두 포함하여 최종 전달 이슈 수를 산정합니다.
+                </p>
+              </section>
+
+              <section className={styles.metricCriteriaSection}>
+                <h3>수정 이슈 수</h3>
+                <ul>
+                  <li>수정 완료된 Jira 이슈 수를 기준으로 산정합니다.</li>
+                  <li>
+                    중복 이슈가 각각 수정된 경우에도 모두 개별 건으로
+                    집계합니다.
+                    <ul>
+                      <li>
+                        예: 동일한 내용의 중복 이슈 2건이 모두 수정된 경우,
+                        2건으로 집계
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </section>
+
+              <section className={styles.metricCriteriaSection}>
+                <h3>수정 불가 이슈 수</h3>
+                <ul>
+                  <li>최종 전달 이슈 중 수정 불가로 판정된 Jira 이슈 수입니다.</li>
+                </ul>
+              </section>
+
+              <section className={styles.metricCriteriaSection}>
+                <h3>이슈 아님</h3>
+                <ul>
+                  <li>검토 후 이슈 아님으로 판정된 건수입니다.</li>
+                </ul>
+              </section>
+
+              <div className={styles.metricFormula}>
+                <strong>개선율 계산식</strong>
+                <code>수정 완료 / 최종 전달 건 수 × 100</code>
+              </div>
+
+              <aside className={styles.metricNote}>
+                <strong>서포터즈 이슈 수와 최종 전달 건 수가 다른 이유</strong>
+                <p>
+                  하나의 서포터즈 이슈가 여러 서비스팀 이슈로 분리 전달될 수
+                  있어, 두 숫자는 1:1로 일치하지 않을 수 있습니다.
+                </p>
+              </aside>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       <div className={styles.chartGrid}>
         <SectionCard title="월별 현황">

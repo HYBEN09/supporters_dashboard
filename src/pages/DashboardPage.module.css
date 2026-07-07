@@ -93,6 +93,266 @@
   margin-bottom: 18px;
 }
 
+.kpiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+}
+
+.kpiHeader h2 {
+  margin: 0;
+  border-left: 3px solid #1f6feb;
+  color: #172033;
+  font-size: 14px;
+  font-weight: 900;
+  padding-left: 8px;
+}
+
+.metricInfoButton {
+  min-width: auto;
+  height: 34px;
+  border-radius: 7px;
+  font-size: 12px;
+  padding: 0 12px;
+}
+
+.metricModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 23, 42, 0.42);
+  padding: 24px;
+}
+
+.metricModal {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: min(780px, calc(100vw - 32px));
+  max-height: min(760px, calc(100vh - 48px));
+  border: 1px solid #cfd8e6;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+}
+
+.metricModalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  background: #0b2456;
+  color: #ffffff;
+  padding: 22px 24px 18px;
+}
+
+.metricModalHeader span {
+  display: block;
+  margin-bottom: 8px;
+  color: #bfdbfe;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.metricModalHeader h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.metricModalClose {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.metricModalClose:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.metricModalClose:focus-visible {
+  outline: 2px solid #bfdbfe;
+  outline-offset: 2px;
+}
+
+.metricModalBody {
+  flex: 1 1 auto;
+  overflow: auto;
+  min-height: 0;
+  padding: 22px 24px 28px;
+}
+
+.metricFormula {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  border: 1px solid #c7d7ef;
+  border-radius: 8px;
+  background: #eef6ff;
+  padding: 14px;
+}
+
+.metricFormula strong {
+  color: #0f2344;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.metricFormula code {
+  color: #1459b8;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.metricCriteriaSection {
+  border: 1px solid #e1e7f0;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 14px 14px;
+}
+
+.metricCriteriaSection + .metricCriteriaSection {
+  margin-top: 14px;
+}
+
+.metricCriteriaSection h3 {
+  margin: 0 -14px 12px;
+  border-bottom: 1px solid #d7deea;
+  border-left: 4px solid #ef4444;
+  color: #0f2344;
+  font-size: 18px;
+  font-weight: 900;
+  padding: 12px 14px 10px;
+}
+
+.metricCriteriaSection ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.metricCriteriaSection li {
+  color: #0f2344;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.metricCriteriaSection li + li {
+  margin-top: 6px;
+}
+
+.metricCriteriaSection ul ul {
+  margin-top: 5px;
+  padding-left: 22px;
+}
+
+.metricCriteriaSection p {
+  margin: 10px 0 0;
+  color: #0f2344;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.metricNote {
+  margin-top: 14px;
+  border: 1px solid #f3c98b;
+  border-radius: 8px;
+  background: #fff7ed;
+  padding: 15px;
+}
+
+.metricNote strong {
+  display: block;
+  color: #9a4f0f;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.metricNote p {
+  margin: 8px 0 0;
+  color: #6f3b12;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+:global(:root[data-theme="dark"]) .kpiHeader h2 {
+  color: #f8fafc;
+}
+
+:global(:root[data-theme="dark"]) .metricModalBackdrop {
+  background: rgba(2, 6, 23, 0.72);
+}
+
+:global(:root[data-theme="dark"]) .metricModal {
+  border-color: #334155;
+  background: #111827;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.46);
+}
+
+:global(:root[data-theme="dark"]) .metricModalHeader {
+  background: #0b2456;
+}
+
+:global(:root[data-theme="dark"]) .metricCriteriaSection {
+  border-color: #2b3b55;
+  background: #162033;
+}
+
+:global(:root[data-theme="dark"]) .metricCriteriaSection h3 {
+  border-bottom-color: #334155;
+  color: #f8fafc;
+}
+
+:global(:root[data-theme="dark"]) .metricCriteriaSection li,
+:global(:root[data-theme="dark"]) .metricCriteriaSection p {
+  color: #e5edf7;
+}
+
+:global(:root[data-theme="dark"]) .metricFormula {
+  border-color: #335a8d;
+  background: #12243d;
+}
+
+:global(:root[data-theme="dark"]) .metricFormula strong {
+  color: #e5edf7;
+}
+
+:global(:root[data-theme="dark"]) .metricFormula code {
+  color: #93c5fd;
+}
+
+:global(:root[data-theme="dark"]) .metricNote {
+  border-color: #7a5428;
+  background: #2f2318;
+}
+
+:global(:root[data-theme="dark"]) .metricNote strong {
+  color: #f7c46c;
+}
+
+:global(:root[data-theme="dark"]) .metricNote p {
+  color: #f3d7a4;
+}
+
 .chartGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -625,6 +885,37 @@
 @media (max-width: 640px) {
   .filterPanel {
     padding: 14px;
+  }
+
+  .kpiHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .metricInfoButton {
+    width: 100%;
+  }
+
+  .metricModalBackdrop {
+    padding: 14px;
+  }
+
+  .metricModalHeader {
+    padding: 18px;
+  }
+
+  .metricModalHeader h2 {
+    font-size: 19px;
+  }
+
+  .metricModalBody {
+    padding: 16px;
+  }
+
+  .metricFormula {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .filterGrid,
