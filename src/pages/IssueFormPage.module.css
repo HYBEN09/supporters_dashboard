@@ -297,6 +297,12 @@
   padding: 12px;
 }
 
+:global(:root[data-theme="dark"]) .message {
+  border-color: #4f9a78;
+  background: #20372f;
+  color: #c8f3df;
+}
+
 .footer {
   display: flex;
   align-items: center;
