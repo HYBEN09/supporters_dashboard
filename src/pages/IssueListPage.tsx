@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   FIX_STATUS_OPTIONS,
   ISSUE_STATUS_OPTIONS,
+  NOT_ISSUE_REASON_OPTIONS,
   PLATFORM_OPTIONS,
   SERVICE_OPTIONS,
 } from "../data/filterOptions";
@@ -13,6 +15,7 @@ import type {
   IssueFilters,
   IssueItem,
   IssueStatus,
+  NotIssueReason,
   Platform,
   SelectableFilter,
   ServiceName,
@@ -44,6 +47,35 @@ type IssueListSort = {
   direction: IssueListSortDirection;
 };
 
+function getNotIssueReasonFromSearch(
+  searchParams: URLSearchParams,
+): SelectableFilter<NotIssueReason> {
+  const reason = searchParams.get("notIssueReason");
+
+  if (
+    reason &&
+    (NOT_ISSUE_REASON_OPTIONS as readonly string[]).includes(reason)
+  ) {
+    return reason as NotIssueReason;
+  }
+
+  return "전체";
+}
+
+function getDateFromSearch(
+  searchParams: URLSearchParams,
+  key: "periodStart" | "periodEnd",
+  fallback: string,
+) {
+  const value = searchParams.get(key);
+
+  if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+
+  return fallback;
+}
+
 function getPrimaryJiraNumber(issue: IssueItem) {
   for (const link of getIssueJiraLinks(issue)) {
     const issueNumber = getJiraIssueNumber(link.label);
@@ -56,19 +88,20 @@ function getPrimaryJiraNumber(issue: IssueItem) {
   return null;
 }
 
-function escapeCsvValue(value: string) {
-  const normalizedValue = value.replaceAll('"', '""');
-  return `"${normalizedValue}"`;
-}
-
 export function IssueListPage() {
   const { selectedPeriodId } = usePeriod();
   const { deleteIssue, issues, updateIssue } = useIssues();
+  const [searchParams] = useSearchParams();
   const selectedPeriod = getPeriodById(selectedPeriodId);
   const defaultFilters: IssueFilters = {
     ...DEFAULT_FILTERS,
-    periodStart: getInitialPeriodStart(selectedPeriod.id),
-    periodEnd: selectedPeriod.end,
+    periodStart: getDateFromSearch(
+      searchParams,
+      "periodStart",
+      getInitialPeriodStart(selectedPeriod.id),
+    ),
+    periodEnd: getDateFromSearch(searchParams, "periodEnd", selectedPeriod.end),
+    notIssueReason: getNotIssueReasonFromSearch(searchParams),
   };
   const [draftFilters, setDraftFilters] =
     useState<IssueFilters>(defaultFilters);
@@ -163,62 +196,12 @@ export function IssueListPage() {
       platform: DEFAULT_FILTERS.platform,
       issueStatus: DEFAULT_FILTERS.issueStatus,
       fixStatus: DEFAULT_FILTERS.fixStatus,
+      notIssueReason: DEFAULT_FILTERS.notIssueReason,
     };
     setDraftFilters(nextFilters);
     setAppliedFilters(nextFilters);
     setSortConfig({ key: "registeredAt", direction: "desc" });
     pagination.goToPage(1);
-  }
-
-  function exportIssuesToCsv() {
-    const headers = [
-      "ID",
-      "등록일",
-      "작성자",
-      "서비스명",
-      "플랫폼",
-      "이슈 여부",
-      "수정 여부",
-      "이슈 아님 사유",
-      "서포터즈 Jira 링크",
-      "서비스 전달 링크",
-      "메모",
-    ];
-
-    const rows = sortedIssues.map((issue) => [
-      issue.id,
-      issue.registeredAt,
-      issue.authorName,
-      issue.serviceName,
-      issue.platform,
-      issue.issueStatus,
-      issue.fixStatus,
-      issue.notIssueReason ?? "",
-      issue.supporterJiraUrl ?? "",
-      issue.serviceJiraUrl ?? "",
-      issue.memo ?? "",
-    ]);
-
-    const csv = [
-      headers.map(escapeCsvValue).join(","),
-      ...rows.map((row) =>
-        row.map((value) => escapeCsvValue(String(value))).join(","),
-      ),
-    ].join("\r\n");
-
-    const blob = new Blob([`\uFEFF${csv}`], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const today = new Date().toISOString().slice(0, 10);
-
-    link.href = url;
-    link.download = `issue-list-${today}.csv`;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
   }
 
   return (
@@ -331,15 +314,30 @@ export function IssueListPage() {
             </select>
           </label>
 
+          <label className={styles.filterField}>
+            <span>이슈 아님 사유</span>
+            <select
+              value={draftFilters.notIssueReason}
+              onChange={(event) =>
+                updateDraft(
+                  "notIssueReason",
+                  event.target.value as SelectableFilter<NotIssueReason>,
+                )
+              }
+            >
+              <option>전체</option>
+              {NOT_ISSUE_REASON_OPTIONS.map((reason) => (
+                <option key={reason}>{reason}</option>
+              ))}
+            </select>
+          </label>
+
           <div className={styles.actions}>
             <Button variant="primary" onClick={applyFilters}>
               조회
             </Button>
             <Button variant="secondary" onClick={resetFilters}>
               초기화
-            </Button>
-            <Button variant="secondary" onClick={exportIssuesToCsv}>
-              CSV 내보내기
             </Button>
           </div>
         </div>

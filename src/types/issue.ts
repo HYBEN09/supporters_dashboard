@@ -49,6 +49,7 @@ export type IssueFilters = {
   platform: SelectableFilter<Platform>;
   issueStatus: SelectableFilter<IssueStatus>;
   fixStatus: SelectableFilter<FixStatus>;
+  notIssueReason: SelectableFilter<NotIssueReason>;
 };
 
 export type IssueFormValues = {

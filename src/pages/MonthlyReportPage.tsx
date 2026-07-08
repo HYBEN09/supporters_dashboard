@@ -32,6 +32,7 @@ export function MonthlyReportPage() {
         platform: "전체",
         issueStatus: "전체",
         fixStatus: "전체",
+        notIssueReason: "전체",
       }),
     [issues, period.end, period.start],
   );

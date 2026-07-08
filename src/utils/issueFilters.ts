@@ -37,6 +37,7 @@ export const DEFAULT_FILTERS: IssueFilters = {
   platform: "전체",
   issueStatus: "전체",
   fixStatus: "전체",
+  notIssueReason: "전체",
 };
 
 export function isWithinPeriod(
@@ -88,6 +89,9 @@ export function filterIssues(items: IssueItem[], filters: IssueFilters) {
       item.issueStatus === filters.issueStatus;
     const matchesFixStatus =
       filters.fixStatus === "전체" || item.fixStatus === filters.fixStatus;
+    const matchesNotIssueReason =
+      filters.notIssueReason === "전체" ||
+      item.notIssueReason === filters.notIssueReason;
 
     return (
       matchesKeyword &&
@@ -95,7 +99,8 @@ export function filterIssues(items: IssueItem[], filters: IssueFilters) {
       matchesService &&
       matchesPlatform &&
       matchesIssueStatus &&
-      matchesFixStatus
+      matchesFixStatus &&
+      matchesNotIssueReason
     );
   });
 }

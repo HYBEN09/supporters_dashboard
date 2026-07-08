@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
   Legend,
@@ -151,6 +152,7 @@ function getMonthlyStatusLabel(dataKey: string) {
 export function DashboardPage() {
   const { selectedPeriodId } = usePeriod();
   const { issues } = useIssues();
+  const navigate = useNavigate();
   const [isMetricInfoOpen, setIsMetricInfoOpen] = useState(false);
   const selectedPeriod = getPeriodById(selectedPeriodId);
   const defaultFilters = createDefaultDashboardFilters(
@@ -326,6 +328,16 @@ export function DashboardPage() {
           : "asc",
     }));
     detailPagination.goToPage(1);
+  }
+
+  function openIssuesByReason(reason: string) {
+    const params = new URLSearchParams({
+      notIssueReason: reason,
+      periodStart: filters.periodStart,
+      periodEnd: filters.periodEnd,
+    });
+
+    navigate(`/issues?${params.toString()}`);
   }
 
   return (
@@ -821,7 +833,12 @@ export function DashboardPage() {
                   {rankedNotIssueReasons.map((reason, index) => (
                     <tr key={reason.reason}>
                       <td>
-                        <span className={styles.reasonTableType}>
+                        <button
+                          className={styles.reasonTableType}
+                          disabled={reason.count === 0}
+                          type="button"
+                          onClick={() => openIssuesByReason(reason.reason)}
+                        >
                           <i
                             style={{
                               backgroundColor:
@@ -831,7 +848,7 @@ export function DashboardPage() {
                             {index + 1}
                           </i>
                           {reason.reason}
-                        </span>
+                        </button>
                       </td>
                       <td>{reason.count}건</td>
                     </tr>
