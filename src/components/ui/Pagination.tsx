@@ -6,8 +6,19 @@ type PaginationProps = {
   onChange: (page: number) => void;
 };
 
+const MAX_VISIBLE_PAGES = 10;
+
 export function Pagination({ page, totalPages, onChange }: PaginationProps) {
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  const pageGroupStart =
+    Math.floor((page - 1) / MAX_VISIBLE_PAGES) * MAX_VISIBLE_PAGES + 1;
+  const pageGroupEnd = Math.min(
+    pageGroupStart + MAX_VISIBLE_PAGES - 1,
+    totalPages,
+  );
+  const pages = Array.from(
+    { length: pageGroupEnd - pageGroupStart + 1 },
+    (_, index) => pageGroupStart + index,
+  );
 
   return (
     <nav className={styles.pagination} aria-label="페이지네이션">
