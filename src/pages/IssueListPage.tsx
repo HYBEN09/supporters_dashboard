@@ -120,9 +120,6 @@ export function IssueListPage() {
   }, [filteredIssues, sortConfig]);
   const kpis = useMemo(() => getKpis(filteredIssues), [filteredIssues]);
   const pagination = usePagination(sortedIssues, 20);
-  const periodSummary = `${appliedFilters.periodStart.replaceAll("-", ".")} - ${appliedFilters.periodEnd.replaceAll("-", ".")}`;
-  const currentSummary = `현재 조회: 전체 기간 · ${appliedFilters.serviceName} 서비스 · ${appliedFilters.platform} 플랫폼`;
-
   function updateDraft<Key extends keyof IssueFilters>(
     key: Key,
     value: IssueFilters[Key],
@@ -346,9 +343,6 @@ export function IssueListPage() {
             </Button>
           </div>
         </div>
-        <p className={styles.currentSummary}>
-          {currentSummary} · 기준 기간 {periodSummary}
-        </p>
       </section>
 
       <div className={styles.summaryGrid}>

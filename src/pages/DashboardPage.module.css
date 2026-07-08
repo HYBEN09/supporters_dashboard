@@ -60,30 +60,116 @@
   white-space: nowrap;
 }
 
-.currentSummary {
-  margin: 12px 0 0;
-  color: #667085;
-  font-size: 12px;
-  font-weight: 800;
+.filterMeta {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
 }
 
 .referenceLink {
-  margin: 8px 0 0;
-  color: #667085;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  color: #344054;
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.referenceLink a {
-  color: #1f6feb;
   font-weight: 800;
-  overflow-wrap: anywhere;
-  text-decoration: none;
+  line-height: 1.45;
 }
 
-.referenceLink a:hover {
-  text-decoration: underline;
+.referenceLink span {
+  display: inline-grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  flex: 0 0 auto;
+  color: #8a9ab0;
+}
+
+.referenceLink svg {
+  width: 14px;
+  height: 14px;
+}
+
+.referenceLink svg * {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.referenceLink strong {
+  color: #475467;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.sheetLinks {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sheetLinks a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  border: 1px solid #c7d7ef;
+  border-radius: 7px;
+  background: #eef6ff;
+  color: #1459b8;
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+  padding: 0 10px;
+}
+
+.sheetLinks a:hover {
+  border-color: #1f6feb;
+  background: #dbeafe;
+}
+
+.sheetLinks a:focus-visible {
+  outline: 2px solid #1f6feb;
+  outline-offset: 2px;
+}
+
+.sheetLinks svg {
+  width: 12px;
+  height: 12px;
+}
+
+.sheetLinks svg * {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+:global(:root[data-theme="dark"]) .referenceLink {
+  color: #cbd5e1;
+}
+
+:global(:root[data-theme="dark"]) .referenceLink span {
+  color: #7f91aa;
+}
+
+:global(:root[data-theme="dark"]) .referenceLink strong {
+  color: #9fb0c7;
+}
+
+:global(:root[data-theme="dark"]) .sheetLinks a {
+  border-color: #5276a3;
+  background: #243f63;
+  color: #dbeafe;
+}
+
+:global(:root[data-theme="dark"]) .sheetLinks a:hover {
+  border-color: #93c5fd;
+  background: #203653;
+  color: #ffffff;
 }
 
 .kpiGrid {

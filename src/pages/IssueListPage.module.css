@@ -76,13 +76,6 @@
   gap: 8px;
 }
 
-.currentSummary {
-  margin: 12px 0 0;
-  color: #667085;
-  font-size: 12px;
-  font-weight: 800;
-}
-
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -138,35 +131,35 @@
 }
 
 .dateColumn {
-  width: 96px;
+  width: 104px;
 }
 
 .authorColumn {
-  width: 72px;
-}
-
-.serviceColumn {
-  width: 120px;
-}
-
-.platformColumn {
-  width: 84px;
-}
-
-.statusColumn {
   width: 92px;
 }
 
+.serviceColumn {
+  width: 116px;
+}
+
+.platformColumn {
+  width: 88px;
+}
+
+.statusColumn {
+  width: 116px;
+}
+
 .reasonColumn {
-  width: 170px;
+  width: 152px;
 }
 
 .jiraColumn {
-  width: 340px;
+  width: 334px;
 }
 
 .detailColumn {
-  width: 76px;
+  width: 88px;
 }
 
 .table th {
@@ -180,6 +173,7 @@
 .sortButton {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   border: 0;
   background: transparent;
@@ -209,25 +203,46 @@
 .table th,
 .table td {
   border-bottom: 1px solid #edf1f6;
-  padding: 10px 16px;
+  padding: 10px 14px;
   vertical-align: middle;
+}
+
+.table th:not(:first-child),
+.table td:not(:first-child) {
+  text-align: center;
+}
+
+.table th:first-child,
+.table td:first-child {
+  text-align: center;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: center;
 }
 
 .nowrapCell {
   white-space: nowrap;
+  text-align: center;
 }
 
 .authorCell {
+  text-align: center;
   word-break: keep-all;
 }
 
 .platformCell {
+  text-align: center;
   white-space: normal;
   word-break: keep-all;
   line-height: 1.4;
 }
 
 .reasonCell {
+  text-align: center;
   word-break: keep-all;
   line-height: 1.45;
 }
@@ -260,7 +275,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
 }
 
 .jiraLinks a {
@@ -282,8 +298,11 @@
 }
 
 .detailButton {
-  height: 28px;
-  min-width: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 30px;
   border: 1px solid #cfd8e6;
   border-radius: 6px;
   background: #ffffff;

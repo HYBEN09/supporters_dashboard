@@ -65,8 +65,20 @@ const reasonColors = [
   "#14b8a6",
   "#eab308",
 ];
-const SUPPORTERS_SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/1eWtMOa5PvyaLjpHM_W4IdTe-sy0c069T7pQka6yjPF8/edit?gid=765303742#gid=765303742";
+const supporterSheetLinks = [
+  {
+    label: "1기",
+    url: "https://docs.google.com/spreadsheets/d/1B7Ncghjq9Yq8ICzpz2jtK5LFCbDJopvY5oKLO8jHhhY/edit?gid=1382932642#gid=1382932642",
+  },
+  {
+    label: "2기",
+    url: "https://docs.google.com/spreadsheets/d/1mC4laA_06kbfea5MQtnWZbSDqDFkEM97IqZVF3bMvDU/edit?gid=1012373745#gid=1012373745",
+  },
+  {
+    label: "3기",
+    url: "https://docs.google.com/spreadsheets/d/1eWtMOa5PvyaLjpHM_W4IdTe-sy0c069T7pQka6yjPF8/edit?gid=765303742#gid=765303742",
+  },
+] as const;
 const DASHBOARD_FILTERS_STORAGE_KEY = "supporters-dashboard-filters";
 
 type DetailSortKey = "registeredAt" | "jiraNumber";
@@ -273,9 +285,6 @@ export function DashboardPage() {
   }, [detailSort, filteredIssues]);
   const detailPagination = usePagination(sortedDetailIssues, 10);
 
-  const periodSummary = `${filters.periodStart.replaceAll("-", ".")} - ${filters.periodEnd.replaceAll("-", ".")}`;
-  const currentSummary = `현재 조회: 전체 기간 · ${filters.serviceName} 서비스 · ${filters.platform} 플랫폼`;
-
   function updateFilter<Key extends keyof IssueFilters>(
     key: Key,
     value: IssueFilters[Key],
@@ -428,15 +437,30 @@ export function DashboardPage() {
             ↻ 초기화
           </Button>
         </div>
-        <p className={styles.currentSummary}>
-          {currentSummary} · 기준 기간 {periodSummary}
-        </p>
-        <p className={styles.referenceLink}>
-          서포터즈 3기 구글시트:{" "}
-          <a href={SUPPORTERS_SHEET_URL} rel="noreferrer" target="_blank">
-            {SUPPORTERS_SHEET_URL}
-          </a>
-        </p>
+        <div className={styles.filterMeta}>
+          <p className={styles.referenceLink}>
+            <span aria-hidden="true">
+              <svg fill="none" viewBox="0 0 24 24">
+                <path d="M14 4h6v6" />
+                <path d="M10 14 20 4" />
+                <path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5" />
+              </svg>
+            </span>
+            <strong>서포터즈 구글시트</strong>
+            <div className={styles.sheetLinks}>
+              {supporterSheetLinks.map((sheet) => (
+                <a href={sheet.url} key={sheet.label} rel="noreferrer" target="_blank">
+                  {sheet.label}
+                  <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+                    <path d="M14 4h6v6" />
+                    <path d="M10 14 20 4" />
+                    <path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </p>
+        </div>
       </section>
 
       <div className={styles.kpiHeader}>
