@@ -617,6 +617,15 @@
   text-align: center;
 }
 
+.authorTable {
+  table-layout: fixed;
+}
+
+.authorTable th,
+.authorTable td {
+  width: 25%;
+}
+
 .totalRow td {
   background: #edf4ff;
   color: #0b1730;

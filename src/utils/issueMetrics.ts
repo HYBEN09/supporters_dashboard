@@ -258,10 +258,11 @@ export function getServiceStatus(items: IssueItem[]) {
     const fixedIssueCount = getUniqueFixedDeliveredIssueCount(serviceItems);
     const unfixableIssueCount =
       getUniqueUnfixableDeliveredIssueCount(serviceItems);
+    const deliveredIssueCount = getUniqueDeliveredIssueCount(serviceItems);
 
     if (
       supporterIssueCount === 0 &&
-      accessibilityIssueCount === 0 &&
+      deliveredIssueCount === 0 &&
       fixedIssueCount === 0 &&
       unfixableIssueCount === 0 &&
       notIssueCount === 0
@@ -274,6 +275,7 @@ export function getServiceStatus(items: IssueItem[]) {
         serviceName: serviceName as ServiceName,
         supporterIssueCount,
         accessibilityIssueCount,
+        deliveredIssueCount,
         fixedIssueCount,
         unfixableIssueCount,
         notIssueCount,

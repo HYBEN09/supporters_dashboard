@@ -550,6 +550,13 @@ export function DashboardPage() {
               </section>
 
               <section className={styles.metricCriteriaSection}>
+                <h3>이슈 아님</h3>
+                <ul>
+                  <li>검토 후 이슈 아님으로 판정된 건수입니다.</li>
+                </ul>
+              </section>
+
+              <section className={styles.metricCriteriaSection}>
                 <h3>최종 전달 이슈</h3>
                 <ul>
                   <li>아지트 또는 서비스팀에 전달한 이슈를 포함합니다.</li>
@@ -584,13 +591,6 @@ export function DashboardPage() {
                 <h3>수정 불가 이슈 수</h3>
                 <ul>
                   <li>최종 전달 이슈 중 수정 불가로 판정된 Jira 이슈 수입니다.</li>
-                </ul>
-              </section>
-
-              <section className={styles.metricCriteriaSection}>
-                <h3>이슈 아님</h3>
-                <ul>
-                  <li>검토 후 이슈 아님으로 판정된 건수입니다.</li>
                 </ul>
               </section>
 
@@ -693,9 +693,9 @@ export function DashboardPage() {
                 <tr>
                   <th>서비스</th>
                   <th>서포터즈 제보 이슈 수</th>
-                  <th>접근성 이슈 수</th>
-                  <th>수정된 이슈 수</th>
                   <th>이슈 아님 수</th>
+                  <th>최종 전달 건수</th>
+                  <th>수정 완료 이슈 수</th>
                   <th>수정 불가 이슈 수</th>
                 </tr>
               </thead>
@@ -705,9 +705,9 @@ export function DashboardPage() {
                     <tr key={service.serviceName}>
                       <td>{service.serviceName}</td>
                       <td>{service.supporterIssueCount}건</td>
-                      <td>{service.accessibilityIssueCount}건</td>
-                      <td>{service.fixedIssueCount}건</td>
                       <td>{service.notIssueCount}건</td>
+                      <td>{service.deliveredIssueCount}건</td>
+                      <td>{service.fixedIssueCount}건</td>
                       <td>{service.unfixableIssueCount}건</td>
                     </tr>
                   ))
@@ -826,8 +826,8 @@ export function DashboardPage() {
               <tr>
                 <th>작성자</th>
                 <th>제보 수</th>
-                <th>최종 전달</th>
                 <th>이슈 아님</th>
+                <th>최종 전달 건수</th>
               </tr>
             </thead>
             <tbody>
@@ -837,15 +837,15 @@ export function DashboardPage() {
                     <tr key={author.authorName}>
                       <td>{author.authorName}</td>
                       <td>{author.totalReports}건</td>
-                      <td>{author.deliveredIssueCount}건</td>
                       <td>{author.notIssueCount}건</td>
+                      <td>{author.deliveredIssueCount}건</td>
                     </tr>
                   ))}
                   <tr className={styles.totalRow}>
                     <td>총 건수</td>
                     <td>{authorTotals.totalReports}건</td>
-                    <td>{authorTotals.deliveredIssueCount}건</td>
                     <td>{authorTotals.notIssueCount}건</td>
+                    <td>{authorTotals.deliveredIssueCount}건</td>
                   </tr>
                 </>
               ) : (
