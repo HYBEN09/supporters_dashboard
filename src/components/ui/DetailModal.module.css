@@ -426,10 +426,13 @@
   grid-column: 1 / -1;
 }
 
-.editForm select:disabled {
+.editForm input:disabled,
+.editForm select:disabled,
+.editForm textarea:disabled {
   background: #eef2f7;
   color: #64748b;
   cursor: not-allowed;
+  opacity: 1;
 }
 
 .editForm em {
@@ -539,6 +542,15 @@
 :global(:root[data-theme="dark"]) .serviceJiraEditorAddButton:hover {
   border-color: #6f9dd1;
   background: #29476e;
+}
+
+:global(:root[data-theme="dark"]) .editForm input:disabled,
+:global(:root[data-theme="dark"]) .editForm select:disabled,
+:global(:root[data-theme="dark"]) .editForm textarea:disabled {
+  border-color: #3b4a60;
+  background: #1e293b;
+  color: #cbd5e1;
+  opacity: 1;
 }
 
 @media (max-width: 640px) {
