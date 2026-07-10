@@ -69,7 +69,7 @@ function migrateLegacyValues(issues: IssueItem[]) {
 }
 
 function getMigratedFixStatus(issue: IssueItem): FixStatus {
-  if (issue.issueStatus === "이슈 아님") {
+  if (issue.issueStatus !== "이슈") {
     return "-";
   }
 
