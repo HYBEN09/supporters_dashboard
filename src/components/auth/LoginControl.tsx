@@ -141,7 +141,7 @@ export function LoginControl() {
           />
           <form
             aria-label="로그인"
-            className={styles.panel}
+            className={styles.loginBox}
             onSubmit={handleSubmit}
           >
             <label>

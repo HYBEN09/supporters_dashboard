@@ -30,6 +30,13 @@
   background: #f6f8fb;
 }
 
+.loginControl > button[aria-expanded="true"],
+.profileTrigger[aria-expanded="true"] {
+  border-color: #1f6feb;
+  background: #eaf1ff;
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.16);
+}
+
 .profileName {
   color: #172033;
   font-size: 13px;
@@ -63,10 +70,10 @@
   flex-direction: column;
   width: 200px;
   overflow: hidden;
-  border: 1px solid #dfe5ef;
+  border: 1px solid #c3cee0;
   border-radius: 10px;
   background: #ffffff;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.24);
 }
 
 .profileMenuHeader {
@@ -106,9 +113,10 @@
   position: fixed;
   inset: 0;
   z-index: 20;
+  background: rgba(15, 23, 42, 0.28);
 }
 
-.panel {
+.loginBox {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -118,13 +126,13 @@
   gap: 12px;
   width: 240px;
   padding: 16px;
-  border: 1px solid #dfe5ef;
+  border: 1px solid #c3cee0;
   border-radius: 10px;
   background: #ffffff;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.24);
 }
 
-.panel label {
+.loginBox label {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -133,7 +141,7 @@
   color: #58677c;
 }
 
-.panel input {
+.loginBox input {
   height: 36px;
   padding: 0 10px;
   border: 1px solid #cfd8e6;
@@ -142,7 +150,7 @@
   color: #172033;
 }
 
-.panel input:focus-visible {
+.loginBox input:focus-visible {
   outline: 2px solid #1f6feb;
   outline-offset: 1px;
 }
@@ -154,7 +162,7 @@
   font-weight: 700;
 }
 
-.panel button[type="submit"] {
+.loginBox button[type="submit"] {
   width: 100%;
 }
 
@@ -167,6 +175,13 @@
   background: #243449;
 }
 
+:global(:root[data-theme="dark"]) .loginControl > button[aria-expanded="true"],
+:global(:root[data-theme="dark"]) .profileTrigger[aria-expanded="true"] {
+  border-color: #60a5fa;
+  background: #1e3a5f;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22);
+}
+
 :global(:root[data-theme="dark"]) .profileName {
   color: #f8fafc;
 }
@@ -176,13 +191,13 @@
 }
 
 :global(:root[data-theme="dark"]) .profileMenu {
-  border-color: #26364f;
-  background: #111827;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border-color: #44546e;
+  background: #1c2942;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
 }
 
 :global(:root[data-theme="dark"]) .profileMenuHeader {
-  border-bottom-color: #26364f;
+  border-bottom-color: #3a4a68;
 }
 
 :global(:root[data-theme="dark"]) .profileMenuHeader strong {
@@ -198,21 +213,21 @@
 }
 
 :global(:root[data-theme="dark"]) .profileMenuItem:hover {
-  background: #1f2937;
+  background: #24334f;
 }
 
-:global(:root[data-theme="dark"]) .panel {
-  border-color: #26364f;
-  background: #111827;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+:global(:root[data-theme="dark"]) .loginBox {
+  border-color: #44546e;
+  background: #1c2942;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
 }
 
-:global(:root[data-theme="dark"]) .panel label {
+:global(:root[data-theme="dark"]) .loginBox label {
   color: #94a3b8;
 }
 
-:global(:root[data-theme="dark"]) .panel input {
+:global(:root[data-theme="dark"]) .loginBox input {
   border-color: #334155;
-  background: #1f2937;
+  background: #0f172a;
   color: #e5edf7;
 }
