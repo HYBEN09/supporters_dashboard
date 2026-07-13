@@ -12,6 +12,7 @@ import { useAuth } from "../features/auth/useAuth";
 import { useIssues } from "../features/issues/useIssues";
 import { usePeriod } from "../features/period/usePeriod";
 import type { IssueFormValues, IssueItem } from "../types/issue";
+import { AuthGate } from "../components/auth/AuthGate";
 import { Button } from "../components/ui/Button";
 import styles from "./IssueFormPage.module.css";
 
@@ -44,7 +45,7 @@ function getJoinedServiceJiraUrls(values: IssueFormValues) {
 }
 
 export function IssueFormPage() {
-  const { isAuthenticated, openLoginPanel } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addIssue } = useIssues();
   const { setSelectedPeriodId } = usePeriod();
   const [message, setMessage] = useState("");
@@ -160,23 +161,16 @@ export function IssueFormPage() {
         </header>
 
         <section className={styles.panel}>
-          <div className={styles.authNotice}>
-            <span className={styles.authNoticeIcon} aria-hidden="true">
-              <svg fill="none" viewBox="0 0 24 24">
-                <rect height="11" rx="2" width="16" x="4" y="10" />
-                <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-              </svg>
-            </span>
-            <h2>로그인이 필요합니다</h2>
-            <p>
-              이슈를 등록하려면 로그인이 필요합니다.
-              <br />
-              우측 상단의 로그인 버튼을 이용해주세요.
-            </p>
-            <Button variant="primary" onClick={openLoginPanel}>
-              로그인하기
-            </Button>
-          </div>
+          <AuthGate
+            description={
+              <>
+                이슈를 등록하려면 로그인이 필요합니다.
+                <br />
+                우측 상단의 로그인 버튼을 이용해주세요.
+              </>
+            }
+            title="로그인이 필요합니다"
+          />
         </section>
       </div>
     );

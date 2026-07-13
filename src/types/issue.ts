@@ -37,6 +37,10 @@ export type IssueItem = {
   supporterJiraUrl?: string;
   serviceJiraUrl?: string;
   memo?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  deletedAt?: string;
+  deletedBy?: string;
 };
 
 export type SelectableFilter<T extends string> = "전체" | T;

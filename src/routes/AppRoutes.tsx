@@ -4,6 +4,7 @@ import { DashboardPage } from "../pages/DashboardPage";
 import { IssueFormPage } from "../pages/IssueFormPage";
 import { IssueListPage } from "../pages/IssueListPage";
 import { MonthlyReportPage } from "../pages/MonthlyReportPage";
+import { TrashPage } from "../pages/TrashPage";
 
 export function AppRoutes() {
   return (
@@ -13,6 +14,7 @@ export function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/issues/new" element={<IssueFormPage />} />
         <Route path="/issues" element={<IssueListPage />} />
+        <Route path="/issues/trash" element={<TrashPage />} />
         <Route path="/reports/monthly" element={<MonthlyReportPage />} />
       </Route>
     </Routes>

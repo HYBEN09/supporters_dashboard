@@ -306,7 +306,11 @@ function DetailModalContent({
   }
 
   function deleteCurrentIssue() {
-    if (!window.confirm(`${issue.id} 제보를 삭제할까요?`)) {
+    if (
+      !window.confirm(
+        `${issue.id} 제보를 삭제할까요? 휴지통으로 이동하며, 이후 휴지통에서 복원할 수 있습니다.`,
+      )
+    ) {
       return;
     }
 
@@ -435,6 +439,20 @@ function DetailModalContent({
                     "-"
                   )}
                 </dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="user" />
+                  등록자 계정
+                </dt>
+                <dd>{issue.createdBy ?? "-"}</dd>
+              </div>
+              <div>
+                <dt>
+                  <DetailIcon name="edit" />
+                  최종 수정자
+                </dt>
+                <dd>{issue.updatedBy ?? "-"}</dd>
               </div>
               <div className={styles.memoDetailRow}>
                 <dt>

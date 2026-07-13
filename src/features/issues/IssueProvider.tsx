@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAuth } from "../auth/useAuth";
 import type {
   FixStatus,
   IssueItem,
@@ -8,8 +9,11 @@ import type {
 } from "../../types/issue";
 import {
   deleteIssueFromStorage,
+  loadDeletedIssueCount,
   loadIssuesFromStorage,
+  restoreIssueInStorage,
   saveIssueToStorage,
+  softDeleteIssueInStorage,
   updateIssueInStorage,
 } from "../../services/issueStorage";
 import { IssueContext, type IssueUpdate, type NewIssueItem } from "./issueContext";
@@ -95,7 +99,10 @@ async function getInitialIssues() {
 }
 
 export function IssueProvider({ children }: IssueProviderProps) {
+  const { isAuthenticated, user } = useAuth();
   const [issues, setIssues] = useState<IssueItem[]>([]);
+  const [deletedCount, setDeletedCount] = useState(0);
+  const actorLdapId = user?.ldapId ?? "unknown";
 
   function reportStorageError(error: unknown) {
     console.error("Failed to sync issue storage.", error);
@@ -115,45 +122,114 @@ export function IssueProvider({ children }: IssueProviderProps) {
     };
   }, []);
 
-  const addIssue = useCallback((issue: NewIssueItem) => {
-    const newIssue = {
-      ...issue,
-      id: createIssueId(),
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    let isMounted = true;
+
+    loadDeletedIssueCount()
+      .then((count) => {
+        if (isMounted) {
+          setDeletedCount(count);
+        }
+      })
+      .catch(reportStorageError);
+
+    return () => {
+      isMounted = false;
     };
+  }, [isAuthenticated]);
 
-    setIssues((current) => {
-      const nextIssues = [newIssue, ...current];
-      void saveIssueToStorage(newIssue).catch(reportStorageError);
+  const addIssue = useCallback(
+    (issue: NewIssueItem) => {
+      const newIssue = {
+        ...issue,
+        id: createIssueId(),
+        createdBy: actorLdapId,
+        updatedBy: actorLdapId,
+      };
 
-      return nextIssues;
-    });
+      setIssues((current) => {
+        const nextIssues = [newIssue, ...current];
+        void saveIssueToStorage(newIssue, actorLdapId).catch(reportStorageError);
 
-    return newIssue;
-  }, []);
+        return nextIssues;
+      });
 
-  const updateIssue = useCallback((id: string, updates: IssueUpdate) => {
-    setIssues((current) => {
-      const nextIssues = current.map((issue) =>
-        issue.id === id ? { ...issue, ...updates } : issue,
-      );
-      void updateIssueInStorage(id, nextIssues).catch(reportStorageError);
+      return newIssue;
+    },
+    [actorLdapId],
+  );
 
-      return nextIssues;
-    });
-  }, []);
+  const updateIssue = useCallback(
+    (id: string, updates: IssueUpdate) => {
+      setIssues((current) => {
+        const nextIssues = current.map((issue) =>
+          issue.id === id
+            ? { ...issue, ...updates, updatedBy: actorLdapId }
+            : issue,
+        );
+        void updateIssueInStorage(id, nextIssues, actorLdapId).catch(
+          reportStorageError,
+        );
 
-  const deleteIssue = useCallback((id: string) => {
-    setIssues((current) => {
-      const nextIssues = current.filter((issue) => issue.id !== id);
-      void deleteIssueFromStorage(id).catch(reportStorageError);
+        return nextIssues;
+      });
+    },
+    [actorLdapId],
+  );
 
-      return nextIssues;
-    });
+  const deleteIssue = useCallback(
+    (id: string) => {
+      setIssues((current) => current.filter((issue) => issue.id !== id));
+      setDeletedCount((current) => current + 1);
+      void softDeleteIssueInStorage(id, actorLdapId).catch(reportStorageError);
+    },
+    [actorLdapId],
+  );
+
+  const restoreIssue = useCallback(
+    (issue: IssueItem) => {
+      const restoredIssue: IssueItem = {
+        ...issue,
+        deletedAt: undefined,
+        deletedBy: undefined,
+        updatedBy: actorLdapId,
+      };
+
+      setIssues((current) => [restoredIssue, ...current]);
+      setDeletedCount((current) => Math.max(0, current - 1));
+      void restoreIssueInStorage(issue.id, actorLdapId).catch(reportStorageError);
+    },
+    [actorLdapId],
+  );
+
+  const permanentlyDeleteIssue = useCallback((id: string) => {
+    setDeletedCount((current) => Math.max(0, current - 1));
+    void deleteIssueFromStorage(id).catch(reportStorageError);
   }, []);
 
   const value = useMemo(
-    () => ({ issues, addIssue, updateIssue, deleteIssue }),
-    [addIssue, deleteIssue, issues, updateIssue],
+    () => ({
+      issues,
+      deletedCount,
+      addIssue,
+      updateIssue,
+      deleteIssue,
+      restoreIssue,
+      permanentlyDeleteIssue,
+    }),
+    [
+      addIssue,
+      deleteIssue,
+      deletedCount,
+      issues,
+      permanentlyDeleteIssue,
+      restoreIssue,
+      updateIssue,
+    ],
   );
 
   return (

@@ -17,6 +17,10 @@ type IssueRow = {
   supporter_jira_url: string | null;
   service_jira_url: string | null;
   memo: string | null;
+  created_by: string | null;
+  updated_by: string | null;
+  deleted_at: string | null;
+  deleted_by: string | null;
 };
 
 export function isRemoteIssueStorageEnabled() {
@@ -38,6 +42,10 @@ function toIssueItem(row: IssueRow): IssueItem {
     supporterJiraUrl: row.supporter_jira_url ?? undefined,
     serviceJiraUrl: row.service_jira_url ?? undefined,
     memo: row.memo ?? undefined,
+    createdBy: row.created_by ?? undefined,
+    updatedBy: row.updated_by ?? undefined,
+    deletedAt: row.deleted_at ?? undefined,
+    deletedBy: row.deleted_by ?? undefined,
   };
 }
 
@@ -56,6 +64,10 @@ function toIssueRow(issue: IssueItem): IssueRow {
     supporter_jira_url: issue.supporterJiraUrl ?? null,
     service_jira_url: issue.serviceJiraUrl ?? null,
     memo: issue.memo ?? null,
+    created_by: issue.createdBy ?? null,
+    updated_by: issue.updatedBy ?? null,
+    deleted_at: issue.deletedAt ?? null,
+    deleted_by: issue.deletedBy ?? null,
   };
 }
 
@@ -71,6 +83,7 @@ export async function loadIssuesFromStorage() {
   const { data, error } = await supabase
     .from(TABLE_NAME)
     .select("*")
+    .is("deleted_at", null)
     .order("registered_at", { ascending: false })
     .order("id", { ascending: false });
 
@@ -81,10 +94,45 @@ export async function loadIssuesFromStorage() {
   return (data as IssueRow[]).map(toIssueItem);
 }
 
-export async function saveIssueToStorage(issue: IssueItem) {
+export async function loadDeletedIssuesFromStorage() {
   requireRemoteIssueStorage();
 
-  const { error } = await supabase.from(TABLE_NAME).insert(toIssueRow(issue));
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .select("*")
+    .not("deleted_at", "is", null)
+    .order("deleted_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data as IssueRow[]).map(toIssueItem);
+}
+
+export async function loadDeletedIssueCount() {
+  requireRemoteIssueStorage();
+
+  const { count, error } = await supabase
+    .from(TABLE_NAME)
+    .select("id", { count: "exact", head: true })
+    .not("deleted_at", "is", null);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return count ?? 0;
+}
+
+export async function saveIssueToStorage(issue: IssueItem, actorLdapId: string) {
+  requireRemoteIssueStorage();
+
+  const { error } = await supabase.from(TABLE_NAME).insert({
+    ...toIssueRow(issue),
+    created_by: actorLdapId,
+    updated_by: actorLdapId,
+  });
 
   if (error) {
     throw new Error(error.message);
@@ -94,6 +142,7 @@ export async function saveIssueToStorage(issue: IssueItem) {
 export async function updateIssueInStorage(
   id: string,
   nextIssues: IssueItem[],
+  actorLdapId: string,
 ) {
   requireRemoteIssueStorage();
 
@@ -105,7 +154,37 @@ export async function updateIssueInStorage(
 
   const { error } = await supabase
     .from(TABLE_NAME)
-    .update(toIssueRow(currentIssue))
+    .update({ ...toIssueRow(currentIssue), updated_by: actorLdapId })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function softDeleteIssueInStorage(id: string, actorLdapId: string) {
+  requireRemoteIssueStorage();
+
+  const { error } = await supabase
+    .from(TABLE_NAME)
+    .update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: actorLdapId,
+      updated_by: actorLdapId,
+    })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function restoreIssueInStorage(id: string, actorLdapId: string) {
+  requireRemoteIssueStorage();
+
+  const { error } = await supabase
+    .from(TABLE_NAME)
+    .update({ deleted_at: null, deleted_by: null, updated_by: actorLdapId })
     .eq("id", id);
 
   if (error) {

@@ -60,6 +60,23 @@ drop policy if exists "Allow issue updates" on public.supporter_issues;
 drop policy if exists "Allow issue deletes" on public.supporter_issues;
 ```
 
+## 1.5 감사 로그 / 휴지통용 컬럼 추가
+
+등록자·최종 수정자 기록과 삭제 복원(휴지통) 기능을 위해 아래 컬럼을 추가합니다. Supabase SQL Editor에서 실행하세요.
+
+```sql
+alter table public.supporter_issues
+  add column if not exists created_by text,
+  add column if not exists updated_by text,
+  add column if not exists deleted_at timestamptz,
+  add column if not exists deleted_by text;
+```
+
+- `created_by` / `updated_by`: 이슈를 등록·수정한 로그인 아이디(LDAP 아이디)를 저장합니다.
+- `deleted_at` / `deleted_by`: 삭제 버튼을 누르면 실제로 행을 지우지 않고 이 값을 채웁니다(소프트 삭제). `/issues/trash`(휴지통) 화면에서 삭제된 지 30일이 안 된 이슈를 복원하거나 영구 삭제할 수 있습니다.
+- 30일이 지난 항목은 별도 서버 스케줄러 없이, 팀원이 휴지통 화면에 접속할 때 앱이 자동으로 영구 삭제합니다. 아무도 휴지통을 열지 않으면 만료된 항목이 남아있을 수 있습니다. 정확한 자동화가 필요하면 Supabase pg_cron으로 `deleted_at < now() - interval '30 days'`인 행을 주기적으로 delete하는 방식을 추가로 고려하세요.
+- 기존 RLS 정책은 그대로 사용합니다. 소프트 삭제/복원은 update 정책으로, 영구 삭제는 delete 정책으로 이미 커버됩니다.
+
 ## 2. 계정(로그인) 설정
 
 이 앱은 사번/LDAP 스타일 아이디(예: `polar.09`)로 로그인합니다. Supabase Auth는 실제 사내 LDAP과 연동되지 않으므로, 아이디를 회사 이메일로 변환해 Supabase Auth 계정을 만드는 방식입니다. 소속에 따라 다음 두 도메인 중 하나로 계정을 만들면 됩니다. 로그인 화면에는 아이디만 입력하면 되고, 앱이 두 도메인을 순서대로 시도해 일치하는 계정으로 로그인합니다.

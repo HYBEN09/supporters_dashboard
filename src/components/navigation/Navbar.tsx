@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../features/auth/useAuth";
+import { useIssues } from "../../features/issues/useIssues";
 import { useTheme } from "../../features/theme/useTheme";
 import { LoginControl } from "../auth/LoginControl";
 import styles from "./Navbar.module.css";
@@ -11,6 +13,8 @@ const navItems = [
 ];
 
 export function Navbar() {
+  const { isAuthenticated } = useAuth();
+  const { deletedCount } = useIssues();
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -35,6 +39,24 @@ export function Navbar() {
           ))}
         </nav>
         <div className={styles.actions}>
+          {isAuthenticated ? (
+            <div className={styles.trashButtonWrap}>
+              <NavLink
+                className={({ isActive }) =>
+                  isActive
+                    ? `${styles.trashButton} ${styles.trashButtonActive}`
+                    : styles.trashButton
+                }
+                end
+                to="/issues/trash"
+              >
+                휴지통
+              </NavLink>
+              {deletedCount > 0 ? (
+                <span className={styles.navBadge}>{deletedCount}</span>
+              ) : null}
+            </div>
+          ) : null}
           <button
             aria-label={
               theme === "dark"

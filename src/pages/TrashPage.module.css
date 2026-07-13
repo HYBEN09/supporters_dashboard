@@ -1,0 +1,189 @@
+.listPanel {
+  overflow: hidden;
+  border: 1px solid #d2d9e6;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-bottom: 1px solid #dfe5ef;
+}
+
+.listHeader h1 {
+  margin: 0;
+  color: #172033;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.listHeader p {
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.listHeader > span {
+  flex-shrink: 0;
+  color: #526174;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.listHeader strong {
+  color: #1f6feb;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 1420px;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: fixed;
+}
+
+.dateColumn {
+  width: 104px;
+}
+
+.authorColumn {
+  width: 92px;
+}
+
+.serviceColumn {
+  width: 116px;
+}
+
+.platformColumn {
+  width: 92px;
+}
+
+.statusColumn {
+  width: 104px;
+}
+
+.reasonColumn {
+  width: 148px;
+}
+
+.jiraColumn {
+  width: 220px;
+}
+
+.ddayColumn {
+  width: 110px;
+}
+
+.actionsColumn {
+  width: 220px;
+}
+
+.table th {
+  height: 38px;
+  background: #f7f9fc;
+  color: #344054;
+  font-weight: 900;
+  text-align: center;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid #edf1f6;
+  padding: 10px 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.nowrapCell {
+  white-space: nowrap;
+}
+
+.jiraLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+.jiraLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #1f6feb;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.25;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+:global(:root[data-theme="dark"]) .jiraLinks a {
+  border: 1px solid #5276a3;
+}
+
+.ddayBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 26px;
+  border: 1px solid #cfd8e6;
+  border-radius: 999px;
+  color: #344054;
+  font-weight: 900;
+  padding: 0 10px;
+}
+
+.actionsCell {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.actionsCell button {
+  min-width: 0;
+  padding: 0 10px;
+}
+
+.empty {
+  height: 120px;
+  color: #667085;
+  text-align: center;
+}
+
+:global(:root[data-theme="dark"]) .table th,
+:global(:root[data-theme="dark"]) .table td {
+  border-bottom-color: #334155;
+}
+
+:global(:root[data-theme="dark"]) .ddayBadge {
+  border-color: #334155;
+  color: #e5edf7;
+}
+
+@media (max-width: 760px) {
+  .listHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .table {
+    min-width: 960px;
+  }
+}
