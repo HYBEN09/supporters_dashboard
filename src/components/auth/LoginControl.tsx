@@ -18,6 +18,7 @@ export function LoginControl() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoginPanelOpen) {
@@ -34,6 +35,22 @@ export function LoginControl() {
 
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [closeLoginPanel, isLoginPanelOpen]);
+
+  useEffect(() => {
+    if (!isProfileMenuOpen) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsProfileMenuOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isProfileMenuOpen]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -59,17 +76,49 @@ export function LoginControl() {
 
   if (isAuthenticated && user) {
     return (
-      <div className={styles.profile}>
-        <span className={styles.avatar} aria-hidden="true">
-          {user.ldapId.slice(0, 2).toUpperCase()}
-        </span>
-        <div>
-          <strong>{user.ldapId}</strong>
-          <span>로그인됨</span>
-        </div>
-        <Button variant="ghost" onClick={() => void signOut()}>
-          로그아웃
-        </Button>
+      <div className={styles.profileControl}>
+        <button
+          aria-expanded={isProfileMenuOpen}
+          className={styles.profileTrigger}
+          type="button"
+          onClick={() => setIsProfileMenuOpen((current) => !current)}
+        >
+          <span className={styles.avatar} aria-hidden="true">
+            {user.ldapId.slice(0, 2).toUpperCase()}
+          </span>
+          <span className={styles.profileName}>{user.ldapId}</span>
+          <span className={styles.chevron} aria-hidden="true">
+            <svg fill="none" viewBox="0 0 24 24">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </span>
+        </button>
+        {isProfileMenuOpen ? (
+          <>
+            <div
+              className={styles.backdrop}
+              role="presentation"
+              onClick={() => setIsProfileMenuOpen(false)}
+            />
+            <div className={styles.profileMenu} role="menu">
+              <div className={styles.profileMenuHeader}>
+                <strong>{user.ldapId}</strong>
+                <span>로그인됨</span>
+              </div>
+              <button
+                className={styles.profileMenuItem}
+                role="menuitem"
+                type="button"
+                onClick={() => {
+                  setIsProfileMenuOpen(false);
+                  void signOut();
+                }}
+              >
+                로그아웃
+              </button>
+            </div>
+          </>
+        ) : null}
       </div>
     );
   }
