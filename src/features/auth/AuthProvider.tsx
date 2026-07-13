@@ -29,6 +29,7 @@ function toAuthUser(id: string, email: string | undefined): AuthUser | null {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoginPanelOpen, setIsLoginPanelOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -73,6 +74,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await supabase.auth.signOut();
   }, []);
 
+  const openLoginPanel = useCallback(() => setIsLoginPanelOpen(true), []);
+  const closeLoginPanel = useCallback(() => setIsLoginPanelOpen(false), []);
+
   const value = useMemo(
     () => ({
       user,
@@ -80,8 +84,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
       isLoading,
       signIn,
       signOut,
+      isLoginPanelOpen,
+      openLoginPanel,
+      closeLoginPanel,
     }),
-    [isLoading, signIn, signOut, user],
+    [
+      closeLoginPanel,
+      isLoading,
+      isLoginPanelOpen,
+      openLoginPanel,
+      signIn,
+      signOut,
+      user,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -13,6 +13,9 @@ export type AuthContextValue = {
   isLoading: boolean;
   signIn: (ldapId: string, password: string) => Promise<SignInResult>;
   signOut: () => Promise<void>;
+  isLoginPanelOpen: boolean;
+  openLoginPanel: () => void;
+  closeLoginPanel: () => void;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
