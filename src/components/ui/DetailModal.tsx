@@ -8,6 +8,7 @@ import {
   NOT_ISSUE_REASON_OPTIONS,
   SERVICE_OPTIONS,
 } from "../../data/filterOptions";
+import { useAuth } from "../../features/auth/useAuth";
 import type { IssueUpdate } from "../../features/issues/issueContext";
 import type { IssueFormValues, IssueItem } from "../../types/issue";
 import {
@@ -201,6 +202,7 @@ function DetailModalContent({
   onDelete,
   onSave,
 }: DetailModalContentProps) {
+  const { isAuthenticated } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [copyMessage, setCopyMessage] = useState("");
   const {
@@ -329,7 +331,7 @@ function DetailModalContent({
             </div>
           </div>
           <div className={styles.headerActions}>
-            {!isEditing ? (
+            {!isEditing && isAuthenticated ? (
               <Button
                 className={styles.editButton}
                 variant="secondary"
@@ -453,14 +455,16 @@ function DetailModalContent({
                   <DetailIcon name="copy" />
                   복사
                 </button>
-                <button
-                  className={styles.utilityButton}
-                  type="button"
-                  onClick={deleteCurrentIssue}
-                >
-                  <DetailIcon name="trash" />
-                  삭제
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    className={styles.utilityButton}
+                    type="button"
+                    onClick={deleteCurrentIssue}
+                  >
+                    <DetailIcon name="trash" />
+                    삭제
+                  </button>
+                ) : null}
               </div>
             </footer>
           </>

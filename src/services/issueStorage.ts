@@ -1,10 +1,7 @@
 import type { IssueItem } from "../types/issue";
+import { isSupabaseConfigured, supabase } from "./supabaseClient";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as
-  | string
-  | undefined;
-const SUPABASE_REST_PATH = "/rest/v1/supporter_issues";
+const TABLE_NAME = "supporter_issues";
 
 type IssueRow = {
   id: string;
@@ -23,7 +20,7 @@ type IssueRow = {
 };
 
 export function isRemoteIssueStorageEnabled() {
-  return Boolean(getSupabaseBaseUrl() && SUPABASE_ANON_KEY);
+  return isSupabaseConfigured;
 }
 
 function toIssueItem(row: IssueRow): IssueItem {
@@ -62,106 +59,43 @@ function toIssueRow(issue: IssueItem): IssueRow {
   };
 }
 
-function getSupabaseEndpoint(path = "") {
-  const baseUrl = getSupabaseBaseUrl();
-
-  if (!baseUrl) {
-    throw new Error(
-      "VITE_SUPABASE_URL must be a full URL like https://your-project.supabase.co.",
-    );
+function requireRemoteIssueStorage() {
+  if (!isRemoteIssueStorageEnabled()) {
+    throw new Error("Supabase storage is not configured.");
   }
-
-  return `${baseUrl}${SUPABASE_REST_PATH}${path}`;
-}
-
-function getSupabaseBaseUrl() {
-  const url = SUPABASE_URL?.trim()
-    .replace(/\/$/, "")
-    .replace(/\/rest\/v1$/, "");
-
-  if (!url) {
-    return "";
-  }
-
-  if (!url.startsWith("https://")) {
-    console.error(
-      "VITE_SUPABASE_URL must start with https://. Use the Supabase Project URL, not the Project ID.",
-    );
-    return "";
-  }
-
-  return url;
-}
-
-async function requestSupabase<T>(
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
-  if (!SUPABASE_ANON_KEY) {
-    throw new Error("Supabase anon key is missing.");
-  }
-
-  const response = await fetch(getSupabaseEndpoint(path), {
-    ...init,
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      "Content-Type": "application/json",
-      ...init.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || "Failed to request issue storage.");
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  const responseText = await response.text();
-
-  if (!responseText) {
-    return undefined as T;
-  }
-
-  return JSON.parse(responseText) as T;
 }
 
 export async function loadIssuesFromStorage() {
-  if (!isRemoteIssueStorageEnabled()) {
-    throw new Error("Supabase storage is not configured.");
+  requireRemoteIssueStorage();
+
+  const { data, error } = await supabase
+    .from(TABLE_NAME)
+    .select("*")
+    .order("registered_at", { ascending: false })
+    .order("id", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
   }
 
-  const rows = await requestSupabase<IssueRow[]>(
-    "?select=*&order=registered_at.desc,id.desc",
-  );
-
-  return rows.map(toIssueItem);
+  return (data as IssueRow[]).map(toIssueItem);
 }
 
 export async function saveIssueToStorage(issue: IssueItem) {
-  if (!isRemoteIssueStorageEnabled()) {
-    throw new Error("Supabase storage is not configured.");
-  }
+  requireRemoteIssueStorage();
 
-  await requestSupabase<IssueRow[]>("", {
-    body: JSON.stringify(toIssueRow(issue)),
-    method: "POST",
-    headers: {
-      Prefer: "return=minimal",
-    },
-  });
+  const { error } = await supabase.from(TABLE_NAME).insert(toIssueRow(issue));
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
 export async function updateIssueInStorage(
   id: string,
   nextIssues: IssueItem[],
 ) {
-  if (!isRemoteIssueStorageEnabled()) {
-    throw new Error("Supabase storage is not configured.");
-  }
+  requireRemoteIssueStorage();
 
   const currentIssue = nextIssues.find((issue) => issue.id === id);
 
@@ -169,21 +103,22 @@ export async function updateIssueInStorage(
     return;
   }
 
-  await requestSupabase<void>(`?id=eq.${encodeURIComponent(id)}`, {
-    body: JSON.stringify(toIssueRow(currentIssue)),
-    method: "PATCH",
-    headers: {
-      Prefer: "return=minimal",
-    },
-  });
+  const { error } = await supabase
+    .from(TABLE_NAME)
+    .update(toIssueRow(currentIssue))
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }
 
 export async function deleteIssueFromStorage(id: string) {
-  if (!isRemoteIssueStorageEnabled()) {
-    throw new Error("Supabase storage is not configured.");
-  }
+  requireRemoteIssueStorage();
 
-  await requestSupabase<void>(`?id=eq.${encodeURIComponent(id)}`, {
-    method: "DELETE",
-  });
+  const { error } = await supabase.from(TABLE_NAME).delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }

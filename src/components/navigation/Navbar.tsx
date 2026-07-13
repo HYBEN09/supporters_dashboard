@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useTheme } from "../../features/theme/useTheme";
+import { LoginControl } from "../auth/LoginControl";
 import styles from "./Navbar.module.css";
 
 const navItems = [
@@ -47,6 +48,7 @@ export function Navbar() {
             <span aria-hidden="true">{theme === "dark" ? "☀" : "◐"}</span>
             {theme === "dark" ? "라이트" : "다크"}
           </button>
+          <LoginControl />
         </div>
       </div>
     </header>

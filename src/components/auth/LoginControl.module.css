@@ -1,0 +1,118 @@
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile strong,
+.profile span {
+  display: block;
+}
+
+.profile strong {
+  color: #172033;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.profile span {
+  margin-top: 2px;
+  color: #6b7688;
+  font-size: 12px;
+}
+
+.avatar {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: #1f6feb;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.loginControl {
+  position: relative;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 240px;
+  padding: 16px;
+  border: 1px solid #dfe5ef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+}
+
+.panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #58677c;
+}
+
+.panel input {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #cfd8e6;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #172033;
+}
+
+.panel input:focus-visible {
+  outline: 2px solid #1f6feb;
+  outline-offset: 1px;
+}
+
+.error {
+  margin: 0;
+  color: #d92d20;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.panel button[type="submit"] {
+  width: 100%;
+}
+
+:global(:root[data-theme="dark"]) .profile strong {
+  color: #f8fafc;
+}
+
+:global(:root[data-theme="dark"]) .profile span {
+  color: #94a3b8;
+}
+
+:global(:root[data-theme="dark"]) .panel {
+  border-color: #26364f;
+  background: #111827;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme="dark"]) .panel label {
+  color: #94a3b8;
+}
+
+:global(:root[data-theme="dark"]) .panel input {
+  border-color: #334155;
+  background: #1f2937;
+  color: #e5edf7;
+}

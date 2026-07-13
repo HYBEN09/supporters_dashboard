@@ -8,6 +8,7 @@ import {
   NOT_ISSUE_REASON_OPTIONS,
   PERIOD_OPTIONS,
 } from "../data/filterOptions";
+import { useAuth } from "../features/auth/useAuth";
 import { useIssues } from "../features/issues/useIssues";
 import { usePeriod } from "../features/period/usePeriod";
 import type { IssueFormValues, IssueItem } from "../types/issue";
@@ -43,6 +44,7 @@ function getJoinedServiceJiraUrls(values: IssueFormValues) {
 }
 
 export function IssueFormPage() {
+  const { isAuthenticated } = useAuth();
   const { addIssue } = useIssues();
   const { setSelectedPeriodId } = usePeriod();
   const [message, setMessage] = useState("");
@@ -145,6 +147,23 @@ export function IssueFormPage() {
   function resetForm() {
     resetIssueForm();
     setMessage("");
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className={styles.page}>
+        <header className={styles.pageHeader}>
+          <div>
+            <h1>이슈 입력 뷰</h1>
+            <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
+          </div>
+        </header>
+
+        <section className={styles.panel}>
+          <p>이슈를 등록하려면 로그인이 필요합니다. 우측 상단의 로그인 버튼을 이용해주세요.</p>
+        </section>
+      </div>
+    );
   }
 
   return (
