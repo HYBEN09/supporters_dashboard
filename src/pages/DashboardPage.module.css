@@ -750,6 +750,15 @@
   color: #0f2344;
 }
 
+:global(:root[data-theme="dark"]) .totalRow td {
+  background: #1e3a5f;
+  color: #dbeafe;
+}
+
+:global(:root[data-theme="dark"]) .totalRow td:first-child {
+  color: #f8fafc;
+}
+
 .serviceTableWrap {
   overflow-x: auto;
   border: 1px solid #b8c7df;
