@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import {
   FIX_STATUS_OPTIONS,
@@ -15,6 +15,58 @@ import type { IssueFormValues, IssueItem } from "../types/issue";
 import { AuthGate } from "../components/auth/AuthGate";
 import { Button } from "../components/ui/Button";
 import styles from "./IssueFormPage.module.css";
+
+const DRAFT_STORAGE_KEY = "supporters-issue-form-draft";
+const AUTO_SAVE_DELAY_MS = 800;
+
+type StoredDraft = {
+  savedAt: string;
+  values: IssueFormValues;
+};
+
+function loadStoredDraft(): StoredDraft | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY);
+
+    if (!raw) {
+      return null;
+    }
+
+    return JSON.parse(raw) as StoredDraft;
+  } catch {
+    return null;
+  }
+}
+
+function saveStoredDraft(values: IssueFormValues) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const draft: StoredDraft = { savedAt: new Date().toISOString(), values };
+  window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+
+  return draft.savedAt;
+}
+
+function clearStoredDraft() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+}
+
+function formatSavedTime(iso: string) {
+  return new Date(iso).toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 function createServiceJiraField(value = "") {
   return { value };
@@ -50,8 +102,13 @@ export function IssueFormPage() {
   const { setSelectedPeriodId } = usePeriod();
   const [message, setMessage] = useState("");
   const [formResetKey, setFormResetKey] = useState(0);
+  const [pendingDraft, setPendingDraft] = useState<StoredDraft | null>(() =>
+    loadStoredDraft(),
+  );
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
-    formState: { errors },
+    formState: { errors, isDirty },
     control,
     getValues,
     handleSubmit,
@@ -69,8 +126,10 @@ export function IssueFormPage() {
     name: "serviceJiraUrls",
   });
   const issueStatus = useWatch({ control, name: "issueStatus" });
+  const watchedValues = useWatch({ control });
   const isNotIssue = issueStatus === "이슈 아님";
-  const isFixStatusLocked = issueStatus === "이슈 아님" || issueStatus === "보류";
+  const isFixStatusLocked =
+    issueStatus === "이슈 아님" || issueStatus === "보류";
 
   useEffect(() => {
     if (isFixStatusLocked) {
@@ -82,6 +141,26 @@ export function IssueFormPage() {
       setValue("fixStatus", "수정 필요");
     }
   }, [getValues, isFixStatusLocked, setValue]);
+
+  useEffect(() => {
+    if (!isDirty) {
+      return;
+    }
+
+    autoSaveTimeoutRef.current = setTimeout(() => {
+      const savedAt = saveStoredDraft(getValues());
+
+      if (savedAt) {
+        setDraftSavedAt(savedAt);
+      }
+    }, AUTO_SAVE_DELAY_MS);
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [getValues, isDirty, watchedValues]);
 
   function toIssueItem(values: IssueFormValues): Omit<IssueItem, "id"> {
     return {
@@ -135,18 +214,59 @@ export function IssueFormPage() {
       setSelectedPeriodId(period.id);
     }
 
+    clearStoredDraft();
+    setDraftSavedAt(null);
     setMessage(`${createdIssue.id} 제보가 등록되었습니다.`);
     resetIssueForm();
   }
 
   function saveDraft() {
-    const values = getValues();
-    console.info("임시 저장", values);
-    setMessage("임시 저장은 브라우저 로컬 저장소에 보관되지 않고 콘솔 기록만 남깁니다.");
+    const savedAt = saveStoredDraft(getValues());
+
+    if (savedAt) {
+      setDraftSavedAt(savedAt);
+      setMessage("임시 저장되었습니다.");
+    }
+  }
+
+  function loadPendingDraft() {
+    if (!pendingDraft) {
+      return;
+    }
+
+    const draftValues = pendingDraft.values;
+
+    reset(draftValues);
+    replaceServiceJiraFields(
+      draftValues.serviceJiraUrls.length > 0
+        ? draftValues.serviceJiraUrls
+        : [createServiceJiraField()],
+    );
+    setValue("registeredAt", draftValues.registeredAt);
+    setValue("authorName", draftValues.authorName);
+    setValue("serviceName", draftValues.serviceName);
+    setValue("platform", draftValues.platform);
+    setValue("issueStatus", draftValues.issueStatus);
+    setValue("fixStatus", draftValues.fixStatus);
+    setValue("notIssueReason", draftValues.notIssueReason);
+    setValue("supporterJiraUrl", draftValues.supporterJiraUrl);
+    setValue("serviceJiraUrls", draftValues.serviceJiraUrls);
+    setValue("memo", draftValues.memo);
+    setFormResetKey((current) => current + 1);
+    setDraftSavedAt(pendingDraft.savedAt);
+    setPendingDraft(null);
+    setMessage("임시 저장된 내용을 불러왔습니다.");
+  }
+
+  function discardPendingDraft() {
+    clearStoredDraft();
+    setPendingDraft(null);
   }
 
   function resetForm() {
     resetIssueForm();
+    clearStoredDraft();
+    setDraftSavedAt(null);
     setMessage("");
   }
 
@@ -180,7 +300,7 @@ export function IssueFormPage() {
     <div className={styles.page}>
       <header className={styles.pageHeader}>
         <div>
-          <h1>이슈 입력 뷰</h1>
+          <h1>이슈 입력</h1>
           <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
         </div>
       </header>
@@ -190,6 +310,23 @@ export function IssueFormPage() {
           <h2>제보 등록</h2>
           <span className={styles.requiredGuide}>* 표시는 필수입니다</span>
         </div>
+
+        {pendingDraft ? (
+          <div className={styles.draftBanner}>
+            <span>
+              임시 저장된 내용이 있습니다 ·{" "}
+              {formatSavedTime(pendingDraft.savedAt)} 저장
+            </span>
+            <div className={styles.draftBannerActions}>
+              <Button variant="secondary" onClick={loadPendingDraft}>
+                불러오기
+              </Button>
+              <Button variant="ghost" onClick={discardPendingDraft}>
+                삭제
+              </Button>
+            </div>
+          </div>
+        ) : null}
 
         <form
           className={styles.form}
@@ -222,7 +359,9 @@ export function IssueFormPage() {
                   작성자 이름 <small>선택</small>
                 </span>
                 <input placeholder="예: 김민준" {...register("authorName")} />
-                {errors.authorName ? <em>{errors.authorName.message}</em> : null}
+                {errors.authorName ? (
+                  <em>{errors.authorName.message}</em>
+                ) : null}
               </label>
 
               <label className={styles.field}>
@@ -241,7 +380,9 @@ export function IssueFormPage() {
                     </option>
                   ))}
                 </select>
-                {errors.serviceName ? <em>{errors.serviceName.message}</em> : null}
+                {errors.serviceName ? (
+                  <em>{errors.serviceName.message}</em>
+                ) : null}
               </label>
             </div>
           </fieldset>
@@ -285,7 +426,9 @@ export function IssueFormPage() {
                   ))}
                 </select>
 
-                {errors.issueStatus ? <em>{errors.issueStatus.message}</em> : null}
+                {errors.issueStatus ? (
+                  <em>{errors.issueStatus.message}</em>
+                ) : null}
               </label>
 
               <label className={styles.field}>
@@ -319,7 +462,9 @@ export function IssueFormPage() {
                 <span>
                   이슈 아님 사유
                   {!isNotIssue ? (
-                    <small className={styles.locked}>이슈 아님 선택 시 활성</small>
+                    <small className={styles.locked}>
+                      이슈 아님 선택 시 활성
+                    </small>
                   ) : null}
                 </span>
                 <select disabled={!isNotIssue} {...register("notIssueReason")}>
@@ -371,7 +516,9 @@ export function IssueFormPage() {
                     <button
                       className={styles.serviceJiraAddButton}
                       type="button"
-                      onClick={() => appendServiceJiraField(createServiceJiraField())}
+                      onClick={() =>
+                        appendServiceJiraField(createServiceJiraField())
+                      }
                     >
                       + 서비스 전달 링크 추가
                     </button>
@@ -401,7 +548,11 @@ export function IssueFormPage() {
           {message ? <p className={styles.message}>{message}</p> : null}
 
           <div className={styles.footer}>
-            <span className={styles.autoSave}>자동 저장 대기 중</span>
+            <span className={styles.autoSave}>
+              {draftSavedAt
+                ? `임시 저장됨 · ${formatSavedTime(draftSavedAt)}`
+                : "임시 저장된 내용 없음"}
+            </span>
             <div className={styles.actions}>
               <Button variant="ghost" onClick={resetForm}>
                 초기화

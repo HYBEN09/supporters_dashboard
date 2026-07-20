@@ -41,6 +41,31 @@
   padding: 0 26px;
 }
 
+.draftBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #cfe0ff;
+  background: #f0f6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 12px 26px;
+}
+
+.draftBannerActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+:global(:root[data-theme="dark"]) .draftBanner {
+  border-bottom-color: #2f4a7a;
+  background: #17243d;
+  color: #bfdbfe;
+}
+
 .panelHeader h2 {
   margin: 0;
   border-left: 3px solid #2f6fed;
