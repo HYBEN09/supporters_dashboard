@@ -78,6 +78,8 @@ export function MonthlyReportPage() {
         <label className={styles.periodControl}>
           <span>기간</span>
           <select
+            id="monthly-report-period"
+            name="period"
             value={periodId}
             onChange={(event) => updatePeriod(event.target.value)}
           >

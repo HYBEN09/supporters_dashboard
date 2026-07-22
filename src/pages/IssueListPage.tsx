@@ -211,6 +211,8 @@ export function IssueListPage() {
           <label className={styles.filterField}>
             <span>검색어</span>
             <input
+              id="issue-list-keyword"
+              name="keyword"
               placeholder="작성자, Jira 링크"
               value={draftFilters.keyword}
               onChange={(event) => updateDraft("keyword", event.target.value)}
@@ -222,7 +224,9 @@ export function IssueListPage() {
             <div className={styles.dateRange}>
               <input
                 aria-label="조회 시작일"
+                id="issue-list-period-start"
                 max={draftFilters.periodEnd || undefined}
+                name="periodStart"
                 type="date"
                 value={draftFilters.periodStart}
                 onChange={(event) =>
@@ -232,7 +236,9 @@ export function IssueListPage() {
               <span aria-hidden="true">~</span>
               <input
                 aria-label="조회 종료일"
+                id="issue-list-period-end"
                 min={draftFilters.periodStart || undefined}
+                name="periodEnd"
                 type="date"
                 value={draftFilters.periodEnd}
                 onChange={(event) =>
@@ -245,6 +251,8 @@ export function IssueListPage() {
           <label className={styles.filterField}>
             <span>서비스</span>
             <select
+              id="issue-list-service-name"
+              name="serviceName"
               value={draftFilters.serviceName}
               onChange={(event) =>
                 updateDraft(
@@ -263,6 +271,8 @@ export function IssueListPage() {
           <label className={styles.filterField}>
             <span>플랫폼</span>
             <select
+              id="issue-list-platform"
+              name="platform"
               value={draftFilters.platform}
               onChange={(event) =>
                 updateDraft(
@@ -281,6 +291,8 @@ export function IssueListPage() {
           <label className={styles.filterField}>
             <span>이슈 여부</span>
             <select
+              id="issue-list-issue-status"
+              name="issueStatus"
               value={draftFilters.issueStatus}
               onChange={(event) =>
                 updateDraft(
@@ -299,6 +311,8 @@ export function IssueListPage() {
           <label className={styles.filterField}>
             <span>수정 여부</span>
             <select
+              id="issue-list-fix-status"
+              name="fixStatus"
               value={draftFilters.fixStatus}
               onChange={(event) =>
                 updateDraft(
@@ -317,6 +331,8 @@ export function IssueListPage() {
           <label className={styles.filterField}>
             <span>이슈 아님 사유</span>
             <select
+              id="issue-list-not-issue-reason"
+              name="notIssueReason"
               value={draftFilters.notIssueReason}
               onChange={(event) =>
                 updateDraft(

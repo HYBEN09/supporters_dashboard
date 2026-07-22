@@ -349,7 +349,9 @@ export function DashboardPage() {
             <div className={styles.dateRange}>
               <input
                 aria-label="조회 시작일"
+                id="dashboard-period-start"
                 max={filters.periodEnd || undefined}
+                name="periodStart"
                 type="date"
                 value={filters.periodStart}
                 onChange={(event) =>
@@ -359,7 +361,9 @@ export function DashboardPage() {
               <span aria-hidden="true">~</span>
               <input
                 aria-label="조회 종료일"
+                id="dashboard-period-end"
                 min={filters.periodStart || undefined}
+                name="periodEnd"
                 type="date"
                 value={filters.periodEnd}
                 onChange={(event) =>
@@ -372,6 +376,8 @@ export function DashboardPage() {
           <label className={styles.filterField}>
             <span>서비스</span>
             <select
+              id="dashboard-service-name"
+              name="serviceName"
               value={filters.serviceName}
               onChange={(event) =>
                 updateFilter(
@@ -390,6 +396,8 @@ export function DashboardPage() {
           <label className={styles.filterField}>
             <span>플랫폼</span>
             <select
+              id="dashboard-platform"
+              name="platform"
               value={filters.platform}
               onChange={(event) =>
                 updateFilter(
@@ -408,6 +416,8 @@ export function DashboardPage() {
           <label className={styles.filterField}>
             <span>이슈 여부</span>
             <select
+              id="dashboard-issue-status"
+              name="issueStatus"
               value={filters.issueStatus}
               onChange={(event) =>
                 updateFilter(
@@ -426,6 +436,8 @@ export function DashboardPage() {
           <label className={styles.filterField}>
             <span>수정 여부</span>
             <select
+              id="dashboard-fix-status"
+              name="fixStatus"
               value={filters.fixStatus}
               onChange={(event) =>
                 updateFilter(

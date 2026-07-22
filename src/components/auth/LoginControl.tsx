@@ -148,6 +148,8 @@ export function LoginControl() {
               <span>아이디</span>
               <input
                 autoFocus
+                id="login-ldap-id"
+                name="ldapId"
                 placeholder="예: polar.09"
                 value={ldapId}
                 onChange={(event) => setLdapId(event.target.value)}
@@ -156,6 +158,8 @@ export function LoginControl() {
             <label>
               <span>비밀번호</span>
               <input
+                id="login-password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
