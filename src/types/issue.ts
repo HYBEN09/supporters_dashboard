@@ -1,6 +1,7 @@
 import type {
   ISSUE_FORM_PLATFORM_OPTIONS,
   ISSUE_FORM_SERVICE_OPTIONS,
+  NOT_ISSUE_REASON_OPTIONS,
 } from "../data/filterOptions";
 
 type IssueFormServiceName = (typeof ISSUE_FORM_SERVICE_OPTIONS)[number];
@@ -15,13 +16,7 @@ export type IssueStatus = "이슈" | "이슈 아님" | "보류";
 
 export type FixStatus = "-" | "수정 필요" | "수정 완료" | "수정 불가";
 
-export type NotIssueReason =
-  | "정상 작동(이슈 재현 안됨)"
-  | "실행 경로 불명확"
-  | "사용성 이슈"
-  | "기능 개발 요청"
-  | "접근성 이슈 아님"
-  | "기타";
+export type NotIssueReason = (typeof NOT_ISSUE_REASON_OPTIONS)[number];
 
 export type IssueItem = {
   id: string;

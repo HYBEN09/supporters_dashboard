@@ -55,9 +55,9 @@ const LEGACY_PLATFORM_MAP: Record<string, Platform> = {
 
 const LEGACY_NOT_ISSUE_REASON_MAP: Record<string, NotIssueReason> = {
   "기획 의도에 부합": "정상 작동(이슈 재현 안됨)",
-  "중복 제보": "기타",
+  "중복 제보": "접근성 이슈 아님",
   "사용자 오인": "사용성 이슈",
-  "개선 불가": "기타",
+  "개선 불가": "접근성 이슈 아님",
 };
 
 function migrateLegacyValues(issues: IssueItem[]) {
