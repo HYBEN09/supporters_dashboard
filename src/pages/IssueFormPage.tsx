@@ -14,6 +14,7 @@ import { usePeriod } from "../features/period/usePeriod";
 import type { IssueFormValues, IssueItem } from "../types/issue";
 import { AuthGate } from "../components/auth/AuthGate";
 import { Button } from "../components/ui/Button";
+import { NotIssueReasonHelp } from "../components/ui/NotIssueReasonHelp";
 import styles from "./IssueFormPage.module.css";
 
 const DRAFT_STORAGE_KEY = "supporters-issue-form-draft";
@@ -461,6 +462,7 @@ export function IssueFormPage() {
               <label className={styles.field}>
                 <span>
                   이슈 아님 사유
+                  <NotIssueReasonHelp />
                   {!isNotIssue ? (
                     <small className={styles.locked}>
                       이슈 아님 선택 시 활성

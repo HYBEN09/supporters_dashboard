@@ -17,6 +17,7 @@ import {
   getServiceJiraUrls,
 } from "../../utils/formatters";
 import { Button } from "./Button";
+import { NotIssueReasonHelp } from "./NotIssueReasonHelp";
 import { StatusBadge } from "./StatusBadge";
 import styles from "./DetailModal.module.css";
 
@@ -555,7 +556,10 @@ function DetailModalContent({
               </select>
             </label>
             <label>
-              <span>이슈 아님 사유</span>
+              <span>
+                이슈 아님 사유
+                <NotIssueReasonHelp />
+              </span>
               <select disabled={!isNotIssue} {...register("notIssueReason")}>
                 <option value="">선택</option>
                 {NOT_ISSUE_REASON_OPTIONS.map((reason) => (

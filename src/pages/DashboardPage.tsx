@@ -49,6 +49,7 @@ import {
 } from "../utils/issueMetrics";
 import { KpiCard } from "../components/dashboard/KpiCard";
 import { Button } from "../components/ui/Button";
+import { NotIssueReasonHelp } from "../components/ui/NotIssueReasonHelp";
 import { Pagination } from "../components/ui/Pagination";
 import { SectionCard } from "../components/ui/SectionCard";
 import { StatusBadge } from "../components/ui/StatusBadge";
@@ -771,7 +772,14 @@ export function DashboardPage() {
           </div>
         </SectionCard>
 
-        <SectionCard title="이슈 아님 분석">
+        <SectionCard
+          title={
+            <>
+              이슈 아님 분석
+              <NotIssueReasonHelp />
+            </>
+          }
+        >
           <div className={styles.reasonAnalysis}>
             <div className={styles.reasonSummaryGrid}>
               <article className={styles.reasonSummaryCard}>
