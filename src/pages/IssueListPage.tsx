@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   FIX_STATUS_OPTIONS,
@@ -47,8 +47,34 @@ type IssueListSort = {
   direction: IssueListSortDirection;
 };
 
+const ISSUE_LIST_FILTERS_STORAGE_KEY = "supporters-issue-list-filters";
+
+function getStoredIssueListFilters(fallbackFilters: IssueFilters) {
+  if (typeof window === "undefined") {
+    return fallbackFilters;
+  }
+
+  try {
+    const storedFilters = window.sessionStorage.getItem(
+      ISSUE_LIST_FILTERS_STORAGE_KEY,
+    );
+
+    if (!storedFilters) {
+      return fallbackFilters;
+    }
+
+    return {
+      ...fallbackFilters,
+      ...(JSON.parse(storedFilters) as Partial<IssueFilters>),
+    };
+  } catch {
+    return fallbackFilters;
+  }
+}
+
 function getNotIssueReasonFromSearch(
   searchParams: URLSearchParams,
+  fallback: SelectableFilter<NotIssueReason>,
 ): SelectableFilter<NotIssueReason> {
   const reason = searchParams.get("notIssueReason");
 
@@ -59,7 +85,7 @@ function getNotIssueReasonFromSearch(
     return reason as NotIssueReason;
   }
 
-  return "전체";
+  return fallback;
 }
 
 function getDateFromSearch(
@@ -93,20 +119,39 @@ export function IssueListPage() {
   const { deleteIssue, issues, updateIssue } = useIssues();
   const [searchParams] = useSearchParams();
   const selectedPeriod = getPeriodById(selectedPeriodId);
-  const defaultFilters: IssueFilters = {
+  const storedOrPeriodFilters = getStoredIssueListFilters({
     ...DEFAULT_FILTERS,
+    periodStart: getInitialPeriodStart(selectedPeriod.id),
+    periodEnd: selectedPeriod.end,
+  });
+  const defaultFilters: IssueFilters = {
+    ...storedOrPeriodFilters,
     periodStart: getDateFromSearch(
       searchParams,
       "periodStart",
-      getInitialPeriodStart(selectedPeriod.id),
+      storedOrPeriodFilters.periodStart,
     ),
-    periodEnd: getDateFromSearch(searchParams, "periodEnd", selectedPeriod.end),
-    notIssueReason: getNotIssueReasonFromSearch(searchParams),
+    periodEnd: getDateFromSearch(
+      searchParams,
+      "periodEnd",
+      storedOrPeriodFilters.periodEnd,
+    ),
+    notIssueReason: getNotIssueReasonFromSearch(
+      searchParams,
+      storedOrPeriodFilters.notIssueReason,
+    ),
   };
   const [draftFilters, setDraftFilters] =
     useState<IssueFilters>(defaultFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<IssueFilters>(defaultFilters);
+
+  useEffect(() => {
+    window.sessionStorage.setItem(
+      ISSUE_LIST_FILTERS_STORAGE_KEY,
+      JSON.stringify(appliedFilters),
+    );
+  }, [appliedFilters]);
   const [sortConfig, setSortConfig] = useState<IssueListSort>({
     key: "registeredAt",
     direction: "desc",
