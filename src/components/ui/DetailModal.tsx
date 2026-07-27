@@ -16,6 +16,7 @@ import {
   getIssueJiraLinks,
   getServiceJiraUrls,
 } from "../../utils/formatters";
+import { linkifyText } from "../../utils/linkify";
 import { Button } from "./Button";
 import { NotIssueReasonHelp } from "./NotIssueReasonHelp";
 import { StatusBadge } from "./StatusBadge";
@@ -460,7 +461,7 @@ function DetailModalContent({
                   <DetailIcon name="file" />
                   비고 / 전달 메모
                 </dt>
-                <dd>{issue.memo ?? "-"}</dd>
+                <dd>{issue.memo ? linkifyText(issue.memo) : "-"}</dd>
               </div>
             </dl>
             <footer className={styles.footer}>
