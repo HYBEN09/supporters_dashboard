@@ -1,4 +1,5 @@
 import type {
+  FIX_STATUS_OPTIONS,
   ISSUE_FORM_PLATFORM_OPTIONS,
   ISSUE_FORM_SERVICE_OPTIONS,
   NOT_ISSUE_REASON_OPTIONS,
@@ -14,7 +15,7 @@ export type Platform = IssueFormPlatform;
 
 export type IssueStatus = "이슈" | "이슈 아님" | "보류";
 
-export type FixStatus = "-" | "수정 필요" | "수정 완료" | "수정 불가";
+export type FixStatus = "-" | (typeof FIX_STATUS_OPTIONS)[number];
 
 export type NotIssueReason = (typeof NOT_ISSUE_REASON_OPTIONS)[number];
 

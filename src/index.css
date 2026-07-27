@@ -250,6 +250,12 @@ a {
   color: #f3d9df;
 }
 
+:root[data-theme="dark"] [class*="StatusBadge_stale"] {
+  border-color: #a68a5c;
+  background: #3a3020;
+  color: #f0dcb0;
+}
+
 :root[data-theme="dark"] [class*="badge"][class*="danger"] {
   border: 1px solid #b85c61;
   background: #3b2529;
@@ -284,6 +290,12 @@ a {
   border: 1px solid #8f6671;
   background: #3a2d33;
   color: #f3d9df;
+}
+
+:root[data-theme="dark"] [class*="badge"][class*="stale"] {
+  border: 1px solid #a68a5c;
+  background: #3a3020;
+  color: #f0dcb0;
 }
 
 :root[data-theme="dark"] [class*="sortButton"],
