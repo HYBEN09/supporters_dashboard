@@ -66,6 +66,60 @@
   color: #bfdbfe;
 }
 
+.sheetImportBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid #cfe0ff;
+  background: #f0f6ff;
+  color: #1d4ed8;
+  padding: 12px 26px;
+}
+
+.sheetImportHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.sheetImportRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sheetImportActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.sheetImportRow textarea {
+  flex: 1;
+  min-height: 44px;
+  resize: vertical;
+  border: 1px solid #cfe0ff;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172033;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+:global(:root[data-theme="dark"]) .sheetImportBanner {
+  border-bottom-color: #2f4a7a;
+  background: #17243d;
+  color: #bfdbfe;
+}
+
+:global(:root[data-theme="dark"]) .sheetImportRow textarea {
+  border-color: #2f4a7a;
+  background: #0f1a2e;
+  color: #e2e8f0;
+}
+
 .panelHeader h2 {
   margin: 0;
   border-left: 3px solid #2f6fed;
@@ -326,6 +380,17 @@
   border-color: #4f9a78;
   background: #20372f;
   color: #c8f3df;
+}
+
+.inlineUndoButton {
+  border: none;
+  background: none;
+  color: #b42318;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
 }
 
 .footer {

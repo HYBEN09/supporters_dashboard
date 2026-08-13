@@ -15,6 +15,14 @@ import type { IssueFormValues, IssueItem } from "../types/issue";
 import { AuthGate } from "../components/auth/AuthGate";
 import { Button } from "../components/ui/Button";
 import { NotIssueReasonHelp } from "../components/ui/NotIssueReasonHelp";
+import {
+  fetchSheetReportRows,
+  filterUnimportedRows,
+  isSheetImportConfigured,
+  parseSheetRowsFromPastedText,
+  sheetRowToFormValues,
+  sheetRowToIssueItem,
+} from "../services/sheetImport";
 import styles from "./IssueFormPage.module.css";
 
 const DRAFT_STORAGE_KEY = "supporters-issue-form-draft";
@@ -99,7 +107,7 @@ function getJoinedServiceJiraUrls(values: IssueFormValues) {
 
 export function IssueFormPage() {
   const { isAuthenticated } = useAuth();
-  const { addIssue } = useIssues();
+  const { addIssue, deleteIssue, issues } = useIssues();
   const { setSelectedPeriodId } = usePeriod();
   const [message, setMessage] = useState("");
   const [formResetKey, setFormResetKey] = useState(0);
@@ -107,6 +115,18 @@ export function IssueFormPage() {
     loadStoredDraft(),
   );
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [sheetPasteText, setSheetPasteText] = useState("");
+  const [sheetImportLoading, setSheetImportLoading] = useState(false);
+  const [bulkImportLoading, setBulkImportLoading] = useState(false);
+  const [lastBulkImportBatch, setLastBulkImportBatch] = useState<string[]>(
+    [],
+  );
+  const [sheetImportPendingCount, setSheetImportPendingCount] = useState<
+    number | null
+  >(null);
+  const [loadedSheetTimestamp, setLoadedSheetTimestamp] = useState<
+    string | null
+  >(null);
   const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     formState: { errors, isDirty },
@@ -182,6 +202,7 @@ export function IssueFormPage() {
       supporterJiraUrl: values.supporterJiraUrl.trim() || undefined,
       serviceJiraUrl: getJoinedServiceJiraUrls(values),
       memo: values.memo.trim() || undefined,
+      sheetTimestamp: loadedSheetTimestamp ?? undefined,
     };
   }
 
@@ -215,10 +236,182 @@ export function IssueFormPage() {
       setSelectedPeriodId(period.id);
     }
 
+    if (loadedSheetTimestamp) {
+      setLoadedSheetTimestamp(null);
+      setSheetImportPendingCount((current) =>
+        current !== null ? Math.max(0, current - 1) : current,
+      );
+    }
+
     clearStoredDraft();
     setDraftSavedAt(null);
     setMessage(`${createdIssue.id} 제보가 등록되었습니다.`);
     resetIssueForm();
+  }
+
+  async function importNextSheetRow() {
+    setMessage("");
+
+    let rows;
+
+    if (isSheetImportConfigured) {
+      setSheetImportLoading(true);
+
+      try {
+        rows = await fetchSheetReportRows();
+      } catch (error) {
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "구글 시트에서 가져오는 중 오류가 발생했습니다.",
+        );
+        return;
+      } finally {
+        setSheetImportLoading(false);
+      }
+    } else {
+      rows = parseSheetRowsFromPastedText(sheetPasteText);
+
+      if (rows.length === 0) {
+        setMessage(
+          "붙여넣은 내용에서 제보를 찾지 못했습니다. 시트에서 새 행을 복사해 붙여넣어주세요.",
+        );
+        return;
+      }
+    }
+
+    const pendingRows = filterUnimportedRows(rows, issues);
+    const nextRow = pendingRows[0] ?? null;
+
+    if (!nextRow) {
+      setSheetImportPendingCount(0);
+      setMessage("가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 건은 자동으로 건너뛰었습니다)");
+      return;
+    }
+
+    const values = sheetRowToFormValues(nextRow, createDefaultValues());
+
+    reset(values);
+    replaceServiceJiraFields(values.serviceJiraUrls);
+    setValue("registeredAt", values.registeredAt);
+    setValue("authorName", values.authorName);
+    setValue("serviceName", values.serviceName);
+    setValue("platform", values.platform);
+    setValue("issueStatus", values.issueStatus);
+    setValue("fixStatus", values.fixStatus);
+    setValue("notIssueReason", values.notIssueReason);
+    setValue("supporterJiraUrl", values.supporterJiraUrl);
+    setValue("serviceJiraUrls", values.serviceJiraUrls);
+    setValue("memo", values.memo);
+    setFormResetKey((current) => current + 1);
+
+    setLoadedSheetTimestamp(nextRow.timestamp);
+    setSheetImportPendingCount(pendingRows.length - 1);
+    setMessage(
+      "구글 시트에서 제보를 불러왔습니다. 이슈 여부/수정 여부를 확인한 뒤 등록해주세요.",
+    );
+  }
+
+  async function bulkImportAllPendingRows() {
+    setMessage("");
+
+    let rows;
+
+    if (isSheetImportConfigured) {
+      setBulkImportLoading(true);
+
+      try {
+        rows = await fetchSheetReportRows();
+      } catch (error) {
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "구글 시트에서 가져오는 중 오류가 발생했습니다.",
+        );
+        return;
+      } finally {
+        setBulkImportLoading(false);
+      }
+    } else {
+      rows = parseSheetRowsFromPastedText(sheetPasteText);
+
+      if (rows.length === 0) {
+        setMessage(
+          "붙여넣은 내용에서 제보를 찾지 못했습니다. 시트에서 새 행을 복사해 붙여넣어주세요.",
+        );
+        return;
+      }
+    }
+
+    const pendingRows = filterUnimportedRows(rows, issues);
+    const skippedCount = rows.length - pendingRows.length;
+
+    if (pendingRows.length === 0) {
+      setSheetImportPendingCount(0);
+      setMessage(
+        skippedCount > 0
+          ? `가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 ${skippedCount}건은 건너뛰었습니다)`
+          : "가져올 새 제보가 없습니다.",
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `${pendingRows.length}건을 이슈 여부 "보류"로 한꺼번에 등록합니다.${
+        skippedCount > 0
+          ? ` (이미 이슈 리스트에 있는 것으로 보이는 ${skippedCount}건은 자동으로 제외했습니다)`
+          : ""
+      } 등록 후 목록에서 메모 등 나머지 항목을 입력해주세요. 계속할까요?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    let unmatchedServiceCount = 0;
+    const createdIds: string[] = [];
+
+    for (const row of pendingRows) {
+      const item = sheetRowToIssueItem(row);
+
+      if (item.memo) {
+        unmatchedServiceCount += 1;
+      }
+
+      const createdIssue = addIssue(item);
+      createdIds.push(createdIssue.id);
+    }
+
+    setLastBulkImportBatch(createdIds);
+    setSheetImportPendingCount(0);
+    setMessage(
+      unmatchedServiceCount > 0
+        ? `${pendingRows.length}건이 일괄 등록되었습니다. 이 중 서비스명이 자동 매칭되지 않은 ${unmatchedServiceCount}건은 메모에 원문을 남겨뒀으니 이슈 리스트에서 확인해주세요.`
+        : `${pendingRows.length}건이 일괄 등록되었습니다.`,
+    );
+  }
+
+  function undoLastBulkImport() {
+    if (lastBulkImportBatch.length === 0) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `방금 일괄 등록한 ${lastBulkImportBatch.length}건을 휴지통으로 이동합니다 (복원 가능). 계속할까요?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    lastBulkImportBatch.forEach((issueId) => deleteIssue(issueId));
+    setSheetImportPendingCount(
+      (current) => (current ?? 0) + lastBulkImportBatch.length,
+    );
+    setLastBulkImportBatch([]);
+    setMessage(
+      "방금 등록한 건들을 휴지통으로 이동했습니다. 필요하면 이슈 리스트 > 휴지통에서 복원할 수 있습니다.",
+    );
   }
 
   function saveDraft() {
@@ -310,6 +503,53 @@ export function IssueFormPage() {
         <div className={styles.panelHeader}>
           <h2>제보 등록</h2>
           <span className={styles.requiredGuide}>* 표시는 필수입니다</span>
+        </div>
+
+        <div className={styles.sheetImportBanner}>
+          <div className={styles.sheetImportHeader}>
+            <span>
+              구글 시트에서 가져오기
+              {sheetImportPendingCount !== null
+                ? ` · 남은 ${sheetImportPendingCount}건`
+                : ""}
+            </span>
+            {isSheetImportConfigured ? (
+              <div className={styles.sheetImportActions}>
+                <Button
+                  disabled={sheetImportLoading || bulkImportLoading}
+                  variant="secondary"
+                  onClick={importNextSheetRow}
+                >
+                  {sheetImportLoading ? "가져오는 중..." : "구글 시트에서 가져오기"}
+                </Button>
+                <Button
+                  disabled={sheetImportLoading || bulkImportLoading}
+                  variant="secondary"
+                  onClick={bulkImportAllPendingRows}
+                >
+                  {bulkImportLoading ? "가져오는 중..." : "전체 일괄 등록"}
+                </Button>
+              </div>
+            ) : null}
+          </div>
+          {!isSheetImportConfigured ? (
+            <div className={styles.sheetImportRow}>
+              <textarea
+                placeholder="시트에서 새 행을 선택해 복사한 뒤 여기에 붙여넣으세요 (Ctrl+V)"
+                rows={2}
+                value={sheetPasteText}
+                onChange={(event) => setSheetPasteText(event.target.value)}
+              />
+              <div className={styles.sheetImportActions}>
+                <Button variant="secondary" onClick={importNextSheetRow}>
+                  가져오기
+                </Button>
+                <Button variant="secondary" onClick={bulkImportAllPendingRows}>
+                  전체 일괄 등록
+                </Button>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {pendingDraft ? (
@@ -548,6 +788,18 @@ export function IssueFormPage() {
           </fieldset>
 
           {message ? <p className={styles.message}>{message}</p> : null}
+          {lastBulkImportBatch.length > 0 ? (
+            <p className={styles.message}>
+              방금 등록한 {lastBulkImportBatch.length}건을 취소하시겠어요?{" "}
+              <button
+                className={styles.inlineUndoButton}
+                type="button"
+                onClick={undoLastBulkImport}
+              >
+                방금 등록한 건 취소
+              </button>
+            </p>
+          ) : null}
 
           <div className={styles.footer}>
             <span className={styles.autoSave}>

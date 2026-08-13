@@ -37,6 +37,7 @@ export type IssueItem = {
   updatedBy?: string;
   deletedAt?: string;
   deletedBy?: string;
+  sheetTimestamp?: string;
 };
 
 export type SelectableFilter<T extends string> = "전체" | T;

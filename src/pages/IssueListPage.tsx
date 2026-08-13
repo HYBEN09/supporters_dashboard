@@ -157,6 +157,7 @@ export function IssueListPage() {
     direction: "desc",
   });
   const [selectedIssue, setSelectedIssue] = useState<IssueItem | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const filteredIssues = useMemo(
     () => filterIssues(issues, appliedFilters),
@@ -208,6 +209,46 @@ export function IssueListPage() {
   function applyFilters() {
     setAppliedFilters(draftFilters);
     pagination.goToPage(1);
+    setSelectedIds(new Set());
+  }
+
+  function toggleSelected(id: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  }
+
+  function toggleSelectAllFiltered() {
+    setSelectedIds((current) =>
+      current.size === sortedIssues.length
+        ? new Set()
+        : new Set(sortedIssues.map((issue) => issue.id)),
+    );
+  }
+
+  function deleteSelectedIssues() {
+    if (selectedIds.size === 0) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `선택한 ${selectedIds.size}건을 휴지통으로 이동합니다 (복원 가능). 계속할까요?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    selectedIds.forEach((id) => deleteIssue(id));
+    setSelectedIds(new Set());
   }
 
   function toggleRegisteredAtSortOrder() {
@@ -247,6 +288,7 @@ export function IssueListPage() {
     setAppliedFilters(nextFilters);
     setSortConfig({ key: "registeredAt", direction: "desc" });
     pagination.goToPage(1);
+    setSelectedIds(new Set());
   }
 
   return (
@@ -445,13 +487,26 @@ export function IssueListPage() {
       <section className={styles.listPanel}>
         <div className={styles.listHeader}>
           <h2>이슈 목록</h2>
-          <span>
-            총 <strong>{filteredIssues.length}</strong>건
-          </span>
+          {selectedIds.size > 0 ? (
+            <div className={styles.selectionActions}>
+              <span>{selectedIds.size}건 선택됨</span>
+              <Button variant="ghost" onClick={() => setSelectedIds(new Set())}>
+                선택 해제
+              </Button>
+              <Button variant="danger" onClick={deleteSelectedIssues}>
+                선택 삭제
+              </Button>
+            </div>
+          ) : (
+            <span>
+              총 <strong>{filteredIssues.length}</strong>건
+            </span>
+          )}
         </div>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <colgroup>
+              <col className={styles.checkboxColumn} />
               <col className={styles.dateColumn} />
               <col className={styles.authorColumn} />
               <col className={styles.serviceColumn} />
@@ -464,6 +519,17 @@ export function IssueListPage() {
             </colgroup>
             <thead>
               <tr>
+                <th>
+                  <input
+                    aria-label="현재 조회된 전체 이슈 선택"
+                    checked={
+                      sortedIssues.length > 0 &&
+                      selectedIds.size === sortedIssues.length
+                    }
+                    type="checkbox"
+                    onChange={toggleSelectAllFiltered}
+                  />
+                </th>
                 <th>
                   <button
                     aria-label={`등록일 ${
@@ -509,6 +575,14 @@ export function IssueListPage() {
               {pagination.paginatedItems.length > 0 ? (
                 pagination.paginatedItems.map((issue) => (
                   <tr key={issue.id}>
+                    <td>
+                      <input
+                        aria-label={`${issue.id} 선택`}
+                        checked={selectedIds.has(issue.id)}
+                        type="checkbox"
+                        onChange={() => toggleSelected(issue.id)}
+                      />
+                    </td>
                     <td className={styles.nowrapCell}>{formatDate(issue.registeredAt)}</td>
                     <td className={styles.authorCell}>{issue.authorName}</td>
                     <td>{issue.serviceName}</td>
@@ -551,7 +625,7 @@ export function IssueListPage() {
                 ))
               ) : (
                 <tr>
-                  <td className={styles.empty} colSpan={9}>
+                  <td className={styles.empty} colSpan={10}>
                     표시할 데이터가 없습니다.
                   </td>
                 </tr>

@@ -21,6 +21,7 @@ type IssueRow = {
   updated_by: string | null;
   deleted_at: string | null;
   deleted_by: string | null;
+  sheet_timestamp: string | null;
 };
 
 export function isRemoteIssueStorageEnabled() {
@@ -46,6 +47,7 @@ function toIssueItem(row: IssueRow): IssueItem {
     updatedBy: row.updated_by ?? undefined,
     deletedAt: row.deleted_at ?? undefined,
     deletedBy: row.deleted_by ?? undefined,
+    sheetTimestamp: row.sheet_timestamp ?? undefined,
   };
 }
 
@@ -68,6 +70,7 @@ function toIssueRow(issue: IssueItem): IssueRow {
     updated_by: issue.updatedBy ?? null,
     deleted_at: issue.deletedAt ?? null,
     deleted_by: issue.deletedBy ?? null,
+    sheet_timestamp: issue.sheetTimestamp ?? null,
   };
 }
 

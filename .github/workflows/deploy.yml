@@ -56,6 +56,8 @@ jobs:
           VITE_BASE_PATH: ${{ env.VITE_BASE_PATH }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SHEET_IMPORT_URL: ${{ secrets.VITE_SHEET_IMPORT_URL }}
+          VITE_SHEET_IMPORT_TOKEN: ${{ secrets.VITE_SHEET_IMPORT_TOKEN }}
 
       - name: Add SPA fallback
         run: cp dist/index.html dist/404.html

@@ -125,6 +125,17 @@
   color: #1f6feb;
 }
 
+.selectionActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.selectionActions span {
+  color: #172033;
+  font-weight: 900;
+}
+
 .tableWrap {
   overflow-x: auto;
 }
@@ -135,6 +146,10 @@
   border-collapse: collapse;
   font-size: 13px;
   table-layout: fixed;
+}
+
+.checkboxColumn {
+  width: 40px;
 }
 
 .dateColumn {
