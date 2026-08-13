@@ -493,7 +493,7 @@ export function IssueListPage() {
               <Button variant="ghost" onClick={() => setSelectedIds(new Set())}>
                 선택 해제
               </Button>
-              <Button variant="danger" onClick={deleteSelectedIssues}>
+              <Button variant="ghost" onClick={deleteSelectedIssues}>
                 선택 삭제
               </Button>
             </div>

@@ -27,7 +27,14 @@
   font-size: 13px;
 }
 
-.listHeader > span {
+.headerActions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerActions > span {
   flex-shrink: 0;
   color: #526174;
   font-size: 13px;

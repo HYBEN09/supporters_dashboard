@@ -38,13 +38,3 @@
 .ghost:hover {
   background: #eef3fa;
 }
-
-.danger {
-  border-color: #fda29b;
-  background: #fef3f2;
-  color: #b42318;
-}
-
-.danger:hover {
-  background: #fee4e2;
-}

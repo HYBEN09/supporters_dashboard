@@ -91,6 +91,23 @@ export function TrashPage() {
     setDeletedIssues((current) => current.filter((item) => item.id !== issue.id));
   }
 
+  function handleEmptyTrash() {
+    if (deletedIssues.length === 0) {
+      return;
+    }
+
+    if (
+      !window.confirm(
+        `휴지통에 있는 ${deletedIssues.length}건을 전부 영구 삭제합니다. 이 작업은 되돌릴 수 없습니다. 계속할까요?`,
+      )
+    ) {
+      return;
+    }
+
+    deletedIssues.forEach((issue) => permanentlyDeleteIssue(issue.id));
+    setDeletedIssues([]);
+  }
+
   if (!isAuthenticated) {
     return (
       <section className={styles.listPanel}>
@@ -115,9 +132,18 @@ export function TrashPage() {
           <h1>휴지통</h1>
           <p>삭제된 이슈는 30일간 보관되며, 이후 자동으로 영구 삭제됩니다.</p>
         </div>
-        <span>
-          <strong>{deletedIssues.length}</strong>개 항목
-        </span>
+        <div className={styles.headerActions}>
+          <span>
+            <strong>{deletedIssues.length}</strong>개 항목
+          </span>
+          <Button
+            disabled={deletedIssues.length === 0}
+            variant="ghost"
+            onClick={handleEmptyTrash}
+          >
+            전체 비우기
+          </Button>
+        </div>
       </div>
       <div className={styles.tableWrap}>
         <table className={styles.table}>
