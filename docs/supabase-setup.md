@@ -97,7 +97,7 @@ alter table public.supporter_issues
 
 ## 3. Environment variables
 
-로컬 개발용 `.env.local` 또는 Vercel Environment Variables에 아래 값을 설정합니다.
+로컬 개발용 `.env.local` 또는 저장소 **Settings > Secrets and variables > Actions**(GitHub Pages 배포용)에 아래 값을 설정합니다.
 
 ```bash
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -106,7 +106,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ## 4. Deploy
 
-Vercel/GitHub Pages에서 환경변수를 추가한 뒤 Production 재배포를 실행합니다.
+GitHub Pages에 시크릿을 추가한 뒤, `main` 브랜치에 푸시하거나 Actions 탭에서 "Deploy to GitHub Pages" 워크플로를 수동 실행해 재배포합니다.
 
 ## Note
 
