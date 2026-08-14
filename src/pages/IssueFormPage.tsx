@@ -22,6 +22,7 @@ import {
   parseSheetRowsFromPastedText,
   sheetRowToFormValues,
   sheetRowToIssueItem,
+  type SheetReportRow,
 } from "../services/sheetImport";
 import styles from "./IssueFormPage.module.css";
 
@@ -121,6 +122,13 @@ export function IssueFormPage() {
   const [lastBulkImportBatch, setLastBulkImportBatch] = useState<string[]>(
     [],
   );
+  const [bulkPreviewRows, setBulkPreviewRows] = useState<SheetReportRow[]>(
+    [],
+  );
+  const [bulkPreviewSelected, setBulkPreviewSelected] = useState<
+    Set<string>
+  >(new Set());
+  const [bulkPreviewSkippedCount, setBulkPreviewSkippedCount] = useState(0);
   const [sheetImportPendingCount, setSheetImportPendingCount] = useState<
     number | null
   >(null);
@@ -306,13 +314,13 @@ export function IssueFormPage() {
     setFormResetKey((current) => current + 1);
 
     setLoadedSheetTimestamp(nextRow.timestamp);
-    setSheetImportPendingCount(pendingRows.length - 1);
+    setSheetImportPendingCount(pendingRows.length);
     setMessage(
       "구글 시트에서 제보를 불러왔습니다. 이슈 여부/수정 여부를 확인한 뒤 등록해주세요.",
     );
   }
 
-  async function bulkImportAllPendingRows() {
+  async function fetchPendingRowsForBulkAction() {
     setMessage("");
 
     let rows;
@@ -328,7 +336,7 @@ export function IssueFormPage() {
             ? error.message
             : "구글 시트에서 가져오는 중 오류가 발생했습니다.",
         );
-        return;
+        return null;
       } finally {
         setBulkImportLoading(false);
       }
@@ -339,7 +347,7 @@ export function IssueFormPage() {
         setMessage(
           "붙여넣은 내용에서 제보를 찾지 못했습니다. 시트에서 새 행을 복사해 붙여넣어주세요.",
         );
-        return;
+        return null;
       }
     }
 
@@ -353,8 +361,34 @@ export function IssueFormPage() {
           ? `가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 ${skippedCount}건은 건너뛰었습니다)`
           : "가져올 새 제보가 없습니다.",
       );
+      return null;
+    }
+
+    return { pendingRows, skippedCount };
+  }
+
+  async function openBulkImportPreview() {
+    const result = await fetchPendingRowsForBulkAction();
+
+    if (!result) {
       return;
     }
+
+    setBulkPreviewRows(result.pendingRows);
+    setBulkPreviewSelected(
+      new Set(result.pendingRows.map((row) => row.timestamp)),
+    );
+    setBulkPreviewSkippedCount(result.skippedCount);
+  }
+
+  async function bulkImportAllPendingRows() {
+    const result = await fetchPendingRowsForBulkAction();
+
+    if (!result) {
+      return;
+    }
+
+    const { pendingRows, skippedCount } = result;
 
     const confirmed = window.confirm(
       `${pendingRows.length}건을 이슈 여부 "보류"로 한꺼번에 등록합니다.${
@@ -388,6 +422,69 @@ export function IssueFormPage() {
       unmatchedServiceCount > 0
         ? `${pendingRows.length}건이 일괄 등록되었습니다. 이 중 서비스명이 자동 매칭되지 않은 ${unmatchedServiceCount}건은 메모에 원문을 남겨뒀으니 이슈 리스트에서 확인해주세요.`
         : `${pendingRows.length}건이 일괄 등록되었습니다.`,
+    );
+  }
+
+  function toggleBulkPreviewRow(timestamp: string) {
+    setBulkPreviewSelected((current) => {
+      const next = new Set(current);
+
+      if (next.has(timestamp)) {
+        next.delete(timestamp);
+      } else {
+        next.add(timestamp);
+      }
+
+      return next;
+    });
+  }
+
+  function toggleBulkPreviewSelectAll() {
+    setBulkPreviewSelected((current) =>
+      current.size === bulkPreviewRows.length
+        ? new Set()
+        : new Set(bulkPreviewRows.map((row) => row.timestamp)),
+    );
+  }
+
+  function cancelBulkPreview() {
+    setBulkPreviewRows([]);
+    setBulkPreviewSelected(new Set());
+    setBulkPreviewSkippedCount(0);
+  }
+
+  function confirmBulkImport() {
+    const rowsToImport = bulkPreviewRows.filter((row) =>
+      bulkPreviewSelected.has(row.timestamp),
+    );
+
+    if (rowsToImport.length === 0) {
+      return;
+    }
+
+    let unmatchedServiceCount = 0;
+    const createdIds: string[] = [];
+
+    for (const row of rowsToImport) {
+      const item = sheetRowToIssueItem(row);
+
+      if (item.memo) {
+        unmatchedServiceCount += 1;
+      }
+
+      const createdIssue = addIssue(item);
+      createdIds.push(createdIssue.id);
+    }
+
+    setLastBulkImportBatch(createdIds);
+    setSheetImportPendingCount(
+      bulkPreviewRows.length - rowsToImport.length,
+    );
+    cancelBulkPreview();
+    setMessage(
+      unmatchedServiceCount > 0
+        ? `${rowsToImport.length}건이 일괄 등록되었습니다. 이 중 서비스명이 자동 매칭되지 않은 ${unmatchedServiceCount}건은 메모에 원문을 남겨뒀으니 이슈 리스트에서 확인해주세요.`
+        : `${rowsToImport.length}건이 일괄 등록되었습니다.`,
     );
   }
 
@@ -507,11 +604,21 @@ export function IssueFormPage() {
 
         <div className={styles.sheetImportBanner}>
           <div className={styles.sheetImportHeader}>
-            <span>
+            <span className={styles.sheetImportCount}>
               구글 시트에서 가져오기
               {sheetImportPendingCount !== null
-                ? ` · 남은 ${sheetImportPendingCount}건`
+                ? ` · 총 ${sheetImportPendingCount}건`
                 : ""}
+              {sheetImportPendingCount !== null ? (
+                <button
+                  className={styles.sheetImportDetailButton}
+                  disabled={sheetImportLoading || bulkImportLoading}
+                  type="button"
+                  onClick={openBulkImportPreview}
+                >
+                  상세보기
+                </button>
+              ) : null}
             </span>
             {isSheetImportConfigured ? (
               <div className={styles.sheetImportActions}>
@@ -546,6 +653,74 @@ export function IssueFormPage() {
                 </Button>
                 <Button variant="secondary" onClick={bulkImportAllPendingRows}>
                   전체 일괄 등록
+                </Button>
+              </div>
+            </div>
+          ) : null}
+          {bulkPreviewRows.length > 0 ? (
+            <div className={styles.bulkPreviewPanel}>
+              <div className={styles.bulkPreviewHeader}>
+                <label className={styles.bulkPreviewSelectAll}>
+                  <input
+                    checked={
+                      bulkPreviewSelected.size === bulkPreviewRows.length
+                    }
+                    type="checkbox"
+                    onChange={toggleBulkPreviewSelectAll}
+                  />
+                  전체 선택
+                </label>
+                <span>
+                  {bulkPreviewSelected.size} / {bulkPreviewRows.length}건 선택됨
+                  {bulkPreviewSkippedCount > 0
+                    ? ` · 이미 등록된 ${bulkPreviewSkippedCount}건은 제외됨`
+                    : ""}
+                </span>
+              </div>
+              <div className={styles.bulkPreviewList}>
+                {bulkPreviewRows.map((row) => (
+                  <div className={styles.bulkPreviewRow} key={row.timestamp}>
+                    <label className={styles.bulkPreviewCheckboxLabel}>
+                      <input
+                        checked={bulkPreviewSelected.has(row.timestamp)}
+                        type="checkbox"
+                        onChange={() => toggleBulkPreviewRow(row.timestamp)}
+                      />
+                      <span className={styles.bulkPreviewMeta}>
+                        <strong>{row.authorName || "(작성자 없음)"}</strong>
+                        <span>{row.serviceName || "-"}</span>
+                        <span>{row.platform || "-"}</span>
+                        <span>{row.timestamp.slice(0, 10)}</span>
+                      </span>
+                    </label>
+                    <div className={styles.bulkPreviewDetail}>
+                      {row.path ? (
+                        <p>
+                          <strong>실행 경로</strong> {row.path}
+                        </p>
+                      ) : null}
+                      <p>
+                        <strong>내용</strong> {row.description || "(내용 없음)"}
+                      </p>
+                      {row.attachment ? (
+                        <p>
+                          <strong>첨부</strong> {row.attachment}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.bulkPreviewActions}>
+                <Button variant="ghost" onClick={cancelBulkPreview}>
+                  취소
+                </Button>
+                <Button
+                  disabled={bulkPreviewSelected.size === 0}
+                  variant="primary"
+                  onClick={confirmBulkImport}
+                >
+                  선택한 {bulkPreviewSelected.size}건 등록
                 </Button>
               </div>
             </div>
