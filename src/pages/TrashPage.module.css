@@ -18,7 +18,7 @@
   margin: 0;
   color: #172033;
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .listHeader p {
@@ -38,11 +38,11 @@
   flex-shrink: 0;
   color: #526174;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .listHeader strong {
-  color: #1f6feb;
+  color: #0369a1;
 }
 
 .tableWrap {
@@ -97,7 +97,7 @@
   height: 38px;
   background: #f7f9fc;
   color: #344054;
-  font-weight: 900;
+  font-weight: 700;
   text-align: center;
 }
 
@@ -131,9 +131,9 @@
   min-height: 24px;
   border-radius: 999px;
   background: #eef4ff;
-  color: #1f6feb;
+  color: #0369a1;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.25;
   padding: 4px 9px;
   white-space: nowrap;
@@ -152,7 +152,7 @@
   border: 1px solid #cfd8e6;
   border-radius: 999px;
   color: #344054;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 10px;
 }
 

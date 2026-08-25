@@ -14,14 +14,14 @@
   margin: 0;
   color: #06152b;
   font-size: 28px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .header p {
   margin: 8px 0 0;
   color: #526174;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .periodControl {
@@ -33,7 +33,7 @@
 .periodControl span {
   color: #111827;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .periodControl select {
@@ -71,17 +71,17 @@
 
 .reportHeader h2 {
   margin: 0;
-  border-left: 3px solid #1f6feb;
+  border-left: 3px solid #0369a1;
   color: #172033;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   padding-left: 8px;
 }
 
 .reportHeader span {
   color: #526174;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .tableWrap {
@@ -97,37 +97,57 @@
 }
 
 .reportTable thead th {
-  height: 40px;
+  height: 52px;
   border: 1px solid #c8ced8;
-  background: #d9d9d9;
+  background: #e7ebf2;
   color: #06152b;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 700;
   text-align: center;
+}
+
+.headerLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.headerLabel svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .reportTable th:first-child,
 .reportTable td:first-child {
-  width: 90px;
+  width: 96px;
 }
 
 .reportTable tbody th {
   border: 1px solid #d4d9e2;
+  padding: 26px 14px;
   color: #06152b;
-  font-size: 16px;
-  font-weight: 900;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   text-align: center;
 }
 
 .reportTable td {
-  height: 128px;
   border: 1px solid #d4d9e2;
-  color: #06152b;
-  font-weight: 700;
+  padding: 26px 14px;
   text-align: center;
   vertical-align: middle;
 }
 
-.reportCount {
+.metricCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.metricNumber {
   display: inline-flex;
   align-items: baseline;
   gap: 3px;
@@ -136,15 +156,22 @@
   line-height: 1;
 }
 
-.reportCount strong {
-  font-size: 16px;
-  font-weight: 900;
+.metricNumber strong {
+  font-size: 22px;
+  font-weight: 700;
 }
 
-.reportCount small {
-  font-size: 16px;
-  font-weight: 800;
+.metricNumber small {
+  font-size: 14px;
+  font-weight: 700;
+  color: #526174;
 }
+
+.tone-accent strong { color: #0369a1; }
+.tone-warning strong { color: #b45309; }
+.tone-muted strong { color: #6b7690; }
+.tone-success strong { color: #15803d; }
+.tone-critical strong { color: #b42318; }
 
 .reportTable tbody tr:nth-child(odd) > th,
 .reportTable tbody tr:nth-child(odd) > td {
@@ -153,7 +180,7 @@
 
 .reportTable tbody tr:nth-child(even) > th,
 .reportTable tbody tr:nth-child(even) > td {
-  background: #f8fbff;
+  background: #f5f8fc;
 }
 
 :global(:root[data-theme="dark"]) .reportTable thead th {
@@ -168,9 +195,19 @@
   color: #e5edf7 !important;
 }
 
-:global(:root[data-theme="dark"]) .reportCount {
+:global(:root[data-theme="dark"]) .metricNumber {
   color: #e5edf7;
 }
+
+:global(:root[data-theme="dark"]) .metricNumber small {
+  color: #94a3b8;
+}
+
+:global(:root[data-theme="dark"]) .tone-accent strong { color: #67b3ea; }
+:global(:root[data-theme="dark"]) .tone-warning strong { color: #e3a13c; }
+:global(:root[data-theme="dark"]) .tone-muted strong { color: #94a3b8; }
+:global(:root[data-theme="dark"]) .tone-success strong { color: #59c884; }
+:global(:root[data-theme="dark"]) .tone-critical strong { color: #ef8a80; }
 
 :global(:root[data-theme="dark"]) .reportTable tbody tr:nth-child(odd) > th,
 :global(:root[data-theme="dark"]) .reportTable tbody tr:nth-child(odd) > td {

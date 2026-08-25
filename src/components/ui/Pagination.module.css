@@ -17,7 +17,7 @@
   background: #ffffff;
   color: #344054;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .arrowButton {
@@ -27,14 +27,14 @@
 .arrowButton span {
   display: block;
   font-size: 26px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
   transform: translateY(-1px);
 }
 
 .pageButton:hover:not(:disabled) {
-  border-color: #1f6feb;
-  color: #1f6feb;
+  border-color: #0369a1;
+  color: #0369a1;
 }
 
 .pageButton:disabled {
@@ -49,8 +49,8 @@
 
 .active,
 .active:hover:not(:disabled) {
-  border-color: #1f6feb;
-  background: #1f6feb;
+  border-color: #0369a1;
+  background: #0369a1;
   color: #ffffff;
 }
 

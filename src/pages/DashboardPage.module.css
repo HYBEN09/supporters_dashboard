@@ -26,7 +26,7 @@
 .dateField > span {
   color: #111827;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .filterField select,
@@ -51,7 +51,7 @@
 .dateRange span {
   color: #6b7688;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .resetButton {
@@ -74,7 +74,7 @@
   margin: 0;
   color: #344054;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.45;
 }
 
@@ -102,7 +102,7 @@
 .referenceLink strong {
   color: #475467;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .sheetLinks {
@@ -119,20 +119,20 @@
   border: 1px solid #c7d7ef;
   border-radius: 7px;
   background: #eef6ff;
-  color: #1459b8;
+  color: #035989;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   text-decoration: none;
   padding: 0 10px;
 }
 
 .sheetLinks a:hover {
-  border-color: #1f6feb;
+  border-color: #0369a1;
   background: #dbeafe;
 }
 
 .sheetLinks a:focus-visible {
-  outline: 2px solid #1f6feb;
+  outline: 2px solid #0369a1;
   outline-offset: 2px;
 }
 
@@ -189,10 +189,10 @@
 
 .kpiHeader h2 {
   margin: 0;
-  border-left: 3px solid #1f6feb;
+  border-left: 3px solid #0369a1;
   color: #172033;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   padding-left: 8px;
 }
 
@@ -241,14 +241,14 @@
   margin-bottom: 8px;
   color: #bfdbfe;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .metricModalHeader h2 {
   margin: 0;
   color: #ffffff;
   font-size: 22px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .metricModalClose {
@@ -262,7 +262,7 @@
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -297,14 +297,14 @@
 .metricFormula strong {
   color: #0f2344;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .metricFormula code {
-  color: #1459b8;
+  color: #035989;
   font-family: inherit;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .metricCriteriaSection {
@@ -324,7 +324,7 @@
   border-left: 4px solid #ef4444;
   color: #0f2344;
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 12px 14px 10px;
 }
 
@@ -336,7 +336,7 @@
 .metricCriteriaSection li {
   color: #0f2344;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.6;
 }
 
@@ -353,7 +353,7 @@
   margin: 10px 0 0;
   color: #0f2344;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.6;
 }
 
@@ -369,14 +369,14 @@
   display: block;
   color: #9a4f0f;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .metricNote p {
   margin: 8px 0 0;
   color: #6f3b12;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.6;
 }
 
@@ -497,9 +497,9 @@
   flex: 0 0 auto;
   border-radius: 999px;
   background: #eaf2ff;
-  color: #1f6feb;
+  color: #0369a1;
   font-size: 21px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -508,14 +508,14 @@
   margin-bottom: 5px;
   color: #172033;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .reasonSummaryCard p {
   margin: 0;
   color: #06152b;
   font-size: 18px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.1;
 }
 
@@ -530,7 +530,7 @@
   color: #526174;
   font-size: 11px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .reasonContentGrid {
@@ -555,7 +555,7 @@
   margin: 0 0 14px;
   color: #172033;
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .reasonBars {
@@ -580,14 +580,14 @@
   color: #ffffff;
   font-size: 14px;
   font-style: normal;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .reasonBarRow strong {
   min-width: 0;
   color: #0f2344;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .reasonTrack {
@@ -607,7 +607,7 @@
 .reasonBarRow b {
   color: #06152b;
   font-size: 16px;
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
   text-align: right;
 }
@@ -620,20 +620,20 @@
   background: transparent;
   color: inherit;
   font: inherit;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   padding: 0;
 }
 
 .reasonTableType:hover {
-  color: #1f6feb;
+  color: #0369a1;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .reasonTableType:focus-visible {
   border-radius: 6px;
-  outline: 2px solid #1f6feb;
+  outline: 2px solid #0369a1;
   outline-offset: 3px;
 }
 
@@ -666,7 +666,7 @@
 
 .summaryTable th {
   color: #526174;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .reportTable {
@@ -701,13 +701,13 @@
   border-bottom: 1px solid #e0e8f4;
   color: #0b1730;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .reportTable td:not(:first-child) {
   color: #0f2344;
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .reportTable td:last-child {
@@ -743,7 +743,7 @@
 .totalRow td {
   background: #edf4ff;
   color: #0b1730;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .totalRow td:first-child {
@@ -800,9 +800,43 @@
   border-bottom: 1px solid #d8e0ee;
   color: #0b1730;
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 700;
   text-align: center;
 }
+
+.serviceMetric {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.serviceMetric strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.serviceMetric small {
+  color: #526174;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.serviceMetricAccent { color: #0369a1; }
+.serviceMetricWarning { color: #b45309; }
+.serviceMetricMuted { color: #6b7690; }
+.serviceMetricSuccess { color: #15803d; }
+.serviceMetricCritical { color: #b42318; }
+
+:global(:root[data-theme="dark"]) .serviceMetric small {
+  color: #94a3b8;
+}
+
+:global(:root[data-theme="dark"]) .serviceMetricAccent { color: #67b3ea; }
+:global(:root[data-theme="dark"]) .serviceMetricWarning { color: #e3a13c; }
+:global(:root[data-theme="dark"]) .serviceMetricMuted { color: #94a3b8; }
+:global(:root[data-theme="dark"]) .serviceMetricSuccess { color: #59c884; }
+:global(:root[data-theme="dark"]) .serviceMetricCritical { color: #ef8a80; }
 
 .serviceTable td:first-child {
   color: #0f2344;
@@ -832,7 +866,7 @@
   height: 120px;
   color: #667085;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
 }
 
@@ -855,21 +889,21 @@
 
 .detailHeader h2 {
   margin: 0;
-  border-left: 3px solid #1f6feb;
+  border-left: 3px solid #0369a1;
   color: #172033;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   padding-left: 8px;
 }
 
 .detailHeader span {
   color: #526174;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .detailHeader strong {
-  color: #1f6feb;
+  color: #0369a1;
 }
 
 .detailTableWrap {
@@ -878,16 +912,45 @@
 
 .detailTable {
   width: 100%;
-  min-width: 960px;
+  min-width: 1118px;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: 13px;
+}
+
+.detailDateColumn {
+  width: 104px;
+}
+
+.detailAuthorColumn {
+  width: 92px;
+}
+
+.detailServiceColumn {
+  width: 116px;
+}
+
+.detailPlatformColumn {
+  width: 88px;
+}
+
+.detailStatusColumn {
+  width: 116px;
+}
+
+.detailReasonColumn {
+  width: 152px;
+}
+
+.detailJiraColumn {
+  width: 334px;
 }
 
 .detailTable th {
   height: 40px;
   background: #eef6ff;
   color: #0f2344;
-  font-weight: 900;
+  font-weight: 700;
   text-align: left;
 }
 
@@ -899,7 +962,7 @@
   background: transparent;
   color: #0f2344;
   font: inherit;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   padding: 0;
 }
@@ -911,12 +974,12 @@
 }
 
 .detailSortButton:hover {
-  color: #1f6feb;
+  color: #0369a1;
 }
 
 .detailSortButton:focus-visible {
   border-radius: 4px;
-  outline: 2px solid #1f6feb;
+  outline: 2px solid #0369a1;
   outline-offset: 3px;
 }
 
@@ -929,7 +992,7 @@
 
 .detailTable td {
   color: #0b1730;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .detailTable tbody tr:nth-child(even) {
@@ -941,8 +1004,8 @@
 }
 
 .detailTable a {
-  color: #1f6feb;
-  font-weight: 800;
+  color: #0369a1;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -962,9 +1025,9 @@
   min-height: 24px;
   border-radius: 999px;
   background: #eaf2ff;
-  color: #1f6feb;
+  color: #0369a1;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 9px;
 }
 

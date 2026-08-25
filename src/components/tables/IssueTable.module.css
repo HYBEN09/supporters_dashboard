@@ -15,7 +15,7 @@
   height: 42px;
   background: #f7f9fc;
   color: #526174;
-  font-weight: 900;
+  font-weight: 700;
   text-align: left;
 }
 
@@ -36,9 +36,9 @@
   min-height: 24px;
   border-radius: 999px;
   background: #eef4ff;
-  color: #1f6feb;
+  color: #0369a1;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
   padding: 0 9px;
 }

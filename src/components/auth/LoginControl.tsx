@@ -84,7 +84,7 @@ export function LoginControl() {
           onClick={() => setIsProfileMenuOpen((current) => !current)}
         >
           <span className={styles.avatar} aria-hidden="true">
-            {user.ldapId.slice(0, 2).toUpperCase()}
+            {user.ldapId.slice(0, 1).toUpperCase()}
           </span>
           <span className={styles.profileName}>{user.ldapId}</span>
           <span className={styles.chevron} aria-hidden="true">

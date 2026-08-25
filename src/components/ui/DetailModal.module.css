@@ -64,7 +64,7 @@
   background: transparent;
   color: #dbeafe;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0;
   padding: 0;
 }
@@ -79,7 +79,7 @@
   margin: 0;
   color: #ffffff;
   font-size: 22px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .headerBadges {
@@ -177,18 +177,18 @@
   gap: 6px;
   color: #102a56;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .details dd {
   margin: 0;
   color: #111827;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .details a {
-  color: #1459b8;
+  color: #035989;
   text-decoration: none;
 }
 
@@ -219,7 +219,7 @@
   min-height: 32px;
   color: #334155;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 4px;
 }
 
@@ -239,9 +239,9 @@
   border-radius: 6px;
   border: 1px solid #b5caf7;
   background: #ffffff;
-  color: #1459b8;
+  color: #035989;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   max-width: 100%;
   overflow-wrap: anywhere;
   padding: 0 12px;
@@ -264,7 +264,7 @@
   gap: 5px;
   color: #475569;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .footerActions {
@@ -284,12 +284,12 @@
   background: #ffffff;
   color: #334155;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .utilityButton:hover {
   background: #eef4ff;
-  color: #1459b8;
+  color: #035989;
 }
 
 .editForm {
@@ -322,7 +322,7 @@
 .jiraEditor > span {
   color: #344054;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .jiraEditor label {
@@ -349,9 +349,9 @@
   border: 1px solid #b9c6d8;
   border-radius: 8px;
   background: #ffffff;
-  color: #1459b8;
+  color: #035989;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 12px;
 }
 
@@ -372,7 +372,7 @@
   background: #ede9fe;
   color: #3730a3;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .serviceJiraEditorGroup strong {
@@ -389,7 +389,7 @@
 .editForm span {
   color: #344054;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .editForm input,
@@ -439,7 +439,7 @@
   color: #b42318;
   font-size: 12px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .formActions {
@@ -469,7 +469,7 @@
 }
 
 :global(:root[data-theme="dark"]) .details {
-  border-top-color: #1f6feb;
+  border-top-color: #0369a1;
   background: #111827;
 }
 

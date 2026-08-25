@@ -48,6 +48,14 @@ import {
   getServiceStatus,
 } from "../utils/issueMetrics";
 import { KpiCard } from "../components/dashboard/KpiCard";
+import {
+  IconDelivered,
+  IconFixed,
+  IconNotIssue,
+  IconReported,
+  IconTrendingUp,
+  IconUnfixable,
+} from "../components/dashboard/kpiIcons";
 import { Button } from "../components/ui/Button";
 import { NotIssueReasonHelp } from "../components/ui/NotIssueReasonHelp";
 import { Pagination } from "../components/ui/Pagination";
@@ -502,42 +510,42 @@ export function DashboardPage() {
       <div className={styles.kpiGrid}>
         <KpiCard
           helper="서포터즈 스프린트 내 생성된 건수"
-          icon="▣"
+          icon={<IconReported />}
           label="서포터즈 이슈"
           tone="blue"
           value={`${kpis.totalReports}건`}
         />
         <KpiCard
           helper="검토 후 이슈 아님으로 판정된 건수"
-          icon="⊘"
+          icon={<IconNotIssue />}
           label="이슈 아님"
           tone="gray"
           value={`${kpis.notIssues}건`}
         />
         <KpiCard
           helper="아지트 및 서비스팀에 전달된 건수"
-          icon="!"
+          icon={<IconDelivered />}
           label="최종 전달 건수"
           tone="orange"
           value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
-          icon="✓"
+          icon={<IconFixed />}
           label="수정 완료"
           tone="green"
           value={`${kpis.fixedDeliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 불가한 건수"
-          icon="×"
+          icon={<IconUnfixable />}
           label="수정 불가"
           tone="rose"
           value={`${kpis.unfixableDeliveredIssues}건`}
         />
         <KpiCard
           helper={`최종 전달 이슈 중 수정 완료 비율 (${kpis.fixedDeliveredIssues} / ${kpis.deliveredIssues})`}
-          icon="↗"
+          icon={<IconTrendingUp />}
           label="개선율"
           progressValue={kpis.improvementRate}
           tone="purple"
@@ -753,11 +761,46 @@ export function DashboardPage() {
                   serviceStatus.map((service) => (
                     <tr key={service.serviceName}>
                       <td>{service.serviceName}</td>
-                      <td>{service.supporterIssueCount}건</td>
-                      <td>{service.notIssueCount}건</td>
-                      <td>{service.deliveredIssueCount}건</td>
-                      <td>{service.fixedIssueCount}건</td>
-                      <td>{service.unfixableIssueCount}건</td>
+                      <td>
+                        <span className={styles.serviceMetric}>
+                          <strong className={styles.serviceMetricAccent}>
+                            {service.supporterIssueCount}
+                          </strong>
+                          <small>건</small>
+                        </span>
+                      </td>
+                      <td>
+                        <span className={styles.serviceMetric}>
+                          <strong className={styles.serviceMetricMuted}>
+                            {service.notIssueCount}
+                          </strong>
+                          <small>건</small>
+                        </span>
+                      </td>
+                      <td>
+                        <span className={styles.serviceMetric}>
+                          <strong className={styles.serviceMetricWarning}>
+                            {service.deliveredIssueCount}
+                          </strong>
+                          <small>건</small>
+                        </span>
+                      </td>
+                      <td>
+                        <span className={styles.serviceMetric}>
+                          <strong className={styles.serviceMetricSuccess}>
+                            {service.fixedIssueCount}
+                          </strong>
+                          <small>건</small>
+                        </span>
+                      </td>
+                      <td>
+                        <span className={styles.serviceMetric}>
+                          <strong className={styles.serviceMetricCritical}>
+                            {service.unfixableIssueCount}
+                          </strong>
+                          <small>건</small>
+                        </span>
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -930,6 +973,16 @@ export function DashboardPage() {
         </div>
         <div className={styles.detailTableWrap}>
           <table className={styles.detailTable}>
+            <colgroup>
+              <col className={styles.detailDateColumn} />
+              <col className={styles.detailAuthorColumn} />
+              <col className={styles.detailServiceColumn} />
+              <col className={styles.detailPlatformColumn} />
+              <col className={styles.detailStatusColumn} />
+              <col className={styles.detailStatusColumn} />
+              <col className={styles.detailReasonColumn} />
+              <col className={styles.detailJiraColumn} />
+            </colgroup>
             <thead>
               <tr>
                 <th>

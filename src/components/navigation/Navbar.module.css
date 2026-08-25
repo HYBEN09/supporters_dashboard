@@ -2,8 +2,8 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  border-bottom: 1px solid #dfe5ef;
-  background: #ffffff;
+  border-bottom: 1px solid #035989;
+  background: #0369a1;
 }
 
 .inner {
@@ -20,9 +20,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #081a33;
+  color: #ffffff;
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .brandIcon {
@@ -31,10 +31,10 @@
   height: 24px;
   place-items: center;
   border-radius: 7px;
-  background: #4f6bed;
-  color: #ffffff;
+  background: #ffffff;
+  color: #0369a1;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .nav {
@@ -50,21 +50,21 @@
   padding: 0 16px;
   border-radius: 0;
   border-bottom: 2px solid transparent;
-  color: #344054;
+  color: #d3ebfb;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   text-decoration: none;
 }
 
 .navLink:hover {
   background: transparent;
-  color: #1d2939;
+  color: #ffffff;
 }
 
 .active {
-  border-bottom-color: #1f6feb;
+  border-bottom-color: #ffffff;
   background: transparent;
-  color: #1459b8;
+  color: #ffffff;
 }
 
 .actions {
@@ -78,12 +78,12 @@
   align-items: center;
   gap: 6px;
   height: 32px;
-  border: 1px solid #cfd8e6;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
-  background: #ffffff;
-  color: #344054;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 11px;
 }
 
@@ -96,25 +96,23 @@
   display: inline-flex;
   align-items: center;
   height: 32px;
-  border: 1px solid #cfd8e6;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
-  background: #ffffff;
-  color: #344054;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 14px;
   text-decoration: none;
 }
 
 .trashButton:hover {
-  background: #eef4ff;
-  color: #1459b8;
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .trashButtonActive {
-  border-color: #1f6feb;
-  background: #eaf1ff;
-  color: #1459b8;
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .navBadge {
@@ -126,64 +124,28 @@
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  border: 2px solid #ffffff;
+  border: 2px solid #0369a1;
   border-radius: 999px;
-  background: #1f6feb;
-  color: #ffffff;
+  background: #ffffff;
+  color: #0369a1;
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 4px;
 }
 
 .themeButton:hover {
-  background: #eef4ff;
-  color: #1459b8;
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .themeButton:focus-visible {
-  outline: 2px solid #1f6feb;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
 
 .themeButton span {
-  color: #1f6feb;
-  font-size: 13px;
-  line-height: 1;
-}
-
-.profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.profile strong,
-.profile span {
-  display: block;
-}
-
-.profile strong {
-  color: #172033;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.profile span {
-  margin-top: 2px;
-  color: #6b7688;
-  font-size: 12px;
-}
-
-.avatar {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  border-radius: 50%;
-  background: #1f6feb;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 900;
+  line-height: 1;
 }
 
 :global(:root[data-theme="dark"]) .header {
@@ -193,6 +155,11 @@
 
 :global(:root[data-theme="dark"]) .brand {
   color: #f8fafc;
+}
+
+:global(:root[data-theme="dark"]) .brandIcon {
+  background: #0369a1;
+  color: #ffffff;
 }
 
 :global(:root[data-theme="dark"]) .navLink {
@@ -219,6 +186,14 @@
   color: #bfdbfe;
 }
 
+:global(:root[data-theme="dark"]) .themeButton:focus-visible {
+  outline-color: #60a5fa;
+}
+
+:global(:root[data-theme="dark"]) .themeButton span {
+  color: #7dd3fc;
+}
+
 :global(:root[data-theme="dark"]) .trashButton {
   border-color: #334155;
   background: #1f2937;
@@ -238,14 +213,43 @@
 
 :global(:root[data-theme="dark"]) .navBadge {
   border-color: #111827;
+  background: #0369a1;
+  color: #ffffff;
 }
 
-:global(:root[data-theme="dark"]) .profile strong {
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile strong,
+.profile span {
+  display: block;
+}
+
+.profile strong {
   color: #f8fafc;
+  font-size: 13px;
+  font-weight: 700;
 }
 
-:global(:root[data-theme="dark"]) .profile span {
+.profile span {
+  margin-top: 2px;
   color: #94a3b8;
+  font-size: 12px;
+}
+
+.avatar {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: #0369a1;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 @media (max-width: 900px) {

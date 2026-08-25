@@ -111,6 +111,7 @@ export function IssueFormPage() {
   const { addIssue, deleteIssue, issues } = useIssues();
   const { setSelectedPeriodId } = usePeriod();
   const [message, setMessage] = useState("");
+  const [sheetImportMessage, setSheetImportMessage] = useState("");
   const [formResetKey, setFormResetKey] = useState(0);
   const [pendingDraft, setPendingDraft] = useState<StoredDraft | null>(() =>
     loadStoredDraft(),
@@ -258,7 +259,7 @@ export function IssueFormPage() {
   }
 
   async function importNextSheetRow() {
-    setMessage("");
+    setSheetImportMessage("");
 
     let rows;
 
@@ -268,7 +269,7 @@ export function IssueFormPage() {
       try {
         rows = await fetchSheetReportRows();
       } catch (error) {
-        setMessage(
+        setSheetImportMessage(
           error instanceof Error
             ? error.message
             : "구글 시트에서 가져오는 중 오류가 발생했습니다.",
@@ -281,7 +282,7 @@ export function IssueFormPage() {
       rows = parseSheetRowsFromPastedText(sheetPasteText);
 
       if (rows.length === 0) {
-        setMessage(
+        setSheetImportMessage(
           "붙여넣은 내용에서 제보를 찾지 못했습니다. 시트에서 새 행을 복사해 붙여넣어주세요.",
         );
         return;
@@ -293,7 +294,7 @@ export function IssueFormPage() {
 
     if (!nextRow) {
       setSheetImportPendingCount(0);
-      setMessage("가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 건은 자동으로 건너뛰었습니다)");
+      setSheetImportMessage("가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 건은 자동으로 건너뛰었습니다)");
       return;
     }
 
@@ -315,13 +316,13 @@ export function IssueFormPage() {
 
     setLoadedSheetTimestamp(nextRow.timestamp);
     setSheetImportPendingCount(pendingRows.length);
-    setMessage(
+    setSheetImportMessage(
       "구글 시트에서 제보를 불러왔습니다. 이슈 여부/수정 여부를 확인한 뒤 등록해주세요.",
     );
   }
 
   async function fetchPendingRowsForBulkAction() {
-    setMessage("");
+    setSheetImportMessage("");
 
     let rows;
 
@@ -331,7 +332,7 @@ export function IssueFormPage() {
       try {
         rows = await fetchSheetReportRows();
       } catch (error) {
-        setMessage(
+        setSheetImportMessage(
           error instanceof Error
             ? error.message
             : "구글 시트에서 가져오는 중 오류가 발생했습니다.",
@@ -344,7 +345,7 @@ export function IssueFormPage() {
       rows = parseSheetRowsFromPastedText(sheetPasteText);
 
       if (rows.length === 0) {
-        setMessage(
+        setSheetImportMessage(
           "붙여넣은 내용에서 제보를 찾지 못했습니다. 시트에서 새 행을 복사해 붙여넣어주세요.",
         );
         return null;
@@ -356,7 +357,7 @@ export function IssueFormPage() {
 
     if (pendingRows.length === 0) {
       setSheetImportPendingCount(0);
-      setMessage(
+      setSheetImportMessage(
         skippedCount > 0
           ? `가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 ${skippedCount}건은 건너뛰었습니다)`
           : "가져올 새 제보가 없습니다.",
@@ -418,7 +419,7 @@ export function IssueFormPage() {
 
     setLastBulkImportBatch(createdIds);
     setSheetImportPendingCount(0);
-    setMessage(
+    setSheetImportMessage(
       unmatchedServiceCount > 0
         ? `${pendingRows.length}건이 일괄 등록되었습니다. 이 중 서비스명이 자동 매칭되지 않은 ${unmatchedServiceCount}건은 메모에 원문을 남겨뒀으니 이슈 리스트에서 확인해주세요.`
         : `${pendingRows.length}건이 일괄 등록되었습니다.`,
@@ -481,7 +482,7 @@ export function IssueFormPage() {
       bulkPreviewRows.length - rowsToImport.length,
     );
     cancelBulkPreview();
-    setMessage(
+    setSheetImportMessage(
       unmatchedServiceCount > 0
         ? `${rowsToImport.length}건이 일괄 등록되었습니다. 이 중 서비스명이 자동 매칭되지 않은 ${unmatchedServiceCount}건은 메모에 원문을 남겨뒀으니 이슈 리스트에서 확인해주세요.`
         : `${rowsToImport.length}건이 일괄 등록되었습니다.`,
@@ -506,18 +507,9 @@ export function IssueFormPage() {
       (current) => (current ?? 0) + lastBulkImportBatch.length,
     );
     setLastBulkImportBatch([]);
-    setMessage(
+    setSheetImportMessage(
       "방금 등록한 건들을 휴지통으로 이동했습니다. 필요하면 이슈 리스트 > 휴지통에서 복원할 수 있습니다.",
     );
-  }
-
-  function saveDraft() {
-    const savedAt = saveStoredDraft(getValues());
-
-    if (savedAt) {
-      setDraftSavedAt(savedAt);
-      setMessage("임시 저장되었습니다.");
-    }
   }
 
   function loadPendingDraft() {
@@ -566,7 +558,6 @@ export function IssueFormPage() {
       <div className={styles.page}>
         <header className={styles.pageHeader}>
           <div>
-            <h1>이슈 입력 뷰</h1>
             <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
           </div>
         </header>
@@ -591,7 +582,6 @@ export function IssueFormPage() {
     <div className={styles.page}>
       <header className={styles.pageHeader}>
         <div>
-          <h1>이슈 입력</h1>
           <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
         </div>
       </header>
@@ -725,6 +715,23 @@ export function IssueFormPage() {
               </div>
             </div>
           ) : null}
+          {sheetImportMessage ? (
+            <p className={styles.sheetImportMessage} role="status">
+              {sheetImportMessage}
+            </p>
+          ) : null}
+          {lastBulkImportBatch.length > 0 ? (
+            <p className={styles.sheetImportMessage} role="status">
+              방금 등록한 {lastBulkImportBatch.length}건을 취소하시겠어요?{" "}
+              <button
+                className={styles.inlineUndoButton}
+                type="button"
+                onClick={undoLastBulkImport}
+              >
+                방금 등록한 건 취소
+              </button>
+            </p>
+          ) : null}
         </div>
 
         {pendingDraft ? (
@@ -766,7 +773,7 @@ export function IssueFormPage() {
                   })}
                 />
                 {errors.registeredAt ? (
-                  <em>{errors.registeredAt.message}</em>
+                  <em role="alert">{errors.registeredAt.message}</em>
                 ) : null}
               </label>
 
@@ -776,7 +783,7 @@ export function IssueFormPage() {
                 </span>
                 <input placeholder="예: 김민준" {...register("authorName")} />
                 {errors.authorName ? (
-                  <em>{errors.authorName.message}</em>
+                  <em role="alert">{errors.authorName.message}</em>
                 ) : null}
               </label>
 
@@ -797,7 +804,7 @@ export function IssueFormPage() {
                   ))}
                 </select>
                 {errors.serviceName ? (
-                  <em>{errors.serviceName.message}</em>
+                  <em role="alert">{errors.serviceName.message}</em>
                 ) : null}
               </label>
             </div>
@@ -822,7 +829,9 @@ export function IssueFormPage() {
                     </option>
                   ))}
                 </select>
-                {errors.platform ? <em>{errors.platform.message}</em> : null}
+                {errors.platform ? (
+                  <em role="alert">{errors.platform.message}</em>
+                ) : null}
               </label>
 
               <label className={styles.field}>
@@ -843,7 +852,7 @@ export function IssueFormPage() {
                 </select>
 
                 {errors.issueStatus ? (
-                  <em>{errors.issueStatus.message}</em>
+                  <em role="alert">{errors.issueStatus.message}</em>
                 ) : null}
               </label>
 
@@ -904,6 +913,7 @@ export function IssueFormPage() {
                     <strong>서포터즈</strong>
                     <input
                       placeholder="https://jira.example.com/browse/SUP-..."
+                      type="url"
                       {...register("supporterJiraUrl")}
                     />
                   </label>
@@ -915,6 +925,7 @@ export function IssueFormPage() {
                         <div className={styles.serviceJiraFieldRow}>
                           <input
                             placeholder="https://jira.daumkakao.com/browse/..."
+                            type="url"
                             {...register(`serviceJiraUrls.${index}.value`)}
                           />
                           {serviceJiraFields.length > 1 ? (
@@ -962,17 +973,9 @@ export function IssueFormPage() {
             </label>
           </fieldset>
 
-          {message ? <p className={styles.message}>{message}</p> : null}
-          {lastBulkImportBatch.length > 0 ? (
-            <p className={styles.message}>
-              방금 등록한 {lastBulkImportBatch.length}건을 취소하시겠어요?{" "}
-              <button
-                className={styles.inlineUndoButton}
-                type="button"
-                onClick={undoLastBulkImport}
-              >
-                방금 등록한 건 취소
-              </button>
+          {message ? (
+            <p className={styles.message} role="status">
+              {message}
             </p>
           ) : null}
 
@@ -985,9 +988,6 @@ export function IssueFormPage() {
             <div className={styles.actions}>
               <Button variant="ghost" onClick={resetForm}>
                 초기화
-              </Button>
-              <Button variant="secondary" onClick={saveDraft}>
-                임시 저장
               </Button>
               <Button type="submit" variant="primary">
                 등록

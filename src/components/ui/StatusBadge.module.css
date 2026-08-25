@@ -6,11 +6,11 @@
   height: 26px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .danger {
-  background: #fee4e2;
+  background: #fdeceb;
   color: #b42318;
 }
 
@@ -20,13 +20,13 @@
 }
 
 .success {
-  background: #dcfae6;
-  color: #067647;
+  background: #e7f6ec;
+  color: #15803d;
 }
 
 .warning {
-  background: #fef0c7;
-  color: #b54708;
+  background: #fdf1e3;
+  color: #b45309;
 }
 
 .pending {

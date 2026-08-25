@@ -1,13 +1,18 @@
 .avatar {
   display: grid;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   place-items: center;
   border-radius: 50%;
-  background: #1f6feb;
+  background: #ffffff;
+  color: #0369a1;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+:global(:root[data-theme="dark"]) .avatar {
+  background: #0369a1;
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 900;
 }
 
 .loginControl,
@@ -20,27 +25,37 @@
   align-items: center;
   gap: 8px;
   height: 38px;
-  border: 1px solid #cfd8e6;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
   padding: 0 12px 0 6px;
 }
 
 .profileTrigger:hover {
-  background: #f6f8fb;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.loginControl > button {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.loginControl > button:hover {
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .loginControl > button[aria-expanded="true"],
 .profileTrigger[aria-expanded="true"] {
-  border-color: #1f6feb;
-  background: #eaf1ff;
-  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.16);
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.22);
 }
 
 .profileName {
-  color: #172033;
-  font-size: 13px;
-  font-weight: 900;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .chevron {
@@ -49,7 +64,41 @@
   justify-content: center;
   width: 16px;
   height: 16px;
-  color: #667085;
+  color: #ffffff;
+}
+
+:global(:root[data-theme="dark"]) .profileTrigger {
+  border-color: #334155;
+  background: #1f2937;
+}
+
+:global(:root[data-theme="dark"]) .profileTrigger:hover {
+  background: #243449;
+}
+
+:global(:root[data-theme="dark"]) .loginControl > button {
+  border-color: #334155;
+  background: #1f2937;
+  color: #e5edf7;
+}
+
+:global(:root[data-theme="dark"]) .loginControl > button:hover {
+  background: #243449;
+}
+
+:global(:root[data-theme="dark"]) .loginControl > button[aria-expanded="true"],
+:global(:root[data-theme="dark"]) .profileTrigger[aria-expanded="true"] {
+  border-color: #60a5fa;
+  background: #1e3a5f;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22);
+}
+
+:global(:root[data-theme="dark"]) .profileName {
+  color: #f8fafc;
+}
+
+:global(:root[data-theme="dark"]) .chevron {
+  color: #cbd5e1;
 }
 
 .chevron svg {
@@ -87,7 +136,7 @@
 .profileMenuHeader strong {
   color: #172033;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .profileMenuHeader span {
@@ -100,7 +149,7 @@
   background: transparent;
   color: #344054;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   text-align: left;
   padding: 12px 16px;
 }
@@ -137,7 +186,7 @@
   flex-direction: column;
   gap: 6px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   color: #58677c;
 }
 
@@ -151,7 +200,7 @@
 }
 
 .loginBox input:focus-visible {
-  outline: 2px solid #1f6feb;
+  outline: 2px solid #0369a1;
   outline-offset: 1px;
 }
 
@@ -159,35 +208,11 @@
   margin: 0;
   color: #d92d20;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .loginBox button[type="submit"] {
   width: 100%;
-}
-
-:global(:root[data-theme="dark"]) .profileTrigger {
-  border-color: #334155;
-  background: #1f2937;
-}
-
-:global(:root[data-theme="dark"]) .profileTrigger:hover {
-  background: #243449;
-}
-
-:global(:root[data-theme="dark"]) .loginControl > button[aria-expanded="true"],
-:global(:root[data-theme="dark"]) .profileTrigger[aria-expanded="true"] {
-  border-color: #60a5fa;
-  background: #1e3a5f;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22);
-}
-
-:global(:root[data-theme="dark"]) .profileName {
-  color: #f8fafc;
-}
-
-:global(:root[data-theme="dark"]) .chevron {
-  color: #cbd5e1;
 }
 
 :global(:root[data-theme="dark"]) .profileMenu {

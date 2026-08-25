@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
 import { KpiCard } from "../components/dashboard/KpiCard";
+import {
+  IconDelivered,
+  IconFixed,
+  IconNotIssue,
+  IconReported,
+  IconUnfixable,
+} from "../components/dashboard/kpiIcons";
 import { PERIOD_OPTIONS } from "../data/filterOptions";
 import { useIssues } from "../features/issues/useIssues";
 import { usePeriod } from "../features/period/usePeriod";
@@ -7,12 +14,16 @@ import { filterIssues, getPeriodById } from "../utils/issueFilters";
 import { getMonthlyReportRows } from "../utils/issueMetrics";
 import styles from "./MonthlyReportPage.module.css";
 
-function ReportCount({ value }: { value: number }) {
+type MetricTone = "accent" | "warning" | "muted" | "success" | "critical";
+
+function ReportMetricCell({ value, tone }: { value: number; tone: MetricTone }) {
   return (
-    <span className={styles.reportCount}>
-      <strong>{value}</strong>
-      <small>건</small>
-    </span>
+    <div className={styles.metricCell}>
+      <span className={`${styles.metricNumber} ${styles[`tone-${tone}`]}`}>
+        <strong>{value}</strong>
+        <small>건</small>
+      </span>
+    </div>
   );
 }
 
@@ -95,35 +106,35 @@ export function MonthlyReportPage() {
       <section className={styles.summaryGrid} aria-label="월별 리포트 요약">
         <KpiCard
           helper="서포터즈 스프린트 내 생성된 건수"
-          icon="▣"
+          icon={<IconReported />}
           label="서포터즈 이슈"
           tone="blue"
           value={`${totals.supporterIssues}건`}
         />
         <KpiCard
           helper="검토 후 이슈 아님으로 판정된 건수"
-          icon="⊘"
+          icon={<IconNotIssue />}
           label="이슈 아님"
           tone="gray"
           value={`${totals.notIssues}건`}
         />
         <KpiCard
           helper="아지트 및 서비스팀에 전달된 건수"
-          icon="!"
+          icon={<IconDelivered />}
           label="최종 전달 건수"
           tone="orange"
           value={`${totals.deliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
-          icon="✓"
+          icon={<IconFixed />}
           label="수정 완료"
           tone="green"
           value={`${totals.fixedIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 불가한 건수"
-          icon="×"
+          icon={<IconUnfixable />}
           label="수정 불가"
           tone="rose"
           value={`${totals.unfixableIssues}건`}
@@ -143,11 +154,31 @@ export function MonthlyReportPage() {
             <thead>
               <tr>
                 <th>해당 월</th>
-                <th>서포터즈 이슈</th>
-                <th>최종 전달 이슈</th>
-                <th>이슈 아님</th>
-                <th>수정 완료 이슈</th>
-                <th>수정 불가 이슈</th>
+                <th>
+                  <span className={styles.headerLabel}>
+                    <IconReported /> 서포터즈 이슈
+                  </span>
+                </th>
+                <th>
+                  <span className={styles.headerLabel}>
+                    <IconDelivered /> 최종 전달 이슈
+                  </span>
+                </th>
+                <th>
+                  <span className={styles.headerLabel}>
+                    <IconNotIssue /> 이슈 아님
+                  </span>
+                </th>
+                <th>
+                  <span className={styles.headerLabel}>
+                    <IconFixed /> 수정 완료 이슈
+                  </span>
+                </th>
+                <th>
+                  <span className={styles.headerLabel}>
+                    <IconUnfixable /> 수정 불가 이슈
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -155,19 +186,19 @@ export function MonthlyReportPage() {
                 <tr key={row.month}>
                   <th scope="row">{row.monthLabel}</th>
                   <td>
-                    <ReportCount value={row.supporterIssues} />
+                    <ReportMetricCell tone="accent" value={row.supporterIssues} />
                   </td>
                   <td>
-                    <ReportCount value={row.deliveredIssues} />
+                    <ReportMetricCell tone="warning" value={row.deliveredIssues} />
                   </td>
                   <td>
-                    <ReportCount value={row.notIssues} />
+                    <ReportMetricCell tone="muted" value={row.notIssues} />
                   </td>
                   <td>
-                    <ReportCount value={row.fixedIssues} />
+                    <ReportMetricCell tone="success" value={row.fixedIssues} />
                   </td>
                   <td>
-                    <ReportCount value={row.unfixableIssues} />
+                    <ReportMetricCell tone="critical" value={row.unfixableIssues} />
                   </td>
                 </tr>
               ))}

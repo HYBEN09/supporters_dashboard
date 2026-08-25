@@ -1,7 +1,7 @@
 .card {
   min-height: 178px;
   border: 1px solid #dfe5ef;
-  border-top: 2px solid #1f6feb;
+  border-top: 2px solid #0369a1;
   border-radius: 8px;
   background: #ffffff;
   padding: 17px 18px 18px;
@@ -13,18 +13,21 @@
   height: 28px;
   place-items: center;
   border-radius: 8px;
-  background: #e8f1ff;
-  color: #1f6feb;
-  font-size: 15px;
-  font-weight: 900;
+  background: #e0f0fb;
+  color: #0369a1;
   margin-bottom: 12px;
+}
+
+.icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .label {
   display: block;
   color: #172033;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .card strong {
@@ -32,7 +35,7 @@
   margin-top: 8px;
   color: currentColor;
   font-size: 30px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.1;
 }
 
@@ -60,33 +63,33 @@
 }
 
 .blue {
-  border-top-color: #1f6feb;
+  border-top-color: #0369a1;
   color: #0f172a;
 }
 
 .blue .icon {
-  background: #e8f1ff;
-  color: #1f6feb;
+  background: #e0f0fb;
+  color: #0369a1;
 }
 
 .orange {
-  border-top-color: #f97316;
+  border-top-color: #b45309;
   color: #0f172a;
 }
 
 .orange .icon {
-  background: #fff0e6;
-  color: #f97316;
+  background: #fdf1e3;
+  color: #b45309;
 }
 
 .green {
-  border-top-color: #16875a;
+  border-top-color: #15803d;
   color: #0f172a;
 }
 
 .green .icon {
-  background: #dcfae6;
-  color: #16875a;
+  background: #e7f6ec;
+  color: #15803d;
 }
 
 .purple {
@@ -100,21 +103,21 @@
 }
 
 .gray {
-  border-top-color: #586174;
+  border-top-color: #6b7690;
   color: #0f172a;
 }
 
 .gray .icon {
   background: #eef2f6;
-  color: #586174;
+  color: #6b7690;
 }
 
 .rose {
-  border-top-color: #a8556a;
+  border-top-color: #b42318;
   color: #0f172a;
 }
 
 .rose .icon {
-  background: #f7e8ec;
-  color: #98445a;
+  background: #fdeceb;
+  color: #b42318;
 }

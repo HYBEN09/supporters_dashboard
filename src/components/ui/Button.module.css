@@ -8,16 +8,16 @@
   border: 1px solid transparent;
   border-radius: 6px;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .primary {
-  background: #1f6feb;
+  background: #0369a1;
   color: #ffffff;
 }
 
 .primary:hover {
-  background: #1a5fc8;
+  background: #035989;
 }
 
 .secondary {
@@ -37,4 +37,9 @@
 
 .ghost:hover {
   background: #eef3fa;
+}
+
+.button:focus-visible {
+  outline: 2px solid #0369a1;
+  outline-offset: 2px;
 }

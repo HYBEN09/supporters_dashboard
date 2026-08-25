@@ -6,7 +6,7 @@
   margin: 0;
   color: #081a33;
   font-size: 28px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .header p {
@@ -42,7 +42,7 @@
 .dateField > span {
   color: #111827;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .filterField input,
@@ -68,7 +68,7 @@
 .dateRange span {
   color: #6b7688;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .actions {
@@ -108,32 +108,21 @@
 
 .listHeader h2 {
   margin: 0;
-  border-left: 3px solid #1f6feb;
+  border-left: 3px solid #0369a1;
   color: #172033;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   padding-left: 8px;
 }
 
 .listHeader span {
   color: #526174;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .listHeader strong {
-  color: #1f6feb;
-}
-
-.selectionActions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.selectionActions span {
-  color: #172033;
-  font-weight: 900;
+  color: #0369a1;
 }
 
 .tableWrap {
@@ -146,10 +135,6 @@
   border-collapse: collapse;
   font-size: 13px;
   table-layout: fixed;
-}
-
-.checkboxColumn {
-  width: 40px;
 }
 
 .dateColumn {
@@ -188,7 +173,7 @@
   height: 38px;
   background: #f7f9fc;
   color: #344054;
-  font-weight: 900;
+  font-weight: 700;
   text-align: left;
 }
 
@@ -201,7 +186,7 @@
   background: transparent;
   color: #172033;
   font: inherit;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   padding: 0;
 }
@@ -213,12 +198,12 @@
 }
 
 .sortButton:hover {
-  color: #1f6feb;
+  color: #0369a1;
 }
 
 .sortButton:focus-visible {
   border-radius: 4px;
-  outline: 2px solid #1f6feb;
+  outline: 2px solid #0369a1;
   outline-offset: 3px;
 }
 
@@ -284,8 +269,8 @@
 }
 
 .table a {
-  color: #1f6feb;
-  font-weight: 800;
+  color: #0369a1;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -307,9 +292,9 @@
   min-height: 24px;
   border-radius: 999px;
   background: #eef4ff;
-  color: #1f6feb;
+  color: #0369a1;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.25;
   padding: 4px 9px;
   white-space: nowrap;
@@ -330,7 +315,7 @@
   background: #ffffff;
   color: #344054;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
   padding: 0 10px;
 }
@@ -341,7 +326,7 @@
 
 .detailButton:hover {
   background: #eef4ff;
-  color: #1459b8;
+  color: #035989;
 }
 
 .empty {

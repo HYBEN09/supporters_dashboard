@@ -10,15 +10,8 @@
   margin: 0 0 30px;
 }
 
-.pageHeader h1 {
-  margin: 0;
-  color: #081a33;
-  font-size: 24px;
-  font-weight: 900;
-}
-
 .pageHeader p {
-  margin: 9px 0 0;
+  margin: 0;
   color: #526174;
   font-size: 13px;
 }
@@ -46,11 +39,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid #cfe0ff;
-  background: #f0f6ff;
-  color: #1d4ed8;
+  border-bottom: 1px solid #bcdcee;
+  background: #e0f0fb;
+  color: #0369a1;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 12px 26px;
 }
 
@@ -70,9 +63,9 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-bottom: 1px solid #cfe0ff;
-  background: #f0f6ff;
-  color: #1d4ed8;
+  border-bottom: 1px solid #bcdcee;
+  background: #e0f0fb;
+  color: #0369a1;
   padding: 12px 26px;
 }
 
@@ -81,7 +74,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .sheetImportCount {
@@ -95,17 +88,17 @@
   align-items: center;
   justify-content: center;
   height: 24px;
-  border: 1px solid #a9c3f5;
+  border: 1px solid #9cc9e8;
   border-radius: 6px;
   background: #ffffff;
-  color: #1d4ed8;
+  color: #0369a1;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 0 8px;
 }
 
 .sheetImportDetailButton:hover {
-  background: #e3edff;
+  background: #d5ebf8;
 }
 
 .sheetImportDetailButton:disabled {
@@ -139,7 +132,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border: 1px solid #cfe0ff;
+  border: 1px solid #bcdcee;
   border-radius: 10px;
   background: #ffffff;
   padding: 12px;
@@ -150,7 +143,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .bulkPreviewSelectAll {
@@ -186,7 +179,7 @@
 }
 
 .bulkPreviewCheckboxLabel:hover {
-  background: #f0f6ff;
+  background: #e0f0fb;
 }
 
 .bulkPreviewMeta {
@@ -195,7 +188,7 @@
   gap: 8px;
   align-items: center;
   color: #344054;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -205,7 +198,7 @@
 
 .bulkPreviewDetail {
   border-radius: 8px;
-  background: #f5f8ff;
+  background: #eef6fb;
   color: #344054;
   line-height: 1.5;
   padding: 8px 10px;
@@ -271,7 +264,7 @@
   flex: 1;
   min-height: 44px;
   resize: vertical;
-  border: 1px solid #cfe0ff;
+  border: 1px solid #bcdcee;
   border-radius: 8px;
   background: #ffffff;
   color: #172033;
@@ -293,10 +286,10 @@
 
 .panelHeader h2 {
   margin: 0;
-  border-left: 3px solid #2f6fed;
+  border-left: 3px solid #0369a1;
   color: #172033;
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 700;
   padding-left: 10px;
 }
 
@@ -306,7 +299,7 @@
   background: #fff7f5;
   color: #d04437;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 6px 10px;
 }
 
@@ -327,9 +320,9 @@
   align-items: center;
   width: 100%;
   margin-bottom: 4px;
-  color: #1f6feb;
+  color: #0369a1;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0;
 }
 
@@ -348,10 +341,10 @@
   place-items: center;
   margin-right: 8px;
   border-radius: 50%;
-  background: #1f6feb;
+  background: #0369a1;
   color: #ffffff;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .grid {
@@ -368,7 +361,7 @@
 .field span {
   color: #344054;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .field b {
@@ -376,9 +369,9 @@
 }
 
 .field small {
-  color: #98a2b3;
+  color: #526174;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .field input,
@@ -403,6 +396,13 @@
   line-height: 1.5;
   padding: 14px;
   resize: vertical;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid #0369a1;
+  outline-offset: 1px;
 }
 
 .jiraLinks {
@@ -438,9 +438,9 @@
   border: 1px solid #cfd8e6;
   border-radius: 8px;
   background: #ffffff;
-  color: #2f6fed;
+  color: #0369a1;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   padding: 0 12px;
 }
 
@@ -461,7 +461,7 @@
   background: #e8e4ff;
   color: #4f46e5;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .serviceJiraGroup strong {
@@ -500,11 +500,11 @@
   color: #b42318;
   font-size: 12px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .help {
-  color: #98a2b3;
+  color: #526174;
   font-size: 11px;
   line-height: 1.45;
 }
@@ -530,9 +530,9 @@
   display: block;
   border-radius: 10px;
   background: #f5f7fc;
-  color: #7a8799;
+  color: #526174;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 12px 14px;
 }
 
@@ -543,11 +543,28 @@
   background: #f0fdf4;
   color: #067647;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   padding: 12px;
 }
 
 :global(:root[data-theme="dark"]) .message {
+  border-color: #4f9a78;
+  background: #20372f;
+  color: #c8f3df;
+}
+
+.sheetImportMessage {
+  margin: 0;
+  border: 1px solid #bee3cc;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #067647;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 12px;
+}
+
+:global(:root[data-theme="dark"]) .sheetImportMessage {
   border-color: #4f9a78;
   background: #20372f;
   color: #c8f3df;
@@ -558,7 +575,7 @@
   background: none;
   color: #b42318;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
@@ -573,9 +590,9 @@
 }
 
 .autoSave {
-  color: #98a2b3;
+  color: #526174;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .autoSave::before {
@@ -612,10 +629,6 @@
 
   .pageHeader {
     margin-bottom: 20px;
-  }
-
-  .pageHeader h1 {
-    font-size: 22px;
   }
 
   .panel {

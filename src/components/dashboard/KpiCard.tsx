@@ -1,10 +1,11 @@
+import type { ReactNode } from "react";
 import styles from "./KpiCard.module.css";
 
 type KpiCardProps = {
   label: string;
   value: string | number;
   helper?: string;
-  icon?: string;
+  icon?: ReactNode;
   progressValue?: number;
   tone?: "blue" | "orange" | "green" | "purple" | "gray" | "rose";
 };
