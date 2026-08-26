@@ -556,12 +556,6 @@ export function IssueFormPage() {
   if (!isAuthenticated) {
     return (
       <div className={styles.page}>
-        <header className={styles.pageHeader}>
-          <div>
-            <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
-          </div>
-        </header>
-
         <section className={styles.panel}>
           <AuthGate
             description={
@@ -580,15 +574,12 @@ export function IssueFormPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.pageHeader}>
-        <div>
-          <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
-        </div>
-      </header>
-
       <section className={styles.panel}>
         <div className={styles.panelHeader}>
-          <h2>제보 등록</h2>
+          <div className={styles.panelHeaderTitle}>
+            <h2>제보 등록</h2>
+            <p>서포터즈 제보 내용을 운영 데이터로 등록합니다.</p>
+          </div>
           <span className={styles.requiredGuide}>* 표시는 필수입니다</span>
         </div>
 

@@ -64,16 +64,16 @@ import { StatusBadge } from "../components/ui/StatusBadge";
 import styles from "./DashboardPage.module.css";
 
 const reasonColors = [
-  "#1f6feb",
-  "#12b76a",
-  "#f79009",
-  "#f04438",
-  "#667085",
-  "#ec4899",
-  "#8b5cf6",
-  "#06b6d4",
-  "#14b8a6",
-  "#eab308",
+  "#5b8dd9",
+  "#4caf82",
+  "#e2934f",
+  "#e2685f",
+  "#8b93a1",
+  "#e07fac",
+  "#9b83d9",
+  "#4bb8c4",
+  "#4fb8a0",
+  "#d9b354",
 ];
 const supporterSheetLinks = [
   {

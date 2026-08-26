@@ -81,28 +81,6 @@ export function MonthlyReportPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1>월별 리포트</h1>
-          <p>월별 제보, 전달, 수정 현황을 확인합니다.</p>
-        </div>
-        <label className={styles.periodControl}>
-          <span>기간</span>
-          <select
-            id="monthly-report-period"
-            name="period"
-            value={periodId}
-            onChange={(event) => updatePeriod(event.target.value)}
-          >
-            {PERIOD_OPTIONS.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </header>
-
       <section className={styles.summaryGrid} aria-label="월별 리포트 요약">
         <KpiCard
           helper="서포터즈 스프린트 내 생성된 건수"
@@ -143,11 +121,25 @@ export function MonthlyReportPage() {
 
       <section className={styles.reportPanel}>
         <div className={styles.reportHeader}>
-          <h2>월별 운영 리포트</h2>
-          <span>
-            기준 기간 {period.start.replaceAll("-", ".")} -{" "}
-            {period.end.replaceAll("-", ".")}
-          </span>
+          <div className={styles.reportHeaderTitle}>
+            <h2>월별 운영 리포트</h2>
+            <p>월별 제보, 전달, 수정 현황을 확인합니다.</p>
+          </div>
+          <label className={styles.periodControl}>
+            <span>기간</span>
+            <select
+              id="monthly-report-period"
+              name="period"
+              value={periodId}
+              onChange={(event) => updatePeriod(event.target.value)}
+            >
+              {PERIOD_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         <div className={styles.tableWrap}>
           <table className={styles.reportTable}>
