@@ -12,6 +12,7 @@ import { useAuth } from "../features/auth/useAuth";
 import { useIssues } from "../features/issues/useIssues";
 import { usePeriod } from "../features/period/usePeriod";
 import type { IssueFormValues, IssueItem } from "../types/issue";
+import { getJiraIssueKey, getServiceJiraUrls } from "../utils/formatters";
 import { AuthGate } from "../components/auth/AuthGate";
 import { Button } from "../components/ui/Button";
 import { NotIssueReasonHelp } from "../components/ui/NotIssueReasonHelp";
@@ -355,8 +356,11 @@ export function IssueFormPage() {
     const pendingRows = filterUnimportedRows(rows, issues);
     const skippedCount = rows.length - pendingRows.length;
 
+    // 방금 조회한 결과로 항상 건수를 갱신합니다. 0건일 때만 갱신하면, 이전에 조회했던
+    // 건수가 배너에 그대로 남아 실제 목록과 숫자가 어긋납니다(예: 목록엔 1건인데 "총 8건").
+    setSheetImportPendingCount(pendingRows.length);
+
     if (pendingRows.length === 0) {
-      setSheetImportPendingCount(0);
       setSheetImportMessage(
         skippedCount > 0
           ? `가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 ${skippedCount}건은 건너뛰었습니다)`
@@ -686,6 +690,35 @@ export function IssueFormPage() {
                       {row.attachment ? (
                         <p>
                           <strong>첨부</strong> {row.attachment}
+                        </p>
+                      ) : null}
+                      {row.supporterJiraUrl ? (
+                        <p>
+                          <strong>서포터즈 Jira</strong>{" "}
+                          <a
+                            className={styles.bulkPreviewJiraLink}
+                            href={row.supporterJiraUrl}
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            {getJiraIssueKey(row.supporterJiraUrl)}
+                          </a>
+                        </p>
+                      ) : null}
+                      {getServiceJiraUrls(row.serviceJiraUrl).length > 0 ? (
+                        <p>
+                          <strong>서비스 전달 Jira</strong>{" "}
+                          {getServiceJiraUrls(row.serviceJiraUrl).map((url) => (
+                            <a
+                              className={styles.bulkPreviewJiraLink}
+                              href={url}
+                              key={url}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              {getJiraIssueKey(url)}
+                            </a>
+                          ))}
                         </p>
                       ) : null}
                     </div>

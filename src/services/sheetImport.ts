@@ -20,6 +20,8 @@ export type SheetReportRow = {
   path: string;
   description: string;
   attachment: string;
+  supporterJiraUrl?: string;
+  serviceJiraUrl?: string;
 };
 
 export async function fetchSheetReportRows(): Promise<SheetReportRow[]> {
@@ -189,6 +191,12 @@ export function sheetRowToFormValues(
   row: SheetReportRow,
   defaults: IssueFormValues,
 ): IssueFormValues {
+  const serviceJiraUrls = (row.serviceJiraUrl ?? "")
+    .split("\n")
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .map((value) => ({ value }));
+
   return {
     ...defaults,
     registeredAt: parseTimestampToDate(row.timestamp),
@@ -196,6 +204,9 @@ export function sheetRowToFormValues(
     serviceName: normalizeServiceName(row.serviceName),
     platform: normalizePlatform(row.platform),
     issueStatus: "보류",
+    supporterJiraUrl: row.supporterJiraUrl?.trim() ?? "",
+    serviceJiraUrls:
+      serviceJiraUrls.length > 0 ? serviceJiraUrls : defaults.serviceJiraUrls,
   };
 }
 
@@ -218,5 +229,7 @@ export function sheetRowToIssueItem(
       ? undefined
       : `[시트 서비스명 원문] ${row.serviceName.trim()} (직접 선택 필요)`,
     sheetTimestamp: row.timestamp.trim(),
+    supporterJiraUrl: row.supporterJiraUrl?.trim() || undefined,
+    serviceJiraUrl: row.serviceJiraUrl?.trim() || undefined,
   };
 }

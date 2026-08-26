@@ -50,6 +50,22 @@
   스크립트가 **그 순간 3기(현재 기수) 원본 시트를 직접 열어**, `getFormUrl()`로 실제 폼이
   연결된 탭을 찾아 그 탭의 데이터를 바로 돌려줍니다.
 
+### 월별 정리 탭의 지라 링크 자동 반영
+
+원본(폼 연결) 탭에는 등록일/작성자/서비스명/플랫폼만 있고, 지라 링크는 담당자가 검토 후
+**월별 정리 탭**(`2608월` 등)에 직접 채워 넣습니다. `doGet`은 원본 탭에서 제보를 읽어올 때,
+각 제보의 타임스탬프로 소속 월(예: `2608월`)을 계산해서 **같은 원본 시트 안의 그 월별 정리
+탭을 같이 열어보고**, 같은 타임스탬프를 가진 열의 "서포터즈 지라 링크" / "전달(한/할) 지라
+링크" 값을 찾아 붙여서 돌려줍니다. 아직 월별 정리 탭에 옮겨지지 않았거나 지라 링크가 비어있는
+제보는 그냥 빈 값으로 돌아옵니다 (등록 자체는 그대로 진행되고, 이슈 여부는 여전히 "보류"로
+유지됩니다).
+
+이 매칭은 두 가지를 전제로 합니다.
+- 월별 정리 탭 이름이 `YYMM월` 규칙(타임스탬프 연도/월 두 자리, 예: `2608월`)을 따를 것.
+- 각 탭 A열에 `타임스탬프`, `서포터즈 지라 링크`, `전달...지라 링크`라는 글자가 포함된 라벨
+  행이 있을 것 (정확한 행 번호나 "전달한"/"전달할" 같은 토씨 차이는 상관없이 라벨 텍스트로
+  찾습니다 — 실제로 확인해보니 달마다 행 구성이 조금씩 달랐습니다).
+
 ## 1. 통합 스프레드시트 준비
 
 1. 구글 드라이브에서 **내 드라이브(공유 드라이브 아님)** 에 스프레드시트를 준비합니다.
@@ -85,11 +101,81 @@ const EXCLUDED_SHEET_NAMES = ["장애유형 구성"];
 // 통합 시트 안의 전체이력 탭 이름. 1번에서 만든 탭 이름과 반드시 일치해야 합니다.
 const HISTORY_SHEET_NAME = "전체이력";
 
+// 월별 정리 탭에 지라 키만 텍스트로 적혀 있을 때(하이퍼링크가 아닐 때) 붙일 기본 주소.
+const JIRA_BROWSE_BASE_URL = "https://jira.daumkakao.com/browse/";
+
+// 타임스탬프 셀 값을 항상 같은 형식("yyyy-MM-ddTHH:mm:ss")의 문자열로 만듭니다.
+// 원본 탭은 보통 날짜값이지만, 월별 정리 탭은 값을 옮겨 적는 과정에서 텍스트
+// (예: "2026. 8. 9 오후 6:45:05")로 들어있는 경우가 있어 양쪽을 모두 처리해야
+// 원본 ↔ 월별 탭 매칭이 성립합니다.
+function normalizeTimestamp_(raw, timezone) {
+  if (raw instanceof Date) {
+    return Utilities.formatDate(raw, timezone, "yyyy-MM-dd'T'HH:mm:ss");
+  }
+
+  const text = String(raw).trim();
+
+  if (!text) {
+    return "";
+  }
+
+  // 이미 "2026-08-09T18:45:05" 또는 "2026-08-09 18:45:05" 형태
+  const isoMatch = text.match(
+    /^(\d{4})-(\d{2})-(\d{2})[T ](\d{1,2}):(\d{2})(?::(\d{2}))?/,
+  );
+
+  if (isoMatch) {
+    return (
+      isoMatch[1] +
+      "-" +
+      isoMatch[2] +
+      "-" +
+      isoMatch[3] +
+      "T" +
+      ("0" + isoMatch[4]).slice(-2) +
+      ":" +
+      isoMatch[5] +
+      ":" +
+      (isoMatch[6] || "00")
+    );
+  }
+
+  // 한국 로케일 표시 형태 "2026. 8. 9 오후 6:45:05"
+  const koreanMatch = text.match(
+    /^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})\.?\s*(오전|오후)?\s*(\d{1,2}):(\d{2})(?::(\d{2}))?/,
+  );
+
+  if (koreanMatch) {
+    let hour = Number(koreanMatch[5]);
+
+    if (koreanMatch[4] === "오후" && hour < 12) {
+      hour += 12;
+    }
+
+    if (koreanMatch[4] === "오전" && hour === 12) {
+      hour = 0;
+    }
+
+    return (
+      koreanMatch[1] +
+      "-" +
+      ("0" + koreanMatch[2]).slice(-2) +
+      "-" +
+      ("0" + koreanMatch[3]).slice(-2) +
+      "T" +
+      ("0" + hour).slice(-2) +
+      ":" +
+      koreanMatch[6] +
+      ":" +
+      (koreanMatch[7] || "00")
+    );
+  }
+
+  return text;
+}
+
 function rowToObject_(row, timezone) {
-  const timestamp =
-    row[0] instanceof Date
-      ? Utilities.formatDate(row[0], timezone, "yyyy-MM-dd'T'HH:mm:ss")
-      : String(row[0]);
+  const timestamp = normalizeTimestamp_(row[0], timezone);
 
   return {
     timestamp: timestamp,
@@ -114,7 +200,139 @@ function findLiveResponseSheet_(spreadsheet) {
   return null;
 }
 
-// 대시보드 "가져오기" 버튼이 호출하는 엔드포인트. 현재 기수 시트를 실시간으로 읽어 돌려줍니다.
+// 월별 정리 탭(예: "2608월")의 지라 링크 셀에서 값을 뽑아냅니다.
+// 실제 시트를 확인해보니 이 칸에는 두 가지 형태가 섞여 있습니다.
+//   1) 진짜 하이퍼링크 — 짧은 코드만 보이고 URL이 걸린 형태 (예: ASUPPORTERS-375)
+//   2) 링크 없이 지라 키만 타이핑된 형태 — 파란 밑줄 "서식"만 입혀져 링크처럼 보이지만
+//      실제 링크는 없음 (예: GIFTACCESS-2418)
+// 1번만 처리하면 2번이 전부 빈 값으로 누락되므로, 링크가 없으면 셀 텍스트에서 지라 키처럼
+// 생긴 부분을 찾아 씁니다 (대시보드가 지라 키만 있어도 링크로 만들어 줍니다).
+// "이슈 아님"처럼 지라 키가 아닌 텍스트는 빈 문자열을 돌려줍니다.
+function extractLinkFromCell_(range) {
+  const richText = range.getRichTextValue();
+
+  if (richText) {
+    const wholeCellLink = richText.getLinkUrl();
+
+    if (wholeCellLink) {
+      return wholeCellLink;
+    }
+
+    // 셀 안에 링크가 여러 개 섞여 있는 경우(여러 지라 티켓을 한 셀에 적은 경우) 전부 모읍니다.
+    const links = richText
+      .getRuns()
+      .map(function (run) {
+        return run.getLinkUrl();
+      })
+      .filter(Boolean);
+
+    if (links.length > 0) {
+      return links.join("\n");
+    }
+  }
+
+  // 하이퍼링크가 전혀 없으면 텍스트에서 지라 키를 찾아 전체 URL로 만들어 줍니다.
+  // (키만 넘기면 대시보드가 붙이는 기본 도메인이 실제와 달라 링크가 깨질 수 있어서,
+  //  여기서 확실하게 전체 주소로 만들어 보냅니다.)
+  const text = String(range.getDisplayValue() || "").trim();
+  const keys = text.match(/[A-Z][A-Z0-9]*-\d+/gi);
+
+  if (!keys) {
+    return "";
+  }
+
+  return keys
+    .map(function (key) {
+      return JIRA_BROWSE_BASE_URL + key.toUpperCase();
+    })
+    .join("\n");
+}
+
+// 시트 A열(라벨 열)에서 원하는 행을 찾습니다. 월별 정리 탭은 달마다 행 구성이 조금씩
+// 달라질 수 있어서("이메일 주소" 행이 있다 없다 하는 식), 행 번호를 고정하지 않고 라벨
+// 텍스트로 찾습니다.
+function findRowIndexByLabel_(values, matchesLabel) {
+  for (let i = 0; i < values.length; i++) {
+    const label = values[i][0] ? String(values[i][0]) : "";
+
+    if (matchesLabel(label)) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
+// 제보 하나의 타임스탬프로 소속 월(예: "2608월")을 계산합니다. 월별 정리 탭 이름 규칙과
+// 반드시 일치해야 합니다.
+function getMonthTabName_(timestamp, timezone) {
+  const date = new Date(timestamp);
+
+  if (isNaN(date.getTime())) {
+    return null;
+  }
+
+  return Utilities.formatDate(date, timezone, "yyMM") + "월";
+}
+
+// 월별 정리 탭 하나를 통째로 읽어서 "타임스탬프 → 지라 링크" 조회표를 만듭니다.
+// 월별 정리 탭은 원본 탭과 반대로 행이 항목, 열이 제보 1건씩인 구조입니다.
+function buildJiraLookupForTab_(spreadsheet, tabName) {
+  const lookup = {};
+  const sheet = spreadsheet.getSheetByName(tabName);
+
+  if (!sheet) {
+    return lookup;
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const timestampRow = findRowIndexByLabel_(values, function (label) {
+    return label.indexOf("타임스탬프") !== -1;
+  });
+
+  if (timestampRow === -1) {
+    return lookup;
+  }
+
+  const supporterJiraRow = findRowIndexByLabel_(values, function (label) {
+    return label.indexOf("서포터즈") !== -1 && /지라|jira/i.test(label);
+  });
+  const serviceJiraRow = findRowIndexByLabel_(values, function (label) {
+    return label.indexOf("전달") !== -1 && /지라|jira/i.test(label);
+  });
+  const timezone = spreadsheet.getSpreadsheetTimeZone();
+  const columnCount = values[timestampRow].length;
+
+  for (let col = 1; col < columnCount; col++) {
+    const rawTimestamp = values[timestampRow][col];
+
+    if (!rawTimestamp) {
+      continue;
+    }
+
+    const timestamp = normalizeTimestamp_(rawTimestamp, timezone);
+
+    if (!timestamp) {
+      continue;
+    }
+
+    lookup[timestamp] = {
+      supporterJiraUrl:
+        supporterJiraRow !== -1
+          ? extractLinkFromCell_(sheet.getRange(supporterJiraRow + 1, col + 1))
+          : "",
+      serviceJiraUrl:
+        serviceJiraRow !== -1
+          ? extractLinkFromCell_(sheet.getRange(serviceJiraRow + 1, col + 1))
+          : "",
+    };
+  }
+
+  return lookup;
+}
+
+// 대시보드 "가져오기" 버튼이 호출하는 엔드포인트. 현재 기수 시트를 실시간으로 읽어 돌려주고,
+// 각 제보의 소속 월별 정리 탭에서 지라 링크가 채워져 있으면 같이 붙여서 돌려줍니다.
 function doGet(e) {
   const token = e.parameter.token;
 
@@ -143,6 +361,28 @@ function doGet(e) {
     .map(function (row) {
       return rowToObject_(row, timezone);
     });
+
+  // 같은 월별 탭을 제보마다 반복해서 열어보지 않도록, 요청 하나 안에서만 캐시합니다.
+  const jiraLookupCache = {};
+
+  rows.forEach(function (row) {
+    const tabName = getMonthTabName_(row.timestamp, timezone);
+
+    if (!tabName) {
+      row.supporterJiraUrl = "";
+      row.serviceJiraUrl = "";
+      return;
+    }
+
+    if (!(tabName in jiraLookupCache)) {
+      jiraLookupCache[tabName] = buildJiraLookupForTab_(spreadsheet, tabName);
+    }
+
+    const jira = jiraLookupCache[tabName][row.timestamp];
+
+    row.supporterJiraUrl = jira ? jira.supporterJiraUrl : "";
+    row.serviceJiraUrl = jira ? jira.serviceJiraUrl : "";
+  });
 
   return ContentService.createTextOutput(
     JSON.stringify({ rows: rows }),
@@ -204,6 +444,60 @@ function syncFullHistory() {
   }
 }
 
+// 지라 링크 매칭이 되는지 확인용. Apps Script 편집기에서 이 함수를 선택해 실행하고
+// "실행 로그"를 보면, 월별 탭을 제대로 찾았는지 / 타임스탬프가 매칭됐는지 알 수 있습니다.
+function debugJiraLookup() {
+  const spreadsheet = SpreadsheetApp.openById(CURRENT_COHORT_SPREADSHEET_ID);
+  const timezone = spreadsheet.getSpreadsheetTimeZone();
+  const sheet = findLiveResponseSheet_(spreadsheet);
+
+  if (!sheet) {
+    Logger.log("폼이 연결된 원본 탭을 찾지 못했습니다.");
+    return;
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const rows = values.slice(1).filter(function (row) {
+    return row[0];
+  });
+  const recent = rows.slice(-5); // 최근 5건만 확인
+
+  recent.forEach(function (row) {
+    const timestamp = normalizeTimestamp_(row[0], timezone);
+    const tabName = getMonthTabName_(timestamp, timezone);
+    const monthSheet = tabName ? spreadsheet.getSheetByName(tabName) : null;
+
+    if (!monthSheet) {
+      Logger.log(
+        timestamp + " → 월별 탭 '" + tabName + "' 없음 (탭 이름 규칙 확인 필요)",
+      );
+      return;
+    }
+
+    const lookup = buildJiraLookupForTab_(spreadsheet, tabName);
+    const jira = lookup[timestamp];
+
+    if (!jira) {
+      Logger.log(
+        timestamp +
+          " → '" +
+          tabName +
+          "' 탭에 이 타임스탬프가 없음. 탭에 있는 값들: " +
+          Object.keys(lookup).join(", "),
+      );
+      return;
+    }
+
+    Logger.log(
+      timestamp +
+        " → 서포터즈: " +
+        (jira.supporterJiraUrl || "(빈값)") +
+        " / 전달: " +
+        (jira.serviceJiraUrl || "(빈값)"),
+    );
+  });
+}
+
 // 시트를 열면 상단에 "동기화" 메뉴가 생겨서 수동으로도 새로고침할 수 있습니다.
 function onOpen() {
   SpreadsheetApp.getUi()
@@ -229,7 +523,24 @@ function onOpen() {
    **시간 단위 타이머 (예: 1시간마다)**.
 3. 저장.
 
-## 5. 웹 앱으로 배포 (반드시 "새 배포"로)
+## 5. 웹 앱으로 배포
+
+> **⚠️ 코드를 고쳤는데 대시보드에 반영이 안 될 때 (실제로 겪은 문제)**
+>
+> Apps Script는 **저장만 해서는 웹 앱에 반영되지 않습니다.** 배포를 다시 해야 하고, 여기서
+> 두 방식의 차이가 중요합니다.
+>
+> - **배포 관리 > 편집(연필) > 버전을 "새 버전"으로 > 배포**: **URL이 그대로 유지**되면서 새
+>   코드가 반영됩니다. 이미 "모든 사용자" 접근으로 잘 돌아가는 배포가 있으면 **이 방법을
+>   먼저 쓰세요.** 환경변수를 고칠 필요가 없습니다.
+> - **배포 > 새 배포**: **URL이 새로 생깁니다.** 기존 URL은 계속 예전 코드를 서비스하므로,
+>   이 방법을 쓰면 `.env.local`과 GitHub Actions 시크릿의 `VITE_SHEET_IMPORT_URL`을 **반드시
+>   새 URL로 바꿔야** 합니다. 안 바꾸면 코드를 고쳐도 대시보드는 계속 옛 응답을 받습니다.
+>
+> 반영됐는지 빠르게 확인하려면 브라우저에서 `웹앱URL?token=내토큰`을 열어보고 응답 JSON에
+> `supporterJiraUrl` 필드가 보이는지 확인하세요. 필드 자체가 없으면 아직 예전 코드입니다.
+
+### 처음 배포하는 경우 (반드시 "새 배포"로)
 
 1. 우측 상단 **배포 > 새 배포** 클릭 — 기존 배포가 있어도 **편집(연필 아이콘)이 아니라 새
    배포**를 만들어야 합니다. 편집으로 업데이트하면 예전에 설정된 접근 권한이 그대로 남아
@@ -265,8 +576,13 @@ function onOpen() {
 2. Apps Script 코드에서:
    - `CURRENT_COHORT_SPREADSHEET_ID`를 새 기수 시트 ID로 교체.
    - `ALL_COHORT_SPREADSHEET_IDS` 배열에 새 기수 시트 ID를 추가.
-3. 저장 후 다시 배포할 필요는 없습니다 (같은 배포 URL이 새 코드를 그대로 반영합니다).
+3. 저장한 뒤 **반드시 재배포해야 합니다** — 저장만으로는 웹 앱(`/exec` URL)에 반영되지 않습니다.
+   `배포 관리 > 편집(연필) > 버전: 새 버전 > 배포`로 하면 URL이 유지된 채 새 코드가 반영됩니다.
+   (자세한 내용은 위 5번의 경고 상자 참고. 이 문서에 예전에 "재배포 불필요"라고 적혀 있었는데,
+   실제로는 코드가 반영되지 않아 대시보드가 계속 옛 응답을 받는 문제가 있었습니다.)
 4. `동기화 > 전체이력 새로고침` 메뉴로 한 번 수동 실행해 새 기수 데이터가 들어오는지 확인합니다.
+5. 통합 시트의 `사용방법` 탭에도 같은 내용(재배포 필요)이 반영되어 있는지 확인해주세요 —
+   시트 안 안내문에 "재배포 불필요"라고 적혀 있으면 같이 고쳐야 합니다.
 
 ## 8. 보안 참고
 

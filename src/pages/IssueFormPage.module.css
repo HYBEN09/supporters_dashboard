@@ -205,6 +205,40 @@
   margin-right: 4px;
 }
 
+.bulkPreviewJiraLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  border: 1px solid #bcdcee;
+  border-radius: 999px;
+  background: #e0f0fb;
+  color: #0369a1;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0 8px;
+  margin-right: 4px;
+}
+
+.bulkPreviewJiraLink:hover {
+  border-color: #0369a1;
+  text-decoration: underline;
+}
+
+.bulkPreviewJiraLink:focus-visible {
+  outline: 2px solid #0369a1;
+  outline-offset: 2px;
+}
+
+:global(:root[data-theme="dark"]) .bulkPreviewJiraLink {
+  border-color: #5276a3;
+  background: #243f63;
+  color: #dbeafe;
+}
+
+:global(:root[data-theme="dark"]) .bulkPreviewJiraLink:hover {
+  border-color: #93c5fd;
+}
+
 .bulkPreviewActions {
   display: flex;
   justify-content: flex-end;
