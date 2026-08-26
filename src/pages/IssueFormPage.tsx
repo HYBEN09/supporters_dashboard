@@ -30,6 +30,59 @@ import styles from "./IssueFormPage.module.css";
 const DRAFT_STORAGE_KEY = "supporters-issue-form-draft";
 const AUTO_SAVE_DELAY_MS = 800;
 
+// 시트 제보 한 건의 원문(실행 경로/내용/첨부/Jira)을 보여줍니다. 일괄 등록 미리보기 목록과
+// "가져오기"로 폼에 불러온 제보, 두 곳에서 같은 형태로 씁니다.
+function SheetRowDetail({ row }: { row: SheetReportRow }) {
+  const serviceJiraUrls = getServiceJiraUrls(row.serviceJiraUrl);
+
+  return (
+    <div className={styles.bulkPreviewDetail}>
+      {row.path ? (
+        <p>
+          <strong>실행 경로</strong> {row.path}
+        </p>
+      ) : null}
+      <p>
+        <strong>내용</strong> {row.description || "(내용 없음)"}
+      </p>
+      {row.attachment ? (
+        <p>
+          <strong>첨부</strong> {row.attachment}
+        </p>
+      ) : null}
+      {row.supporterJiraUrl ? (
+        <p>
+          <strong>서포터즈 Jira</strong>{" "}
+          <a
+            className={styles.bulkPreviewJiraLink}
+            href={row.supporterJiraUrl}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {getJiraIssueKey(row.supporterJiraUrl)}
+          </a>
+        </p>
+      ) : null}
+      {serviceJiraUrls.length > 0 ? (
+        <p>
+          <strong>서비스 전달 Jira</strong>{" "}
+          {serviceJiraUrls.map((url) => (
+            <a
+              className={styles.bulkPreviewJiraLink}
+              href={url}
+              key={url}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {getJiraIssueKey(url)}
+            </a>
+          ))}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 type StoredDraft = {
   savedAt: string;
   values: IssueFormValues;
@@ -295,9 +348,15 @@ export function IssueFormPage() {
 
     if (!nextRow) {
       setSheetImportPendingCount(0);
+      cancelBulkPreview();
       setSheetImportMessage("가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 건은 자동으로 건너뛰었습니다)");
       return;
     }
+
+    // 가져오는 즉시 제보 목록(원문/Jira 포함)을 펼쳐서 바로 확인할 수 있게 합니다.
+    setBulkPreviewRows(pendingRows);
+    setBulkPreviewSelected(new Set(pendingRows.map((row) => row.timestamp)));
+    setBulkPreviewSkippedCount(rows.length - pendingRows.length);
 
     const values = sheetRowToFormValues(nextRow, createDefaultValues());
 
@@ -372,20 +431,6 @@ export function IssueFormPage() {
     return { pendingRows, skippedCount };
   }
 
-  async function openBulkImportPreview() {
-    const result = await fetchPendingRowsForBulkAction();
-
-    if (!result) {
-      return;
-    }
-
-    setBulkPreviewRows(result.pendingRows);
-    setBulkPreviewSelected(
-      new Set(result.pendingRows.map((row) => row.timestamp)),
-    );
-    setBulkPreviewSkippedCount(result.skippedCount);
-  }
-
   async function bulkImportAllPendingRows() {
     const result = await fetchPendingRowsForBulkAction();
 
@@ -423,6 +468,14 @@ export function IssueFormPage() {
 
     setLastBulkImportBatch(createdIds);
     setSheetImportPendingCount(0);
+    // 전체를 등록했으므로 폼에 불러와 둔 제보도 이미 등록된 상태입니다. 폼을 비워
+    // 같은 제보를 두 번 등록하는 것을 막습니다.
+    if (loadedSheetTimestamp) {
+      setLoadedSheetTimestamp(null);
+      resetIssueForm();
+    }
+
+    cancelBulkPreview();
     setSheetImportMessage(
       unmatchedServiceCount > 0
         ? `${pendingRows.length}건이 일괄 등록되었습니다. 이 중 서비스명이 자동 매칭되지 않은 ${unmatchedServiceCount}건은 메모에 원문을 남겨뒀으니 이슈 리스트에서 확인해주세요.`
@@ -485,6 +538,16 @@ export function IssueFormPage() {
     setSheetImportPendingCount(
       bulkPreviewRows.length - rowsToImport.length,
     );
+    // 목록에서 방금 등록한 건이 폼에도 불러와져 있으면, 폼을 비워 같은 제보를 두 번
+    // 등록하는 것을 막습니다 (목록이 항상 펼쳐져 있어 실제로 겹치기 쉽습니다).
+    if (
+      loadedSheetTimestamp &&
+      rowsToImport.some((row) => row.timestamp === loadedSheetTimestamp)
+    ) {
+      setLoadedSheetTimestamp(null);
+      resetIssueForm();
+    }
+
     cancelBulkPreview();
     setSheetImportMessage(
       unmatchedServiceCount > 0
@@ -555,6 +618,10 @@ export function IssueFormPage() {
     clearStoredDraft();
     setDraftSavedAt(null);
     setMessage("");
+    // 불러온 시트 제보를 버리는 것이므로 연결도 끊어야 합니다. 그대로 두면 이어서 직접
+    // 입력한 이슈에 이 타임스탬프가 붙어, 정작 등록되지 않은 시트 제보가 "이미 등록됨"으로
+    // 처리되어 다음 가져오기에서 빠집니다.
+    setLoadedSheetTimestamp(null);
   }
 
   if (!isAuthenticated) {
@@ -594,16 +661,6 @@ export function IssueFormPage() {
               {sheetImportPendingCount !== null
                 ? ` · 총 ${sheetImportPendingCount}건`
                 : ""}
-              {sheetImportPendingCount !== null ? (
-                <button
-                  className={styles.sheetImportDetailButton}
-                  disabled={sheetImportLoading || bulkImportLoading}
-                  type="button"
-                  onClick={openBulkImportPreview}
-                >
-                  상세보기
-                </button>
-              ) : null}
             </span>
             {isSheetImportConfigured ? (
               <div className={styles.sheetImportActions}>
@@ -678,50 +735,7 @@ export function IssueFormPage() {
                         <span>{row.timestamp.slice(0, 10)}</span>
                       </span>
                     </label>
-                    <div className={styles.bulkPreviewDetail}>
-                      {row.path ? (
-                        <p>
-                          <strong>실행 경로</strong> {row.path}
-                        </p>
-                      ) : null}
-                      <p>
-                        <strong>내용</strong> {row.description || "(내용 없음)"}
-                      </p>
-                      {row.attachment ? (
-                        <p>
-                          <strong>첨부</strong> {row.attachment}
-                        </p>
-                      ) : null}
-                      {row.supporterJiraUrl ? (
-                        <p>
-                          <strong>서포터즈 Jira</strong>{" "}
-                          <a
-                            className={styles.bulkPreviewJiraLink}
-                            href={row.supporterJiraUrl}
-                            rel="noreferrer"
-                            target="_blank"
-                          >
-                            {getJiraIssueKey(row.supporterJiraUrl)}
-                          </a>
-                        </p>
-                      ) : null}
-                      {getServiceJiraUrls(row.serviceJiraUrl).length > 0 ? (
-                        <p>
-                          <strong>서비스 전달 Jira</strong>{" "}
-                          {getServiceJiraUrls(row.serviceJiraUrl).map((url) => (
-                            <a
-                              className={styles.bulkPreviewJiraLink}
-                              href={url}
-                              key={url}
-                              rel="noreferrer"
-                              target="_blank"
-                            >
-                              {getJiraIssueKey(url)}
-                            </a>
-                          ))}
-                        </p>
-                      ) : null}
-                    </div>
+                    <SheetRowDetail row={row} />
                   </div>
                 ))}
               </div>
