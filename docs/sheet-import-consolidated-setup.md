@@ -200,6 +200,11 @@ function findLiveResponseSheet_(spreadsheet) {
   return null;
 }
 
+// 셀에 보이는 그대로의 글자를 돌려줍니다 (링크든 일반 텍스트든).
+function getCellText_(range) {
+  return String(range.getDisplayValue() || "").trim();
+}
+
 // 월별 정리 탭(예: "2608월")의 지라 링크 셀에서 값을 뽑아냅니다.
 // 실제 시트를 확인해보니 이 칸에는 두 가지 형태가 섞여 있습니다.
 //   1) 진짜 하이퍼링크 — 짧은 코드만 보이고 URL이 걸린 형태 (예: ASUPPORTERS-375)
@@ -316,15 +321,20 @@ function buildJiraLookupForTab_(spreadsheet, tabName) {
       continue;
     }
 
+    const supporterCell =
+      supporterJiraRow !== -1
+        ? sheet.getRange(supporterJiraRow + 1, col + 1)
+        : null;
+    const serviceCell =
+      serviceJiraRow !== -1 ? sheet.getRange(serviceJiraRow + 1, col + 1) : null;
+
     lookup[timestamp] = {
-      supporterJiraUrl:
-        supporterJiraRow !== -1
-          ? extractLinkFromCell_(sheet.getRange(supporterJiraRow + 1, col + 1))
-          : "",
-      serviceJiraUrl:
-        serviceJiraRow !== -1
-          ? extractLinkFromCell_(sheet.getRange(serviceJiraRow + 1, col + 1))
-          : "",
+      supporterJiraUrl: supporterCell ? extractLinkFromCell_(supporterCell) : "",
+      serviceJiraUrl: serviceCell ? extractLinkFromCell_(serviceCell) : "",
+      // 링크가 아닌 원문 텍스트도 같이 넘깁니다. 전달 칸에 "이슈 아님", "-" 처럼 적어두는
+      // 경우가 있어서, 대시보드가 이슈 여부를 자동 분류하려면 이 값이 필요합니다.
+      supporterJiraText: supporterCell ? getCellText_(supporterCell) : "",
+      serviceJiraText: serviceCell ? getCellText_(serviceCell) : "",
     };
   }
 
@@ -371,6 +381,8 @@ function doGet(e) {
     if (!tabName) {
       row.supporterJiraUrl = "";
       row.serviceJiraUrl = "";
+      row.supporterJiraText = "";
+      row.serviceJiraText = "";
       return;
     }
 
@@ -382,6 +394,8 @@ function doGet(e) {
 
     row.supporterJiraUrl = jira ? jira.supporterJiraUrl : "";
     row.serviceJiraUrl = jira ? jira.serviceJiraUrl : "";
+    row.supporterJiraText = jira ? jira.supporterJiraText : "";
+    row.serviceJiraText = jira ? jira.serviceJiraText : "";
   });
 
   return ContentService.createTextOutput(
@@ -491,9 +505,14 @@ function debugJiraLookup() {
     Logger.log(
       timestamp +
         " → 서포터즈: " +
-        (jira.supporterJiraUrl || "(빈값)") +
-        " / 전달: " +
-        (jira.serviceJiraUrl || "(빈값)"),
+        (jira.supporterJiraUrl || "(링크없음)") +
+        " [원문: " +
+        (jira.supporterJiraText || "(빈칸)") +
+        "] / 전달: " +
+        (jira.serviceJiraUrl || "(링크없음)") +
+        " [원문: " +
+        (jira.serviceJiraText || "(빈칸)") +
+        "]",
     );
   });
 }

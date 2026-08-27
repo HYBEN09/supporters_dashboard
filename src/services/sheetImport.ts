@@ -1,5 +1,12 @@
 import { ISSUE_FORM_SERVICE_OPTIONS } from "../data/filterOptions";
-import type { IssueFormValues, IssueItem, Platform, ServiceName } from "../types/issue";
+import type {
+  FixStatus,
+  IssueFormValues,
+  IssueItem,
+  IssueStatus,
+  Platform,
+  ServiceName,
+} from "../types/issue";
 
 const SHEET_IMPORT_URL = (
   import.meta.env.VITE_SHEET_IMPORT_URL as string | undefined
@@ -22,6 +29,10 @@ export type SheetReportRow = {
   attachment: string;
   supporterJiraUrl?: string;
   serviceJiraUrl?: string;
+  // 지라 칸의 원문 텍스트. 링크 대신 "이슈 아님", "-" 처럼 적어두는 경우가 있어서
+  // 이슈 여부를 자동 분류하려면 링크와 별개로 이 값이 필요합니다.
+  supporterJiraText?: string;
+  serviceJiraText?: string;
 };
 
 export async function fetchSheetReportRows(): Promise<SheetReportRow[]> {
@@ -187,6 +198,42 @@ function normalizePlatform(raw: string): Platform {
   return "기타";
 }
 
+// 전달 칸에 링크 대신 적어두는 "이슈 아님" 계열 표기.
+const NOT_ISSUE_TEXT_PATTERN = /^(이슈\s*아님|아님|해당\s*없음|없음|[-–—xX])$/;
+
+function isNotIssueText(value?: string) {
+  return NOT_ISSUE_TEXT_PATTERN.test((value ?? "").trim());
+}
+
+// 월별 정리 탭의 지라 두 칸으로 이슈 여부를 추정합니다.
+//  - 서포터즈 링크가 없으면 아직 검토 전이므로 "보류"
+//  - 서포터즈/전달 링크가 모두 있으면 서비스팀까지 전달된 것이므로 "이슈"
+//  - 서포터즈 링크는 있는데 전달 칸에 "이슈 아님"/"-" 같은 표기가 있으면 "이슈 아님"
+//  - 서포터즈 링크만 있고 전달 칸이 비어 있으면 아직 전달 전이므로 "보류"
+export function classifyIssueStatus(row: SheetReportRow): IssueStatus {
+  const hasSupporterJira = Boolean(row.supporterJiraUrl?.trim());
+  const hasServiceJira = Boolean(row.serviceJiraUrl?.trim());
+
+  if (!hasSupporterJira) {
+    return "보류";
+  }
+
+  if (hasServiceJira) {
+    return "이슈";
+  }
+
+  if (isNotIssueText(row.serviceJiraText)) {
+    return "이슈 아님";
+  }
+
+  return "보류";
+}
+
+// 이슈로 분류된 건만 "수정 필요"로 시작하고, 나머지는 수정 여부를 쓰지 않습니다.
+function defaultFixStatusFor(issueStatus: IssueStatus): FixStatus {
+  return issueStatus === "이슈" ? "수정 필요" : "-";
+}
+
 export function sheetRowToFormValues(
   row: SheetReportRow,
   defaults: IssueFormValues,
@@ -197,13 +244,16 @@ export function sheetRowToFormValues(
     .filter(Boolean)
     .map((value) => ({ value }));
 
+  const issueStatus = classifyIssueStatus(row);
+
   return {
     ...defaults,
     registeredAt: parseTimestampToDate(row.timestamp),
     authorName: row.authorName.trim(),
     serviceName: normalizeServiceName(row.serviceName),
     platform: normalizePlatform(row.platform),
-    issueStatus: "보류",
+    issueStatus,
+    fixStatus: defaultFixStatusFor(issueStatus),
     supporterJiraUrl: row.supporterJiraUrl?.trim() ?? "",
     serviceJiraUrls:
       serviceJiraUrls.length > 0 ? serviceJiraUrls : defaults.serviceJiraUrls,
@@ -216,6 +266,7 @@ export function sheetRowToIssueItem(
   row: SheetReportRow,
 ): Omit<IssueItem, "id"> {
   const normalizedService = normalizeServiceName(row.serviceName);
+  const issueStatus = classifyIssueStatus(row);
 
   return {
     registeredAt: parseTimestampToDate(row.timestamp),
@@ -223,8 +274,8 @@ export function sheetRowToIssueItem(
     serviceName: normalizedService || "카카오톡",
     platform: normalizePlatform(row.platform),
     path: "-",
-    issueStatus: "보류",
-    fixStatus: "-",
+    issueStatus,
+    fixStatus: defaultFixStatusFor(issueStatus),
     memo: normalizedService
       ? undefined
       : `[시트 서비스명 원문] ${row.serviceName.trim()} (직접 선택 필요)`,
