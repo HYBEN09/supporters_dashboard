@@ -575,7 +575,7 @@ function DetailModalContent({
               <label>
                 <strong>서포터즈</strong>
                 <input
-                  placeholder="https://jira.example.com/browse/SUP-..."
+                  placeholder="https://jira.daumkakao.com/browse/ASUPPORTERS-..."
                   {...register("supporterJiraUrl")}
                 />
               </label>

@@ -8,24 +8,20 @@ export function formatDate(value: string) {
   return value.replaceAll("-", ".");
 }
 
+// 지라 티켓 주소의 공통 앞부분. 서포터즈 지라와 서비스 전달 지라가 같은 서버를 쓰므로
+// 하나로 관리합니다. 예전에는 두 함수가 각자 주소를 들고 있었고 서포터즈 쪽만
+// jira.example.com(존재하지 않는 주소)이라, 티켓 키만 입력하면 링크가 죽어 있었습니다.
+const JIRA_BROWSE_BASE_URL = "https://jira.daumkakao.com/browse/";
+
+// 전체 URL이면 그대로 쓰고, 티켓 키만 있으면 주소를 붙여 완성합니다.
 export function createJiraUrl(jiraKey?: string) {
-  if (!jiraKey) {
+  const value = jiraKey?.trim();
+
+  if (!value) {
     return "";
   }
 
-  return jiraKey.startsWith("http")
-    ? jiraKey
-    : `https://jira.example.com/browse/${jiraKey}`;
-}
-
-export function createServiceJiraUrl(jiraKey?: string) {
-  if (!jiraKey) {
-    return "";
-  }
-
-  return jiraKey.startsWith("http")
-    ? jiraKey
-    : `https://jira.daumkakao.com/browse/${jiraKey}`;
+  return value.startsWith("http") ? value : `${JIRA_BROWSE_BASE_URL}${value}`;
 }
 
 export function getJiraIssueKey(value?: string) {
@@ -84,7 +80,7 @@ export function getIssueJiraLinks(issue: IssueItem) {
         id: `service-${index}`,
         kind: "service" as const,
         label: getJiraIssueKey(jiraValue) || "서비스 전달",
-        url: createServiceJiraUrl(jiraValue),
+        url: createJiraUrl(jiraValue),
         text: jiraValue,
       });
     });
@@ -93,7 +89,7 @@ export function getIssueJiraLinks(issue: IssueItem) {
       id: "service-0",
       kind: "service" as const,
       label: getJiraIssueKey(issue.jiraKey) || "서비스 전달",
-      url: createServiceJiraUrl(issue.jiraKey),
+      url: createJiraUrl(issue.jiraKey),
       text: issue.jiraKey,
     });
   }
