@@ -21,7 +21,9 @@ export function Navbar() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <div className={styles.brand}>
-          <span className={styles.brandIcon}>✓</span>
+          <span aria-hidden="true" className={styles.brandIcon}>
+            ✓
+          </span>
           서포터즈 제보 관리
         </div>
         <nav className={styles.nav} aria-label="주요 메뉴">

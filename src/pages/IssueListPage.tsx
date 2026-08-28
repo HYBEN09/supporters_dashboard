@@ -33,6 +33,13 @@ import {
 } from "../utils/issueFilters";
 import { getKpis } from "../utils/issueMetrics";
 import { KpiCard } from "../components/dashboard/KpiCard";
+import {
+  IconDelivered,
+  IconFixed,
+  IconNotIssue,
+  IconReported,
+  IconUnfixable,
+} from "../components/dashboard/kpiIcons";
 import { Button } from "../components/ui/Button";
 import { DetailModal } from "../components/ui/DetailModal";
 import { Pagination } from "../components/ui/Pagination";
@@ -407,35 +414,35 @@ export function IssueListPage() {
       <div className={styles.summaryGrid}>
         <KpiCard
           helper="서포터즈 스프린트 내 생성된 건수"
-          icon="▣"
+          icon={<IconReported />}
           label="서포터즈 이슈"
           tone="blue"
           value={`${kpis.totalReports}건`}
         />
         <KpiCard
           helper="검토 후 이슈 아님으로 판정된 건수"
-          icon="⊘"
+          icon={<IconNotIssue />}
           label="이슈 아님"
           tone="gray"
           value={`${kpis.notIssues}건`}
         />
         <KpiCard
           helper="아지트 및 서비스팀에 전달된 건수"
-          icon="!"
+          icon={<IconDelivered />}
           label="최종 전달 건수"
           tone="orange"
           value={`${kpis.deliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 완료된 건수"
-          icon="✓"
+          icon={<IconFixed />}
           label="수정 완료"
           tone="green"
           value={`${kpis.fixedDeliveredIssues}건`}
         />
         <KpiCard
           helper="전달 이슈 중 수정이 불가한 건수"
-          icon="×"
+          icon={<IconUnfixable />}
           label="수정 불가"
           tone="rose"
           value={`${kpis.unfixableDeliveredIssues}건`}

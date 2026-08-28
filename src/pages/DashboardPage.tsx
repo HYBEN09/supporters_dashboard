@@ -841,7 +841,9 @@ export function DashboardPage() {
           <div className={styles.reasonAnalysis}>
             <div className={styles.reasonSummaryGrid}>
               <article className={styles.reasonSummaryCard}>
-                <span className={styles.reasonSummaryIcon}>▣</span>
+                <span aria-hidden="true" className={styles.reasonSummaryIcon}>
+                  ▣
+                </span>
                 <div>
                   <strong>전체 건수</strong>
                   <p>
@@ -851,7 +853,9 @@ export function DashboardPage() {
                 </div>
               </article>
               <article className={styles.reasonSummaryCard}>
-                <span className={styles.reasonSummaryIcon}>★</span>
+                <span aria-hidden="true" className={styles.reasonSummaryIcon}>
+                  ★
+                </span>
                 <div>
                   <strong>최다 유형</strong>
                   <p>{topNotIssueReason?.reason ?? "-"}</p>
