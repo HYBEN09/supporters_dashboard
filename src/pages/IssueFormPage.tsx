@@ -183,7 +183,6 @@ export function IssueFormPage() {
   const [bulkPreviewSelected, setBulkPreviewSelected] = useState<
     Set<string>
   >(new Set());
-  const [bulkPreviewSkippedCount, setBulkPreviewSkippedCount] = useState(0);
   const [sheetImportPendingCount, setSheetImportPendingCount] = useState<
     number | null
   >(null);
@@ -356,7 +355,6 @@ export function IssueFormPage() {
     // 가져오는 즉시 제보 목록(원문/Jira 포함)을 펼쳐서 바로 확인할 수 있게 합니다.
     setBulkPreviewRows(pendingRows);
     setBulkPreviewSelected(new Set(pendingRows.map((row) => row.timestamp)));
-    setBulkPreviewSkippedCount(rows.length - pendingRows.length);
 
     const values = sheetRowToFormValues(nextRow, createDefaultValues());
 
@@ -413,22 +411,17 @@ export function IssueFormPage() {
     }
 
     const pendingRows = filterUnimportedRows(rows, issues);
-    const skippedCount = rows.length - pendingRows.length;
 
     // 방금 조회한 결과로 항상 건수를 갱신합니다. 0건일 때만 갱신하면, 이전에 조회했던
     // 건수가 배너에 그대로 남아 실제 목록과 숫자가 어긋납니다(예: 목록엔 1건인데 "총 8건").
     setSheetImportPendingCount(pendingRows.length);
 
     if (pendingRows.length === 0) {
-      setSheetImportMessage(
-        skippedCount > 0
-          ? `가져올 새 제보가 없습니다. (이미 이슈 리스트에 있는 ${skippedCount}건은 건너뛰었습니다)`
-          : "가져올 새 제보가 없습니다.",
-      );
+      setSheetImportMessage("가져올 새 제보가 없습니다.");
       return null;
     }
 
-    return { pendingRows, skippedCount };
+    return { pendingRows };
   }
 
   async function bulkImportAllPendingRows() {
@@ -438,14 +431,10 @@ export function IssueFormPage() {
       return;
     }
 
-    const { pendingRows, skippedCount } = result;
+    const { pendingRows } = result;
 
     const confirmed = window.confirm(
-      `${pendingRows.length}건을 이슈 여부 "보류"로 한꺼번에 등록합니다.${
-        skippedCount > 0
-          ? ` (이미 이슈 리스트에 있는 것으로 보이는 ${skippedCount}건은 자동으로 제외했습니다)`
-          : ""
-      } 등록 후 목록에서 메모 등 나머지 항목을 입력해주세요. 계속할까요?`,
+      `${pendingRows.length}건을 한꺼번에 등록합니다. 등록 후 목록에서 메모 등 나머지 항목을 입력해주세요. 계속할까요?`,
     );
 
     if (!confirmed) {
@@ -508,7 +497,6 @@ export function IssueFormPage() {
   function cancelBulkPreview() {
     setBulkPreviewRows([]);
     setBulkPreviewSelected(new Set());
-    setBulkPreviewSkippedCount(0);
   }
 
   function confirmBulkImport() {
@@ -714,9 +702,6 @@ export function IssueFormPage() {
                 </label>
                 <span>
                   {bulkPreviewSelected.size} / {bulkPreviewRows.length}건 선택됨
-                  {bulkPreviewSkippedCount > 0
-                    ? ` · 이미 등록된 ${bulkPreviewSkippedCount}건은 제외됨`
-                    : ""}
                 </span>
               </div>
               <div className={styles.bulkPreviewList}>
