@@ -526,7 +526,7 @@ export function IssueListPage() {
                           {getIssueJiraLinks(issue).map((link) => (
                             <a
                               href={link.url}
-                              key={`${link.label}-${link.url}`}
+                              key={link.id}
                               rel="noreferrer"
                               target="_blank"
                             >

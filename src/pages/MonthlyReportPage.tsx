@@ -153,12 +153,12 @@ export function MonthlyReportPage() {
                 </th>
                 <th>
                   <span className={styles.headerLabel}>
-                    <IconDelivered /> 최종 전달 이슈
+                    <IconNotIssue /> 이슈 아님
                   </span>
                 </th>
                 <th>
                   <span className={styles.headerLabel}>
-                    <IconNotIssue /> 이슈 아님
+                    <IconDelivered /> 최종 전달 이슈
                   </span>
                 </th>
                 <th>
@@ -181,10 +181,10 @@ export function MonthlyReportPage() {
                     <ReportMetricCell tone="accent" value={row.supporterIssues} />
                   </td>
                   <td>
-                    <ReportMetricCell tone="warning" value={row.deliveredIssues} />
+                    <ReportMetricCell tone="muted" value={row.notIssues} />
                   </td>
                   <td>
-                    <ReportMetricCell tone="muted" value={row.notIssues} />
+                    <ReportMetricCell tone="warning" value={row.deliveredIssues} />
                   </td>
                   <td>
                     <ReportMetricCell tone="success" value={row.fixedIssues} />

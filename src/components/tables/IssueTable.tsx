@@ -55,7 +55,7 @@ export function IssueTable({
                         <a
                           className={styles.link}
                           href={link.url}
-                          key={`${link.label}-${link.url}`}
+                          key={link.id}
                           rel="noreferrer"
                           target="_blank"
                         >

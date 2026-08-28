@@ -58,6 +58,9 @@ export function getServiceJiraUrls(value?: string) {
     .filter(Boolean);
 }
 
+// 각 링크에는 목록 안에서 유일한 id를 붙입니다. 서포터즈 지라와 서비스 전달 지라에 같은
+// 티켓이 들어가는 경우가 실제로 있어서(예: ASUPPORTERS-374), 라벨이나 URL로 key를 만들면
+// 중복돼 React가 링크 하나를 빠뜨리거나 중복 렌더링할 수 있습니다.
 export function getIssueJiraLinks(issue: IssueItem) {
   const links = [];
 
@@ -65,6 +68,7 @@ export function getIssueJiraLinks(issue: IssueItem) {
     const jiraValue = issue.supporterJiraUrl ?? issue.jiraKey ?? "";
 
     links.push({
+      id: "supporter",
       kind: "supporter" as const,
       label: getJiraIssueKey(jiraValue) || "서포터즈",
       url: createJiraUrl(jiraValue),
@@ -75,8 +79,9 @@ export function getIssueJiraLinks(issue: IssueItem) {
   const serviceJiraUrls = getServiceJiraUrls(issue.serviceJiraUrl);
 
   if (serviceJiraUrls.length > 0) {
-    serviceJiraUrls.forEach((jiraValue) => {
+    serviceJiraUrls.forEach((jiraValue, index) => {
       links.push({
+        id: `service-${index}`,
         kind: "service" as const,
         label: getJiraIssueKey(jiraValue) || "서비스 전달",
         url: createServiceJiraUrl(jiraValue),
@@ -85,6 +90,7 @@ export function getIssueJiraLinks(issue: IssueItem) {
     });
   } else if (issue.jiraKey) {
     links.push({
+      id: "service-0",
       kind: "service" as const,
       label: getJiraIssueKey(issue.jiraKey) || "서비스 전달",
       url: createServiceJiraUrl(issue.jiraKey),

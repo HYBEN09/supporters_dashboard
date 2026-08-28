@@ -471,7 +471,9 @@ export function DashboardPage() {
           </Button>
         </div>
         <div className={styles.filterMeta}>
-          <p className={styles.referenceLink}>
+          {/* 안에 링크 묶음(div)이 들어가므로 p가 아니라 div여야 합니다. p 안에는 div를
+              넣을 수 없어서, 브라우저가 p를 임의로 닫아버려 레이아웃이 깨질 수 있습니다. */}
+          <div className={styles.referenceLink}>
             <span aria-hidden="true">
               <svg fill="none" viewBox="0 0 24 24">
                 <path d="M14 4h6v6" />
@@ -492,7 +494,7 @@ export function DashboardPage() {
                 </a>
               ))}
             </div>
-          </p>
+          </div>
         </div>
       </section>
 
@@ -1046,7 +1048,7 @@ export function DashboardPage() {
                           {getIssueJiraLinks(issue).map((link) => (
                             <a
                               href={link.url}
-                              key={`${link.label}-${link.url}`}
+                              key={link.id}
                               rel="noreferrer"
                               target="_blank"
                             >
