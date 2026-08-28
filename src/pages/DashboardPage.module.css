@@ -442,7 +442,6 @@
 .chartGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
   gap: 18px;
   margin-bottom: 18px;
 }
@@ -467,8 +466,10 @@
   min-height: 260px;
 }
 
+/* 옆 카드와 높이를 맞추느라 생기는 여유 공간은 막대 목록이 받아 채웁니다. */
 .reasonAnalysis {
   display: grid;
+  grid-template-rows: auto 1fr;
   gap: 16px;
 }
 
@@ -535,6 +536,8 @@
 }
 
 .reasonBarPanel {
+  display: flex;
+  flex-direction: column;
   border: 1px solid #d8e0ee;
   border-radius: 8px;
   background: #ffffff;
@@ -566,8 +569,12 @@
   font-weight: 500;
 }
 
+/* 카드 높이를 옆 카드에 맞추느라 공간이 남더라도 막대 간격은 그대로 두고, 남는 공간은
+   아래쪽에 둡니다. 늘려서 채우면 막대 사이가 150px 넘게 벌어져 오히려 어색합니다. */
 .reasonBars {
   display: grid;
+  align-content: start;
+  flex: 1 1 auto;
   gap: 12px;
 }
 
@@ -929,166 +936,6 @@
   text-align: center;
 }
 
-.detailPanel {
-  overflow: hidden;
-  border: 1px solid #d6e2f2;
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
-}
-
-.detailHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 42px;
-  border-bottom: 1px solid #d6e2f2;
-  padding: 0 18px;
-}
-
-.detailHeader h2 {
-  margin: 0;
-  border-left: 3px solid #0369a1;
-  color: #172033;
-  font-size: 14px;
-  font-weight: 700;
-  padding-left: 8px;
-}
-
-.detailHeader span {
-  color: #526174;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.detailHeader strong {
-  color: #0369a1;
-}
-
-.detailTableWrap {
-  overflow-x: auto;
-}
-
-.detailTable {
-  width: 100%;
-  min-width: 1118px;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 13px;
-}
-
-.detailDateColumn {
-  width: 104px;
-}
-
-.detailAuthorColumn {
-  width: 92px;
-}
-
-.detailServiceColumn {
-  width: 116px;
-}
-
-.detailPlatformColumn {
-  width: 88px;
-}
-
-.detailStatusColumn {
-  width: 116px;
-}
-
-.detailReasonColumn {
-  width: 152px;
-}
-
-.detailJiraColumn {
-  width: 334px;
-}
-
-.detailTable th {
-  height: 40px;
-  background: #eef6ff;
-  color: #0f2344;
-  font-weight: 700;
-  text-align: left;
-}
-
-.detailSortButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 0;
-  background: transparent;
-  color: #0f2344;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
-}
-
-.detailSortButton span {
-  color: #0f2344;
-  font-size: 13px;
-  line-height: 1;
-}
-
-.detailSortButton:hover {
-  color: #0369a1;
-}
-
-.detailSortButton:focus-visible {
-  border-radius: 4px;
-  outline: 2px solid #0369a1;
-  outline-offset: 3px;
-}
-
-.detailTable th,
-.detailTable td {
-  border-bottom: 1px solid #e0e8f4;
-  padding: 11px 16px;
-  vertical-align: middle;
-}
-
-.detailTable td {
-  color: #0b1730;
-  font-weight: 500;
-}
-
-.detailTable tbody tr:nth-child(even) {
-  background: #f8fbff;
-}
-
-.detailTable tbody tr:hover {
-  background: #eef4ff;
-}
-
-.detailTable a {
-  color: #0369a1;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.detailTable a:hover {
-  text-decoration: underline;
-}
-
-.jiraLinks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.jiraLinks a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  border-radius: 999px;
-  background: #eaf2ff;
-  color: #0369a1;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 0 9px;
-}
 
 .empty {
   height: 120px;
@@ -1192,16 +1039,5 @@
 
   .reasonTrack {
     grid-column: 2 / -1;
-  }
-
-  .detailHeader {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
-    padding: 12px 14px;
-  }
-
-  .detailTable {
-    min-width: 760px;
   }
 }

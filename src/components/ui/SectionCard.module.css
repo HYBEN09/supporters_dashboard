@@ -1,8 +1,17 @@
+/* 나란히 놓인 카드끼리 높이를 맞출 때, 남는 공간을 본문이 받아 채우도록 세로 flex로
+   둡니다. 그렇지 않으면 짧은 카드 아래쪽에 빈 공간이 그대로 남습니다. */
 .card {
+  display: flex;
+  flex-direction: column;
   border: 1px solid #dfe5ef;
   border-radius: 8px;
   background: #ffffff;
   padding: 20px;
+}
+
+.card > *:last-child {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .header {

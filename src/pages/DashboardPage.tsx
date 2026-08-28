@@ -21,19 +21,12 @@ import { usePeriod } from "../features/period/usePeriod";
 import type {
   FixStatus,
   IssueFilters,
-  IssueItem,
   IssueStatus,
   Platform,
   SelectableFilter,
   ServiceName,
 } from "../types/issue";
-import { usePagination } from "../hooks/usePagination";
-import {
-  formatDate,
-  formatPercent,
-  getIssueJiraLinks,
-  getJiraIssueNumber,
-} from "../utils/formatters";
+import { formatPercent } from "../utils/formatters";
 import {
   DEFAULT_FILTERS,
   filterIssues,
@@ -58,9 +51,7 @@ import {
 } from "../components/dashboard/kpiIcons";
 import { Button } from "../components/ui/Button";
 import { NotIssueReasonHelp } from "../components/ui/NotIssueReasonHelp";
-import { Pagination } from "../components/ui/Pagination";
 import { SectionCard } from "../components/ui/SectionCard";
-import { StatusBadge } from "../components/ui/StatusBadge";
 import styles from "./DashboardPage.module.css";
 
 const reasonColors = [
@@ -93,13 +84,6 @@ const DASHBOARD_FILTERS_STORAGE_KEY = "supporters-dashboard-filters";
 // 작성자별 표에서 접힌 상태로 보여줄 인원 수.
 const AUTHOR_PREVIEW_COUNT = 10;
 
-type DetailSortKey = "registeredAt" | "jiraNumber";
-type DetailSortDirection = "asc" | "desc";
-
-type DetailSort = {
-  key: DetailSortKey;
-  direction: DetailSortDirection;
-};
 
 function createDefaultDashboardFilters(periodId: string, periodEnd: string) {
   return {
@@ -132,17 +116,6 @@ function getStoredDashboardFilters(fallbackFilters: IssueFilters) {
   }
 }
 
-function getPrimaryJiraNumber(issue: IssueItem) {
-  for (const link of getIssueJiraLinks(issue)) {
-    const jiraNumber = getJiraIssueNumber(link.label);
-
-    if (jiraNumber !== null) {
-      return jiraNumber;
-    }
-  }
-
-  return null;
-}
 
 function getMonthlyStatusLabel(dataKey: string) {
   if (dataKey === "reportedIssueCount") {
@@ -173,10 +146,6 @@ export function DashboardPage() {
   const [filters, setFilters] = useState<IssueFilters>(() =>
     getStoredDashboardFilters(defaultFilters),
   );
-  const [detailSort, setDetailSort] = useState<DetailSort>({
-    key: "registeredAt",
-    direction: "desc",
-  });
   const [isAuthorListExpanded, setIsAuthorListExpanded] = useState(false);
 
   useEffect(() => {
@@ -274,41 +243,6 @@ export function DashboardPage() {
     notIssueTotal > 0 && topNotIssueReason
       ? (topNotIssueReason.count / notIssueTotal) * 100
       : 0;
-  const sortedDetailIssues = useMemo(() => {
-    return [...filteredIssues].sort((a, b) => {
-      if (detailSort.key === "jiraNumber") {
-        const aJiraNumber = getPrimaryJiraNumber(a);
-        const bJiraNumber = getPrimaryJiraNumber(b);
-
-        if (aJiraNumber !== null && bJiraNumber !== null) {
-          const jiraCompare = aJiraNumber - bJiraNumber;
-
-          if (jiraCompare !== 0) {
-            return detailSort.direction === "asc" ? jiraCompare : -jiraCompare;
-          }
-        }
-
-        if (aJiraNumber !== null && bJiraNumber === null) {
-          return -1;
-        }
-
-        if (aJiraNumber === null && bJiraNumber !== null) {
-          return 1;
-        }
-      }
-
-      const dateCompare = a.registeredAt.localeCompare(b.registeredAt);
-
-      if (dateCompare !== 0) {
-        return detailSort.direction === "desc" ? -dateCompare : dateCompare;
-      }
-
-      const idCompare = a.id.localeCompare(b.id);
-      return detailSort.direction === "desc" ? -idCompare : idCompare;
-    });
-  }, [detailSort, filteredIssues]);
-  const detailPagination = usePagination(sortedDetailIssues, 10);
-
   function updateFilter<Key extends keyof IssueFilters>(
     key: Key,
     value: IssueFilters[Key],
@@ -326,30 +260,6 @@ export function DashboardPage() {
       issueStatus: DEFAULT_FILTERS.issueStatus,
       fixStatus: DEFAULT_FILTERS.fixStatus,
     });
-    setDetailSort({ key: "registeredAt", direction: "desc" });
-    detailPagination.goToPage(1);
-  }
-
-  function toggleDetailRegisteredAtSort() {
-    setDetailSort((current) => ({
-      key: "registeredAt",
-      direction:
-        current.key === "registeredAt" && current.direction === "desc"
-          ? "asc"
-          : "desc",
-    }));
-    detailPagination.goToPage(1);
-  }
-
-  function toggleDetailJiraNumberSort() {
-    setDetailSort((current) => ({
-      key: "jiraNumber",
-      direction:
-        current.key === "jiraNumber" && current.direction === "asc"
-          ? "desc"
-          : "asc",
-    }));
-    detailPagination.goToPage(1);
   }
 
   function openIssuesByReason(reason: string) {
@@ -977,119 +887,6 @@ export function DashboardPage() {
           ) : null}
         </SectionCard>
       </div>
-
-      <section className={styles.detailPanel}>
-        <div className={styles.detailHeader}>
-          <h2>상세 데이터</h2>
-          <span>
-            총 <strong>{filteredIssues.length}</strong>건
-          </span>
-        </div>
-        <div className={styles.detailTableWrap}>
-          <table className={styles.detailTable}>
-            <colgroup>
-              <col className={styles.detailDateColumn} />
-              <col className={styles.detailAuthorColumn} />
-              <col className={styles.detailServiceColumn} />
-              <col className={styles.detailPlatformColumn} />
-              <col className={styles.detailStatusColumn} />
-              <col className={styles.detailStatusColumn} />
-              <col className={styles.detailReasonColumn} />
-              <col className={styles.detailJiraColumn} />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>
-                  <button
-                    aria-label={`등록일 ${
-                      detailSort.key === "registeredAt" &&
-                      detailSort.direction === "desc"
-                        ? "최신순"
-                        : "오래된순"
-                    }. 클릭하면 정렬 순서가 변경됩니다.`}
-                    className={styles.detailSortButton}
-                    type="button"
-                    onClick={toggleDetailRegisteredAtSort}
-                  >
-                    등록일
-                    <span aria-hidden="true">↕</span>
-                  </button>
-                </th>
-                <th>작성자</th>
-                <th>서비스</th>
-                <th>플랫폼</th>
-                <th>이슈 여부</th>
-                <th>수정 여부</th>
-                <th>이슈 아님 사유</th>
-                <th>
-                  <button
-                    aria-label={`Jira 링크 ${
-                      detailSort.key === "jiraNumber" &&
-                      detailSort.direction === "desc"
-                        ? "큰 번호순"
-                        : "작은 번호순"
-                    }. 클릭하면 정렬 순서가 변경됩니다.`}
-                    className={styles.detailSortButton}
-                    type="button"
-                    onClick={toggleDetailJiraNumberSort}
-                  >
-                    Jira 링크
-                    <span aria-hidden="true">↕</span>
-                  </button>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {detailPagination.paginatedItems.length > 0 ? (
-                detailPagination.paginatedItems.map((issue) => (
-                  <tr key={issue.id}>
-                    <td>{formatDate(issue.registeredAt)}</td>
-                    <td>{issue.authorName}</td>
-                    <td>{issue.serviceName}</td>
-                    <td>{issue.platform}</td>
-                    <td>
-                      <StatusBadge value={issue.issueStatus} />
-                    </td>
-                    <td>
-                      <StatusBadge value={issue.fixStatus} />
-                    </td>
-                    <td>{issue.notIssueReason ?? "-"}</td>
-                    <td>
-                      {getIssueJiraLinks(issue).length > 0 ? (
-                        <div className={styles.jiraLinks}>
-                          {getIssueJiraLinks(issue).map((link) => (
-                            <a
-                              href={link.url}
-                              key={link.id}
-                              rel="noreferrer"
-                              target="_blank"
-                            >
-                              {link.label}
-                            </a>
-                          ))}
-                        </div>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className={styles.empty} colSpan={8}>
-                    표시할 데이터가 없습니다.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        <Pagination
-          page={detailPagination.page}
-          totalPages={detailPagination.totalPages}
-          onChange={detailPagination.goToPage}
-        />
-      </section>
     </>
   );
 }
