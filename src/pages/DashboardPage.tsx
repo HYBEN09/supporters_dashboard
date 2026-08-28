@@ -90,6 +90,8 @@ const supporterSheetLinks = [
   },
 ] as const;
 const DASHBOARD_FILTERS_STORAGE_KEY = "supporters-dashboard-filters";
+// 작성자별 표에서 접힌 상태로 보여줄 인원 수.
+const AUTHOR_PREVIEW_COUNT = 10;
 
 type DetailSortKey = "registeredAt" | "jiraNumber";
 type DetailSortDirection = "asc" | "desc";
@@ -175,6 +177,7 @@ export function DashboardPage() {
     key: "registeredAt",
     direction: "desc",
   });
+  const [isAuthorListExpanded, setIsAuthorListExpanded] = useState(false);
 
   useEffect(() => {
     window.sessionStorage.setItem(
@@ -229,6 +232,16 @@ export function DashboardPage() {
       ),
     [authorStatus],
   );
+  // 작성자가 30명을 넘어가면 표가 화면 몇 개 분량으로 길어져서, 기본은 제보 수 상위
+  // 몇 명만 보여주고 나머지는 접어둡니다. 합계 행은 접힘 여부와 무관하게 전체 기준입니다.
+  const visibleAuthorStatus = useMemo(
+    () =>
+      isAuthorListExpanded
+        ? authorStatus
+        : authorStatus.slice(0, AUTHOR_PREVIEW_COUNT),
+    [authorStatus, isAuthorListExpanded],
+  );
+  const hiddenAuthorCount = authorStatus.length - visibleAuthorStatus.length;
   const serviceStatus = useMemo(
     () => getServiceStatus(filteredIssues),
     [filteredIssues],
@@ -914,7 +927,7 @@ export function DashboardPage() {
             <tbody>
               {authorStatus.length > 0 ? (
                 <>
-                  {authorStatus.map((author) => (
+                  {visibleAuthorStatus.map((author) => (
                     <tr key={author.authorName}>
                       <td>{author.authorName}</td>
                       <td>{author.totalReports}건</td>
@@ -922,6 +935,8 @@ export function DashboardPage() {
                       <td>{author.deliveredIssueCount}건</td>
                     </tr>
                   ))}
+                  {/* 합계는 접혀 있어도 항상 전체 작성자 기준입니다. 보이는 행만 더한
+                      값으로 착각하지 않도록 아래 안내 문구와 함께 씁니다. */}
                   <tr className={styles.totalRow}>
                     <td>총 건수</td>
                     <td>{authorTotals.totalReports}건</td>
@@ -938,6 +953,24 @@ export function DashboardPage() {
               )}
             </tbody>
           </table>
+          {hiddenAuthorCount > 0 || isAuthorListExpanded ? (
+            <div className={styles.authorTableFooter}>
+              <span>
+                {isAuthorListExpanded
+                  ? `전체 ${authorStatus.length}명`
+                  : `제보 수 상위 ${visibleAuthorStatus.length}명 · ${hiddenAuthorCount}명 더 있음`}
+              </span>
+              <button
+                className={styles.authorToggleButton}
+                type="button"
+                onClick={() => setIsAuthorListExpanded((current) => !current)}
+              >
+                {isAuthorListExpanded
+                  ? "접기"
+                  : `전체 ${authorStatus.length}명 보기`}
+              </button>
+            </div>
+          ) : null}
         </SectionCard>
       </div>
 
