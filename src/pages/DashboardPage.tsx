@@ -850,76 +850,51 @@ export function DashboardPage() {
               </article>
             </div>
 
-            <div className={styles.reasonContentGrid}>
-              <div className={styles.reasonBarPanel}>
+            <div className={styles.reasonBarPanel}>
+              <div className={styles.reasonBarHeader}>
                 <h3>유형별 건수</h3>
-                <div className={styles.reasonBars}>
-                  {rankedNotIssueReasons.map((reason, index) => {
-                    const barWidth =
-                      reason.count === 0
-                        ? 0
-                        : (reason.count / maxNotIssueReasonCount) * 100;
+                <span>유형을 선택하면 해당 이슈 목록으로 이동합니다</span>
+              </div>
+              <div className={styles.reasonBars}>
+                {rankedNotIssueReasons.map((reason, index) => {
+                  const barWidth =
+                    reason.count === 0
+                      ? 0
+                      : (reason.count / maxNotIssueReasonCount) * 100;
 
-                    return (
-                      <div className={styles.reasonBarRow} key={reason.reason}>
+                  return (
+                    <button
+                      aria-label={`${reason.reason} ${reason.count}건. 해당 이슈 목록 보기`}
+                      className={styles.reasonBarRow}
+                      disabled={reason.count === 0}
+                      key={reason.reason}
+                      type="button"
+                      onClick={() => openIssuesByReason(reason.reason)}
+                    >
+                      <span
+                        className={styles.reasonRank}
+                        style={{
+                          backgroundColor:
+                            reasonColors[index % reasonColors.length],
+                        }}
+                      >
+                        {index + 1}
+                      </span>
+                      <strong>{reason.reason}</strong>
+                      <span className={styles.reasonTrack}>
                         <span
-                          className={styles.reasonRank}
                           style={{
                             backgroundColor:
                               reasonColors[index % reasonColors.length],
+                            width: `${barWidth}%`,
                           }}
-                        >
-                          {index + 1}
-                        </span>
-                        <strong>{reason.reason}</strong>
-                        <div className={styles.reasonTrack}>
-                          <span
-                            style={{
-                              backgroundColor:
-                                reasonColors[index % reasonColors.length],
-                              width: `${barWidth}%`,
-                            }}
-                          />
-                        </div>
-                        <b>{reason.count}건</b>
-                      </div>
-                    );
-                  })}
-                </div>
+                        />
+                      </span>
+                      <b>{reason.count}건</b>
+                    </button>
+                  );
+                })}
               </div>
-              <table className={`${styles.summaryTable} ${styles.reportTable}`}>
-                <thead>
-                  <tr>
-                    <th>유형</th>
-                    <th>건수</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rankedNotIssueReasons.map((reason, index) => (
-                    <tr key={reason.reason}>
-                      <td>
-                        <button
-                          className={styles.reasonTableType}
-                          disabled={reason.count === 0}
-                          type="button"
-                          onClick={() => openIssuesByReason(reason.reason)}
-                        >
-                          <i
-                            style={{
-                              backgroundColor:
-                                reasonColors[index % reasonColors.length],
-                            }}
-                          >
-                            {index + 1}
-                          </i>
-                          {reason.reason}
-                        </button>
-                      </td>
-                      <td>{reason.count}건</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         </SectionCard>

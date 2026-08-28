@@ -442,6 +442,7 @@
 .chartGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 18px;
   margin-bottom: 18px;
 }
@@ -533,13 +534,6 @@
   font-weight: 700;
 }
 
-.reasonContentGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  align-items: stretch;
-}
-
 .reasonBarPanel {
   border: 1px solid #d8e0ee;
   border-radius: 8px;
@@ -551,11 +545,25 @@
   font-size: 17px;
 }
 
+.reasonBarHeader {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
 .reasonBarPanel h3 {
-  margin: 0 0 14px;
+  margin: 0;
   color: #172033;
   font-size: 15px;
   font-weight: 700;
+}
+
+.reasonBarHeader span {
+  color: #526174;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .reasonBars {
@@ -563,15 +571,47 @@
   gap: 12px;
 }
 
+/* 행 전체가 버튼이라 기본 버튼 모양을 지웁니다. 표를 없애고 클릭 필터 기능을 이쪽으로
+   옮겼기 때문에, 클릭 영역이 넓고 키보드로도 이동할 수 있어야 합니다. */
 .reasonBarRow {
   display: grid;
   grid-template-columns: 32px minmax(120px, 1.1fr) minmax(120px, 1.8fr) 52px;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 4px 6px;
+  margin: 0 -6px;
 }
 
-.reasonRank,
-.reasonTableType i {
+.reasonBarRow:hover:not(:disabled) {
+  background: #eef4ff;
+}
+
+.reasonBarRow:focus-visible {
+  outline: 2px solid #0369a1;
+  outline-offset: 2px;
+}
+
+.reasonBarRow:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+:global(:root[data-theme="dark"]) .reasonBarRow:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+:global(:root[data-theme="dark"]) .reasonBarHeader span {
+  color: #94a3b8;
+}
+
+.reasonRank {
   display: grid;
   place-items: center;
   width: 24px;
@@ -591,6 +631,7 @@
 }
 
 .reasonTrack {
+  display: block;
   overflow: hidden;
   height: 24px;
   border-radius: 5px;
@@ -610,40 +651,6 @@
   font-weight: 700;
   white-space: nowrap;
   text-align: right;
-}
-
-.reasonTableType {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
-}
-
-.reasonTableType:hover {
-  color: #0369a1;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.reasonTableType:focus-visible {
-  border-radius: 6px;
-  outline: 2px solid #0369a1;
-  outline-offset: 3px;
-}
-
-.reasonTableType:disabled {
-  cursor: default;
-}
-
-.reasonTableType:disabled:hover {
-  color: inherit;
-  text-decoration: none;
 }
 
 .summaryTable {
@@ -1070,10 +1077,6 @@
 
   .chartGrid > section:nth-child(2) {
     grid-column: auto;
-  }
-
-  .reasonContentGrid {
-    grid-template-columns: 1fr;
   }
 }
 
