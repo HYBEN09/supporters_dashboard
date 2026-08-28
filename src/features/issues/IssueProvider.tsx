@@ -151,12 +151,12 @@ export function IssueProvider({ children }: IssueProviderProps) {
         updatedBy: actorLdapId,
       };
 
-      setIssues((current) => {
-        const nextIssues = [newIssue, ...current];
-        void saveIssueToStorage(newIssue, actorLdapId).catch(reportStorageError);
+      setIssues((current) => [newIssue, ...current]);
 
-        return nextIssues;
-      });
+      // 저장은 반드시 setIssues 바깥에서 합니다. 상태 갱신 함수 안에 두면 React가
+      // 개발 모드(StrictMode)에서 그 함수를 두 번 실행하면서 같은 id로 두 번 저장을
+      // 시도해, 두 번째 요청이 기본키 중복(409)으로 실패합니다.
+      void saveIssueToStorage(newIssue, actorLdapId).catch(reportStorageError);
 
       return newIssue;
     },
@@ -165,20 +165,28 @@ export function IssueProvider({ children }: IssueProviderProps) {
 
   const updateIssue = useCallback(
     (id: string, updates: IssueUpdate) => {
-      setIssues((current) => {
-        const nextIssues = current.map((issue) =>
+      setIssues((current) =>
+        current.map((issue) =>
           issue.id === id
             ? { ...issue, ...updates, updatedBy: actorLdapId }
             : issue,
-        );
-        void updateIssueInStorage(id, nextIssues, actorLdapId).catch(
-          reportStorageError,
-        );
+        ),
+      );
 
-        return nextIssues;
-      });
+      // addIssue와 같은 이유로, 저장은 상태 갱신 함수 바깥에서 합니다.
+      const targetIssue = issues.find((issue) => issue.id === id);
+
+      if (!targetIssue) {
+        return;
+      }
+
+      void updateIssueInStorage(
+        id,
+        [{ ...targetIssue, ...updates, updatedBy: actorLdapId }],
+        actorLdapId,
+      ).catch(reportStorageError);
     },
-    [actorLdapId],
+    [actorLdapId, issues],
   );
 
   const deleteIssue = useCallback(
