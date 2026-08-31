@@ -54,6 +54,7 @@ export const ISSUE_FORM_SERVICE_OPTIONS = [
   "톡딜",
   "헤이카카오",
   "다음메일",
+  "카카오워크",
 ] as const;
 
 export const SERVICE_OPTIONS = ISSUE_FORM_SERVICE_OPTIONS;
