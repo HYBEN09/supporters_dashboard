@@ -36,6 +36,22 @@ function getUniqueDeliveredIssueCount(items: IssueItem[]) {
   return new Set(items.flatMap((item) => getDeliveredIssueKeys(item))).size;
 }
 
+export function getDuplicateDeliveredIssueKeys(items: IssueItem[]) {
+  const keyCounts = new Map<string, number>();
+
+  items.forEach((item) => {
+    getDeliveredIssueKeys(item).forEach((key) => {
+      keyCounts.set(key, (keyCounts.get(key) ?? 0) + 1);
+    });
+  });
+
+  return new Set(
+    Array.from(keyCounts.entries())
+      .filter(([, count]) => count > 1)
+      .map(([key]) => key),
+  );
+}
+
 function getUniqueFixedDeliveredIssueCount(items: IssueItem[]) {
   return new Set(
     items.flatMap((item) =>

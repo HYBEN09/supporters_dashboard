@@ -31,7 +31,7 @@ import {
   getInitialPeriodStart,
   getPeriodById,
 } from "../utils/issueFilters";
-import { getKpis } from "../utils/issueMetrics";
+import { getDuplicateDeliveredIssueKeys, getKpis } from "../utils/issueMetrics";
 import { KpiCard } from "../components/dashboard/KpiCard";
 import {
   IconDelivered,
@@ -109,6 +109,19 @@ function getDateFromSearch(
   return fallback;
 }
 
+function isDuplicateServiceLink(
+  issue: IssueItem,
+  link: ReturnType<typeof getIssueJiraLinks>[number],
+  duplicateDeliveredKeys: Set<string>,
+) {
+  if (link.kind !== "service") {
+    return false;
+  }
+
+  const monthKey = issue.registeredAt.slice(0, 7);
+  return duplicateDeliveredKeys.has(`${monthKey}::${link.text}`);
+}
+
 function getPrimaryJiraNumber(issue: IssueItem) {
   for (const link of getIssueJiraLinks(issue)) {
     const issueNumber = getJiraIssueNumber(link.label);
@@ -168,6 +181,10 @@ export function IssueListPage() {
   const filteredIssues = useMemo(
     () => filterIssues(issues, appliedFilters),
     [appliedFilters, issues],
+  );
+  const duplicateDeliveredKeys = useMemo(
+    () => getDuplicateDeliveredIssueKeys(issues),
+    [issues],
   );
   const sortedIssues = useMemo(() => {
     return [...filteredIssues].sort((a, b) => {
@@ -531,14 +548,23 @@ export function IssueListPage() {
                       {getIssueJiraLinks(issue).length > 0 ? (
                         <div className={styles.jiraLinks}>
                           {getIssueJiraLinks(issue).map((link) => (
-                            <a
-                              href={link.url}
-                              key={link.id}
-                              rel="noreferrer"
-                              target="_blank"
-                            >
-                              {link.label}
-                            </a>
+                            <span className={styles.jiraLinkItem} key={link.id}>
+                              <a href={link.url} rel="noreferrer" target="_blank">
+                                {link.label}
+                              </a>
+                              {isDuplicateServiceLink(
+                                issue,
+                                link,
+                                duplicateDeliveredKeys,
+                              ) ? (
+                                <span
+                                  className={styles.duplicateBadge}
+                                  title="같은 달에 동일한 서비스 전달 지라 티켓이 다른 이슈에도 등록되어 있습니다."
+                                >
+                                  중복
+                                </span>
+                              ) : null}
+                            </span>
                           ))}
                         </div>
                       ) : (

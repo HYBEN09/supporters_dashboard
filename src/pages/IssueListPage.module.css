@@ -304,6 +304,32 @@
   border: 1px solid #5276a3;
 }
 
+.jiraLinkItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.duplicateBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  border-radius: 999px;
+  background: #fff1e6;
+  color: #b8500a;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 7px;
+  white-space: nowrap;
+}
+
+:global(:root[data-theme="dark"]) .duplicateBadge {
+  border: 1px solid #b8500a;
+  background: transparent;
+  color: #ffb066;
+}
+
 .detailButton {
   display: inline-flex;
   align-items: center;
